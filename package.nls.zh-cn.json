@@ -1,0 +1,5 @@
+{
+  "ext.config.title": "Yapi - 快速补全TS效率工具",
+  "ext.config.responseType": "补全返回类型",
+  "ext.config.filePath": "类型文件路径"
+}

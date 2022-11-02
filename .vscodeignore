@@ -1,0 +1,11 @@
+.vscode/**
+.vscode-test/**
+.gitignore
+tsconfig.json
+CHANGELOG.md
+node_modules/
+dist/*.map
+src
+src/webview/node_modules
+src/server/node_modules
+vsc-extension-quickstart.md

@@ -1,0 +1,146 @@
+@import '~antd/dist/antd.css';
+body {
+  overflow: auto;
+  background-color: var(--vscode-sideBar-background);
+  padding: 0;
+  color: var(--vscode-foreground);
+  .ant-tree.ant-tree-directory {
+    background-color: transparent;
+    color: var(--vscode-foreground);
+    .ant-tree-treenode {
+      &::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 4px;
+        left: 0;
+        transition: background-color 0.3s;
+        content: '';
+        pointer-events: none;
+      }
+      &:hover {
+        &::before {
+          background-color: var(--vscode-list-inactiveSelectionBackground);
+        }
+      }
+      &.ant-tree-treenode-selected {
+        &::before {
+          background-color: var(--vscode-inputOption-activeBackground);
+          border: 1px solid var(--vscode-list-focusOutline);
+        }
+      }
+      &.ant-tree-treenode-selected:hover {
+        &::before {
+          background-color: var(--vscode-inputOption-activeBackground);
+        }
+      }
+    }
+  }
+  .ant-input-affix-wrapper {
+    background-color: var(--vscode-input-background);
+    border: 1px solid transparent;
+    padding: 2px;
+    width: calc(100% - 60px);
+  }
+  .ant-input {
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-foreground);
+    border-width: 0;
+    border-color: var(--vscode-input-background);
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: var(--vscode-input-background);
+      color: var(--vscode-inputOption-activeForeground);
+      background-color: var(--vscode-input-background);
+      box-shadow: none;
+      border-right-width: 0 !important;
+    }
+  }
+  .ant-input-suffix {
+    color: var(--vscode-icon-foreground);
+  }
+  .ant-tree-switcher {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: scale(0.9);
+  }
+  .ant-btn-primary {
+    background: var(--vscode-button-background);
+    border-color: var(--vscode-button-background);
+    font-weight: normal;
+    text-shadow: none;
+    box-shadow: none;
+  }
+  .ant-btn-primary:hover,
+  .ant-btn-primary:focus {
+    background: var(--vscode-button-hoverBackground);
+    border-color: var(--vscode-button-hoverBackground);
+  }
+  .ant-btn {
+    box-shadow: none;
+  }
+  .ant-btn-link {
+    color: var(--vscode-button-hoverBackground);
+  }
+  .ant-tree-indent-unit,
+  .ant-tree-switcher {
+    width: 12px;
+  }
+  .ant-tree-node-content-wrapper {
+    display: flex;
+    overflow: hidden;
+  }
+  .ant-tree-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .ant-badge-multiple-words {
+    padding: 0;
+  }
+  .ant-badge-not-a-wrapper:not(.ant-badge-status) {
+    vertical-align: baseline;
+  }
+}
+.margin8 {
+  margin: 8px 0;
+  width: 100%;
+}
+.text-right {
+  text-align: right;
+}
+* {
+  font-size: 13px;
+}
+.spin-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 36px;
+}
+.ant-message-notice-content {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .banner-inner {
+    margin-left: 15px;
+    .api-icon svg {
+      font-size: 20px;
+      color: var(--vscode-icon-foreground);
+    }
+  }
+}
+.ant-list-item {
+  padding: 4px 12px;
+  cursor: pointer;
+  color: var(--vscode-foreground);
+}
+
+

@@ -1,0 +1,172 @@
+{
+  "name": "Yapi to Code",
+  "displayName": "Yapi to Code",
+  "version": "0.0.1",
+  "description": "",
+  "categories": [
+    "yapi",
+    "ts",
+    "dart"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhixiaoqiang/yapi2code.git"
+  },
+  "publisher": "zhixiaoqiang",
+  "main": "./dist/extension.js",
+  "scripts": {
+    "commit": "git-cz",
+    "compile": "webpack",
+    "compile-tests": "tsc -p . --outDir out",
+    "preinstall": "npx only-allow pnpm",
+    "lint": "eslint src --ext ts",
+    "lint-fix": "eslint --fix './**/*.{js?(x),ts?(x),mjs}' --cache",
+    "markdownlint-fix": "markdownlint-cli2-fix",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "prepare": "husky install",
+    "sort-package-json": "sort-package-json '**/package.json'",
+    "start": "webpack --watch",
+    "pretest": "pnpm compile-tests && pnpm compile && pnpm lint",
+    "test": "node ./out/test/runTest.js",
+    "vscode:prepublish": "pnpm package && cd src/webview && yarn build --devtool hidden-source-map && cd .. && cd server && pnpm build --devtool hidden-source-map",
+    "watch": "webpack --watch",
+    "watch-tests": "tsc -p . -w --outDir out"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "yapi.refresh",
+        "title": "刷新接口",
+        "icon": {
+          "dark": "dist/assets/refresh-light.svg",
+          "light": "dist/assets/refresh-dark.svg"
+        }
+      },
+      {
+        "command": "yapi.logout",
+        "title": "退出登录"
+      },
+      {
+        "command": "yapi.github",
+        "title": "github",
+        "icon": {
+          "dark": "dist/assets/github-light.svg",
+          "light": "dist/assets/github-dark.svg"
+        }
+      },
+      {
+        "command": "yapi.fixall",
+        "title": "Yapi: 补充所有yapi接口类型"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "yapi-mate-test",
+      "properties": {
+        "yapi.responseType": {
+          "type": "string",
+          "enum": [
+            "methodGeneric"
+          ],
+          "default": "methodGeneric",
+          "markdownDescription": "%ext.config.responseType%",
+          "scope": "resource"
+        }
+      }
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "yapi.refresh",
+          "when": "tree.view.show && view == yapi.view",
+          "group": "navigation"
+        },
+        {
+          "command": "yapi.github",
+          "when": "tree.view.show && view == yapi.view",
+          "group": "navigation"
+        },
+        {
+          "command": "yapi.logout",
+          "when": "tree.view.show && view == yapi.view"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceLangId == typescript",
+          "command": "yapi.fixall",
+          "group": "yapi"
+        }
+      ]
+    },
+    "views": {
+      "yapi-menu": [
+        {
+          "id": "yapi.view",
+          "name": "yapi-menu",
+          "type": "webview"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "yapi-menu",
+          "title": "yapi mate",
+          "icon": "dist/assets/icon.svg"
+        }
+      ]
+    }
+  },
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onView:yapi.view"
+  ],
+  "dependencies": {
+    "axios": "0",
+    "cheerio": "^1.0.0-rc.12",
+    "copy-webpack-plugin": "^11.0.0",
+    "vsce": "^2.13.0",
+    "vscode-languageclient": "^7.0.0",
+    "vscode-languageserver": "^7.0.0",
+    "vscode-languageserver-textdocument": "^1.0.7"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.25.1",
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.11.8",
+    "@types/vscode": "^1.72.0",
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0",
+    "@vscode/test-electron": "^2.2.0",
+    "commitizen": "4.2.5",
+    "conventional-changelog-cli": "2.2.2",
+    "cross-env": "^7.0.3",
+    "cz-conventional-changelog": "3.3.0",
+    "eslint": "^8.26.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-define-config": "^1.11.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.10",
+    "fast-glob": "^3.2.12",
+    "fs-extra": "^10.1.0",
+    "husky": "8.0.1",
+    "lint-staged": "13.0.3",
+    "markdownlint-cli2": "0.5.1",
+    "mocha": "^10.1.0",
+    "prettier": "2.7.1",
+    "rimraf": "^3.0.2",
+    "sort-package-json": "1.57.0",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.8.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "engines": {
+    "vscode": "^1.72.0"
+  }
+}

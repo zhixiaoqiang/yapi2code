@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+      {
+          // 定义 npm: watch
+          "type": "npm",
+          "script": "watch",
+          "problemMatcher": {
+              "owner": "typescript",
+              "pattern":[
+                  {
+                      "regexp": "\\[tsl\\] ERROR",
+                      "file": 1,
+                      "location": 2,
+                      "message": 3
+                  }
+              ],
+              "background": {
+                  "activeOnStart": true,
+                  // 通过对 Webpack 的输出内容进行匹配，得知编译是否完成
+                  "beginsPattern": "extension\\.*",
+                  "endsPattern": "successfully\\.*"
+              }
+          },
+          "isBackground": true,
+          "presentation": {
+              "reveal": "never"
+          },
+          "group": {
+              "kind": "build",
+              "isDefault": true
+          }
+      }
+  ]
+}
