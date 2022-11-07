@@ -2,10 +2,6 @@
 
 一个基于 YAPI 生成 TS/Dart的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
 
-## 安装
-
-[下载插件](http://git.hljnbw.cn/hui_xu/yapi-mate/releases)后，进入 vscode 扩展，顶部三个点，选择从 VSIX 安装
-
 ## 登录 YAPI
 
 初次使用，输入 yapi 的账号密码，进行登录

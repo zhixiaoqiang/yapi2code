@@ -1,13 +1,8 @@
 {
   "name": "yapi-to-code",
   "displayName": "Yapi to Code",
-  "version": "0.0.1",
-  "description": "",
-  "categories": [
-    "yapi",
-    "ts",
-    "dart"
-  ],
+  "version": "0.0.2",
+  "description": "YApi 生成 ts/dart/...",
   "repository": {
     "type": "git",
     "url": "https://github.com/zhixiaoqiang/yapi2code.git"
