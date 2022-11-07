@@ -16,8 +16,6 @@
 
 Yapi-Mate 对文档中未定义参数类型或返回值类型的接口进行波浪形警告，可以通过快速修复（quick fix）直接添加接口类型到项目中。
 
-例如海草云礼服版之前的代码，接口中没有定义类型，可以进行快速修复。自动完成导入和引用
-
 <img src="https://qnm.hunliji.com/FnOC3c1bW5bzpRu23iArFXKTrMZH" width="800" />
 
 #### 接口浏览器
