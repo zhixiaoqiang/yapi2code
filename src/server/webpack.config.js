@@ -16,7 +16,7 @@ const config = {
 		filename: 'server.js',
 		libraryTarget: 'commonjs2'
 	},
-	devtool: 'nosources-source-map',
+	devtool: 'hidden-source-map',
 	externals: {
 		vscode: 'commonjs vscode'
 	},

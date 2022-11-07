@@ -61,5 +61,5 @@ module.exports = {
 		extensions: ['.ts', '.tsx', '.js', '.jsx']
 	},
 	mode: 'development',
-	devtool: 'source-map'
+	devtool: 'hidden-source-map'
 }
