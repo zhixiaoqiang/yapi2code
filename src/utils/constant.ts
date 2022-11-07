@@ -2,5 +2,3 @@
 export const MAIN_MSG = 'MAIN_MSG'
 // 未定义API的类型
 export const API_NOT_DEFINED = 'NOT_TYPE'
-// 检查更新的地址
-export const EXTENSION_URL = 'http://git.hljnbw.cn/hui_xu/yapi-mate/releases'

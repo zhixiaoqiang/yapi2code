@@ -11,7 +11,6 @@ import {
 } from './constant'
 import { getSlideBarWebview } from './core'
 import { writeFile } from './server/src/fileSys'
-import { EXTENSION_URL } from './utils/constant'
 import Dove from './utils/dove'
 import storage from './utils/storage'
 import { ApiTypeList } from './utils/types'
@@ -47,10 +46,6 @@ export function activate(context: vscode.ExtensionContext): void {
 		vscode.commands.registerCommand(Command.GITHUB, () => {
 			// 访问github
 			vscode.env.openExternal(vscode.Uri.parse(GIT_REMOTE_URL))
-		}),
-		vscode.commands.registerCommand(Command.DOWNLOAD_EXTENSION, () => {
-			// 跳转到下载页
-			vscode.env.openExternal(vscode.Uri.parse(EXTENSION_URL))
 		}),
 		vscode.commands.registerCommand(Command.LOGOUT, () => {
 			// 退出登录

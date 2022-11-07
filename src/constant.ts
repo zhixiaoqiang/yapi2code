@@ -3,7 +3,6 @@ export enum Command {
 	GITHUB = 'yapi.github',
 	LOGOUT = 'yapi.logout',
 	REFRESH = 'yapi.refresh',
-	DOWNLOAD_EXTENSION = 'yapi.download.extension',
 	INSERT_TYPE = 'yapi.insert.type', // 注入类型
 	FIX_ALL = 'yapi.fixall' // 修复所有
 }
@@ -60,10 +59,6 @@ export enum StorageType { // 储存类型
 export const GIT_REMOTE_URL = 'https://github.com/zhixiaoqiang/yapi2code'
 
 export const YAPI_RESPONSE_NAME = 'YapiResponse'
-
-export const CHECK_VERSION_TIME_DUR = 1 * 3600 * 1e3 // 1小时检查一次更新
-
-export const VERSION = '0.0.1' // 版本号，每次升级时需要修改
 
 export const YAPI_DEFAULT_SERVER_URL = 'http://yapi.internal.weimob.com'
 

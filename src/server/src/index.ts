@@ -233,7 +233,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				end: textDocument.positionAt(apiFn.end)
 			},
 			message: tipsMessage,
-			source: 'yapi mate'
+			source: 'yapi to code'
 		}
 		diagStore.setCurDiagnostic(tipsMessage, {
 			paramTypeInsertPosition: Number.isFinite(apiFn.paramTypeInsertPosition)

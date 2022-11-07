@@ -1,7 +1,7 @@
 {
   "name": "yapi-to-code",
   "displayName": "Yapi to Code",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "YApi 生成 ts/dart/...",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "start": "webpack --watch",
     "pretest": "pnpm compile-tests && pnpm compile && pnpm lint",
     "test": "node ./out/test/runTest.js",
-    "vscode:prepublish": "",
+    "vscode:prepublish": "yarn package --devtool hidden-source-map && cd src/server && yarn build --devtool hidden-source-map && cd ../webview && yarn build --devtool hidden-source-map",
     "watch": "webpack --watch",
     "watch-tests": "tsc -p . -w --outDir out"
   },
@@ -55,7 +55,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "yapi-mate-test",
+      "title": "yapi-to-code-test",
       "properties": {
         "yapi.responseType": {
           "type": "string",
@@ -106,7 +106,7 @@
       "activitybar": [
         {
           "id": "yapi-menu",
-          "title": "yapi mate",
+          "title": "yapi to code",
           "icon": "dist/assets/icon.svg"
         }
       ]

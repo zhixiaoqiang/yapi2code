@@ -1,7 +1,7 @@
 {
-	"name": "lsp-yapi-mate-server",
+	"name": "lsp-yapi-to-code-server",
 	"version": "1.0.0",
-	"description": "yapi mate of a language server in node.",
+	"description": "yapi to code of a language server in node.",
 	"license": "MIT",
 	"scripts": {
 		"build": "webpack --mode production",

@@ -1,4 +1,4 @@
-# YAPI-MATE
+# YAPI-TO-CODE
 
 一个基于 YAPI 生成 TS/Dart的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
 
@@ -14,13 +14,13 @@
 
 #### 代码诊断功能
 
-Yapi-Mate 对文档中未定义参数类型或返回值类型的接口进行波浪形警告，可以通过快速修复（quick fix）直接添加接口类型到项目中。
+Yapi-To-Code 对文档中未定义参数类型或返回值类型的接口进行波浪形警告，可以通过快速修复（quick fix）直接添加接口类型到项目中。
 
 <img src="https://qnm.hunliji.com/FnOC3c1bW5bzpRu23iArFXKTrMZH" width="800" />
 
 #### 接口浏览器
 
-Yapi-Mate 还提供了接口预览的功能，可以通过搜索选择接口对接口类型进行预览，然后把类型复制到项目中。
+Yapi-To-Code 还提供了接口预览的功能，可以通过搜索选择接口对接口类型进行预览，然后把类型复制到项目中。
 
 这种方式比较笨拙，推荐使用代码诊断功能，一条龙完成
 
