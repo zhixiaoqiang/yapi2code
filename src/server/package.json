@@ -1,23 +1,24 @@
 {
 	"name": "lsp-yapi-mate-server",
-	"description": "yapi mate of a language server in node.",
 	"version": "1.0.0",
+	"description": "yapi mate of a language server in node.",
 	"license": "MIT",
-	"engines": {
-		"node": "*"
+	"scripts": {
+		"build": "webpack --mode production",
+		"start": "webpack --mode development --watch",
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"dependencies": {
 		"typescript": "^4.5.2",
 		"vscode-languageserver": "^7.0.0",
 		"vscode-languageserver-textdocument": "^1.0.1"
 	},
-	"scripts": {
-		"start": "webpack --mode development --watch",
-		"build": "webpack --mode production",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
 	"devDependencies": {
+		"ts-loader": "^9.4.1",
 		"webpack": "^5.64.4",
 		"webpack-cli": "^4.9.1"
+	},
+	"engines": {
+		"node": "*"
 	}
 }
