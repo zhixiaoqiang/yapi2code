@@ -17,7 +17,7 @@ import type { DetailData } from './type'
  * @description 获取名称
  */
 const getApiName = (data: DetailData) => {
-	const paths = data?.path?.split('/') || []
+	const paths = data?.path?.split(/[/.]/g) || []
 	const lastWord = paths[paths.length - 1]
 	const preLastWord = paths[paths.length - 2]
 	return preLastWord + firstCharUpperCase(lastWord)
@@ -64,6 +64,32 @@ export const formatBaseTips = (data: DetailData, decs = '') => {
 */\n`
 }
 
+export const genRequest = (data: DetailData) => {
+	const paths = data?.path?.split(/[/.]/g) || []
+	const lastWord = paths[paths.length - 1]
+
+	const interfaceName = getApiName(data)
+
+	const suffixMap: Record<string, string> = {
+		GET: 'ReqQuery',
+		POST: 'ReqBody'
+	}
+
+	return (
+		`\n/**
+  * @description ${data.title}
+  * @url ${getApiUrl(data)}
+  */\n` +
+		`export async function ${lastWord}(params: I${firstCharUpperCase(
+			interfaceName
+		)}${suffixMap[data.method] || ''}): Promise<I${firstCharUpperCase(
+			interfaceName
+		)}ResBody> {
+	return request.${data.method.toLowerCase()}('${data?.path}', params)
+}`
+	)
+}
+
 /**
  *
  */
@@ -92,8 +118,13 @@ export function data2Type(data: DetailData) {
 		: ''
 	const resBodyDataType = data.res_body
 		? formatInterfaceComment(data, '响应体') +
-		  resBodyData2type(interfaceName, parseJson(data.res_body).properties.data)
+		  resBodyData2type(
+				interfaceName,
+				parseJson(data.res_body)?.properties?.data
+		  )
 		: ''
+
+	const requestContent = genRequest(data)
 
 	const wholeNamespace = `/**\n * @description ${
 		data.title
@@ -109,6 +140,7 @@ export function data2Type(data: DetailData) {
 		reqBodyType,
 		resBodyType,
 		resBodyDataType,
+		requestContent,
 		reqQueryTitleUnderNamespace: 'ReqQuery',
 		reqQueryTitle: firstCharUpperCase(interfaceName) + 'ReqQuery',
 		reqBodyTitleUnderNamespace: 'ReqBody',

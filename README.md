@@ -1,6 +1,6 @@
 # YAPI-MATE
 
-智能化的前端 yapi 助手，接口类型推导，类型补全
+一个基于 YAPI 生成 TS/Dart的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
 
 ## 安装
 
@@ -32,11 +32,9 @@ Yapi-Mate 还提供了接口预览的功能，可以通过搜索选择接口对�
 
 <img src="https://qnm.hunliji.com/FtK9IFJlRvKdPCA4jLNoEXs1xyKO" width="800" />
 
-## 贡献者
+<!-- ## 更新说明 -->
 
-## 更新说明
-
-0.0.1-0.0.5
+<!-- 0.0.1-0.0.5
 
     【新增】代码诊断，通过修复进行接口补全
     【新增】yapi接口树查看，接口查询
@@ -80,4 +78,4 @@ Yapi-Mate 还提供了接口预览的功能，可以通过搜索选择接口对�
     【新增】兼容@core/fetch createApi并兼容大部分主流写法
     【新增】增加接口类型待办清单视图，仅扫描api文件夹下或api.ts文件
     【更新】去除yapi.config.json配置方式，减少文件频繁读写，默认methodGeneric方式，若需要使用YapiResponse方式，需要在settings.json配置为："yapi.responseType":""
-    【修复】反引号、环境变量不识别
+    【修复】反引号、环境变量不识别 -->

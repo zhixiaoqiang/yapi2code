@@ -8,7 +8,7 @@ const createFile = async (content: string, blank = false) => {
 		const edit = new vscode.WorkspaceEdit()
 		edit.replace(
 			cacheDocument.uri,
-			new vscode.Range(0, 0, cacheDocument.lineCount, 0),
+			new vscode.Range(0, 0, Math.max(9999, cacheDocument.lineCount), 0),
 			content
 		)
 		vscode.window.showTextDocument(cacheDocument)

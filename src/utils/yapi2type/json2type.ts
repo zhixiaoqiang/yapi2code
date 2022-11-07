@@ -104,7 +104,7 @@ export function formatTabSpace(tabCount: number) {
  * @description GET请求参数转化typescript interface
  */
 export function reqQuery2type(typeName: string, queryList: ReqQuery) {
-	return `export interface ${firstCharUpperCase(typeName)}ReqQuery {${queryList
+	return `export interface I${firstCharUpperCase(typeName)}ReqQuery {${queryList
 		.map((query) => {
 			const linkSymbol = query.required === '0' ? '?: ' : ': '
 			const key = query.name
@@ -159,7 +159,7 @@ export function resBody2type(
 	resBody: AllTypeNode,
 	suffix = 'ResBody'
 ) {
-	const result = `export interface ${firstCharUpperCase(
+	const result = `export interface I${firstCharUpperCase(
 		typeName
 	)}${suffix} ${getTypeNode(resBody)}`
 
@@ -177,7 +177,7 @@ export function resBodyData2type(
 		const prefix =
 			isBasicType(resBody.type) || isArrayType
 				? 'export type '
-				: 'export interface '
+				: 'export interface I'
 
 		return `${prefix}${firstCharUpperCase(typeName)}${suffix} ${getTypeNode(
 			resBody

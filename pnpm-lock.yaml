@@ -2636,7 +2636,7 @@ packages:
     resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
 
   /fsevents/2.3.2:
-    resolution: {integrity: sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=, tarball: http://npm.weimob.com:80/fsevents/-/fsevents-2.3.2.tgz}
+    resolution: {integrity: sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
@@ -5274,7 +5274,7 @@ packages:
     resolution: {integrity: sha1-nEEagCpAmpH8bPdAgbq6NLJEmaw=}
 
   /uglify-js/3.17.4:
-    resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==, tarball: http://npm.weimob.com:80/uglify-js/-/uglify-js-3.17.4.tgz}
+    resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==}
     engines: {node: '>=0.8.0'}
     hasBin: true
     requiresBuild: true
@@ -5375,7 +5375,7 @@ packages:
     dev: false
 
   /vscode-jsonrpc/6.0.0:
-    resolution: {integrity: sha1-EIvbCbRABwUXa5V87KngiA6bbU4=, tarball: http://npm.weimob.com:80/vscode-jsonrpc/-/vscode-jsonrpc-6.0.0.tgz}
+    resolution: {integrity: sha1-EIvbCbRABwUXa5V87KngiA6bbU4=}
     engines: {node: '>=8.0.0 || >=10.0.0'}
     dev: false
 
@@ -5389,7 +5389,7 @@ packages:
     dev: false
 
   /vscode-languageserver-protocol/3.16.0:
-    resolution: {integrity: sha1-NBNbYakJHblyGIoH0zdAajzb6CE=, tarball: http://npm.weimob.com:80/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.16.0.tgz}
+    resolution: {integrity: sha1-NBNbYakJHblyGIoH0zdAajzb6CE=}
     dependencies:
       vscode-jsonrpc: 6.0.0
       vscode-languageserver-types: 3.16.0
@@ -5400,7 +5400,7 @@ packages:
     dev: false
 
   /vscode-languageserver-types/3.16.0:
-    resolution: {integrity: sha1-7POT/BIexpdLLaPvsxVWRMUU4kc=, tarball: http://npm.weimob.com:80/vscode-languageserver-types/-/vscode-languageserver-types-3.16.0.tgz}
+    resolution: {integrity: sha1-7POT/BIexpdLLaPvsxVWRMUU4kc=}
     dev: false
 
   /vscode-languageserver/7.0.0:

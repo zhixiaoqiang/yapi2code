@@ -3,6 +3,8 @@ export interface GroupData {
 	custom_field1: { enable: boolean }
 	group_name: string
 	role: string
+	sub?: GroupData[]
+	key?: string | number
 	type: 'private' | 'public'
 	up_time: number
 	_id: number

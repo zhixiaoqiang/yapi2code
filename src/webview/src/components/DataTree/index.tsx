@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ApiFilled, SearchOutlined, SelectOutlined } from '@ant-design/icons'
 import { Badge, Input, List, message, Spin, Tree } from 'antd'
 import debounce from 'lodash/debounce'
-import { DataNode as TreeData } from 'antd/lib/tree/index'
+import { DataNode } from 'antd/lib/tree/index'
 import fileIcon from '../../../../assets/api-file.svg'
 import { Command, YAPI_DEFAULT_SERVER_URL, MsgType } from '../../../../constant'
 import { dove, useDoveReceiveMsg } from '../../util'
@@ -17,15 +17,21 @@ import type {
 
 const { DirectoryTree } = Tree
 
+type TreeData = DataNode & { isDubbo?: boolean; path?: string; isApi?: boolean }
+
 function DataTree() {
 	const [loading, setLoading] = useState(true)
 	const [treeData, setTreeData] = useState<TreeData[]>([])
 	const [filterText, setFilterText] = useState('')
 	const [expandKeys, setExpendKeys] = useState<TreeData['key'][]>([])
-	const basePathMap = useRef<Map<string, string>>(new Map())
-	const subPathMap = useRef<Map<string, string>>(new Map())
-	const onSelect = async (keys: (string | number)[], blank = false) => {
-		if (keys[0].toString().split('-').length < 4) {
+	const [autoExpandParent, setAutoExpandParent] = useState(true)
+
+	const onSelect = async (
+		keys: (string | number)[],
+		isApi = false,
+		blank = false
+	) => {
+		if (!isApi) {
 			return
 		}
 
@@ -60,13 +66,41 @@ function DataTree() {
 			}
 		)
 		for (const group of groupRes) {
-			const projectData: TreeData[] = []
-			treeData.push({
-				title: group.group_name,
-				key: group._id,
-				children: projectData
-			})
-			getProjectData(projectData, group._id, group._id, needFresh)
+			if (group.sub?.length) {
+				treeData.push({
+					title: group.group_name,
+					key: group._id,
+					children: [
+						{
+							_id: group._id,
+							key: `self_${group._id}`,
+							group_name: `self_${group.group_name}`
+						},
+						...group.sub
+					].map((group) => {
+						const projectData: TreeData[] = []
+						getProjectData(
+							projectData,
+							group._id,
+							group.key || group._id,
+							needFresh
+						)
+						return {
+							title: group.group_name,
+							key: group.key || group._id,
+							children: projectData
+						}
+					})
+				})
+			} else {
+				const projectData: TreeData[] = []
+				treeData.push({
+					title: group.group_name,
+					key: group._id,
+					children: projectData
+				})
+				getProjectData(projectData, group._id, group._id, needFresh)
+			}
 		}
 		setTreeData(treeData)
 	}, [])
@@ -74,7 +108,7 @@ function DataTree() {
 	const getProjectData = useCallback(
 		async (
 			projectDataContainer: TreeData[],
-			groupId: number,
+			groupId: number | string,
 			parentKey: number | string,
 			needFresh = false
 		) => {
@@ -93,7 +127,7 @@ function DataTree() {
 					key: `${parentKey}-${item._id}`,
 					children: dirContainer
 				})
-				basePathMap.current.set(`${parentKey}-${item._id}`, item.basepath)
+
 				getDirData(
 					dirContainer,
 					item._id,
@@ -158,9 +192,11 @@ function DataTree() {
 					title: item.title,
 					key: `${parentKey}-${item._id}`,
 					icon: <img src={fileIcon} className="leaf-icon" />,
-					isLeaf: true
+					isLeaf: true,
+					isDubbo: item.method === 'DUBBO',
+					path: item.path,
+					isApi: true
 				})
-				subPathMap.current.set(`${parentKey}-${item._id}`, item.path)
 			})
 			updateTreeData()
 		},
@@ -197,33 +233,23 @@ function DataTree() {
 	}, [])
 
 	const titleRender = (nodeData: TreeData) => {
-		const showSubTitle = nodeData.key.toString().split('-').length > 3
-		if (!showSubTitle) {
-			return (
-				<div className="node-container">
-					<div>{nodeData.title}</div>
-				</div>
-			)
-		}
-		const [k1, k2] = nodeData.key.toString().split('-')
-		const subTitle =
-			(basePathMap.current.get(k1 + '-' + k2) || '') +
-			(subPathMap.current.get(nodeData.key.toString()) || '')
 		return (
 			<div className="node-container">
 				<div className="node-container-content">
 					<span>{nodeData.title}</span>
-					<span
-						onClick={(e) => {
-							e.preventDefault()
-							e.stopPropagation()
-							onSelect([nodeData.key], true)
-						}}
-					>
-						<SelectOutlined></SelectOutlined>
-					</span>
+					{nodeData.isApi && !nodeData.isDubbo && (
+						<span
+							onClick={(e) => {
+								e.preventDefault()
+								e.stopPropagation()
+								onSelect([nodeData.key], nodeData.isApi, true)
+							}}
+						>
+							<SelectOutlined></SelectOutlined>
+						</span>
+					)}
 				</div>
-				<div>{subTitle}</div>
+				<div>{nodeData.isApi && nodeData.path}</div>
 			</div>
 		)
 	}
@@ -242,20 +268,18 @@ function DataTree() {
 				urlInfo.key = pt[2]
 			}
 		}
-		// http://api.hljnbw.cn/project/19/interface/api/5265
+
 		// 筛选节点
 		for (const node of nodes) {
 			if (node.title?.toString().includes(filterText)) {
 				container.push(node)
 			} else {
 				// 不包含节点，向下查找
-				const hasSubTitle = node.key.toString().split('-').length > 3
+				const hasSubTitle = !!node.path
 				if (hasSubTitle) {
 					// 有子标题
 					const [k1, k2, k3, k4] = node.key.toString().split('-')
-					const subTitle =
-						(basePathMap.current.get(k1 + '-' + k2) || '') +
-						(subPathMap.current.get(node.key.toString()) || '')
+					const subTitle = node.path
 					if (!subTitle || subTitle === filterText) {
 						container.push(node)
 					} else if (isUrl && urlInfo.projectId === k2 && urlInfo.key === k4) {
@@ -279,12 +303,13 @@ function DataTree() {
 		return container
 	}
 
-	const treeDataAfterFilter = useMemo(() => {
-		const afterFilterData = getFilterNode(treeData)
-		return afterFilterData
-	}, [filterText, treeData])
+	const treeDataAfterFilter = useMemo(
+		() => getFilterNode(treeData),
+		[filterText, treeData]
+	)
 	const onExpand = (keys: TreeData['key'][]) => {
 		setExpendKeys(keys)
+		setAutoExpandParent(false)
 	}
 
 	useEffect(() => {
@@ -328,7 +353,10 @@ function DataTree() {
 						value={filterText}
 						suffix={<SearchOutlined />}
 						className="search-bar"
-						onChange={(e) => setFilterText(e.target.value)}
+						onChange={(e) => {
+							setFilterText(e.target.value)
+							setAutoExpandParent(true)
+						}}
 					></Input>
 				) : (
 					<div className="search-bar">
@@ -350,8 +378,9 @@ function DataTree() {
 							expandedKeys={expandKeys}
 							treeData={treeDataAfterFilter}
 							titleRender={titleRender}
-							onSelect={(keys) => onSelect(keys)}
+							onSelect={(keys, { node }) => onSelect(keys, node.isApi)}
 							onExpand={onExpand}
+							autoExpandParent={autoExpandParent}
 						/>
 					</div>
 				) : (

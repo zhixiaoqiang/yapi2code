@@ -5,7 +5,7 @@ export default async function (username: string, password: string) {
 		email: username,
 		password: password
 	}).catch((e: any) => {
-		console.log(e)
+		console.log('登录失败，无法访问', e)
 		return {
 			success: false,
 			msg: '登录失败，无法访问'

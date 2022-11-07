@@ -8,7 +8,7 @@ import {
 	TransportKind
 } from 'vscode-languageclient/node'
 import Dove from '../utils/dove'
-import { checkVersion } from '../utils/checkNewVersion'
+// import { checkVersion } from '../utils/checkNewVersion'
 import { MAIN_MSG } from '../utils/constant'
 import { Client_Server_MsgTYpe } from '../utils/types'
 import { searchApi, getApiDetail, getDir } from '../service/api'
@@ -74,7 +74,7 @@ function clientRun(context: ExtensionContext): [LanguageClient, Dove] {
 			Client_Server_MsgTYpe.GIVE_INFO_FROM_PATH__SERVER,
 			(apiPath: string) => {
 				// 顺便检查更新
-				checkVersion()
+				// checkVersion()
 				return searchApiUntilDone(apiPath).catch(() => {
 					return null
 				})
