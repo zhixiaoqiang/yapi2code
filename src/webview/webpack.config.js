@@ -1,6 +1,9 @@
 const path = require('path')
 
-module.exports = {
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+const smp = new SpeedMeasurePlugin()
+
+module.exports = smp.wrap({
 	// 入口文件
 	target: 'web',
 	entry: {
@@ -10,35 +13,15 @@ module.exports = {
 		path: path.resolve(__dirname, '..', '..', 'dist'),
 		filename: '[name].js'
 	},
-	cache: {
-		type: 'filesystem'
-	},
+	// cache: {
+	// 	type: 'filesystem'
+	// },
 	module: {
 		rules: [
 			{
 				test: /\.(ts|js)x?$/,
 				exclude: /node_modules/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						cacheDirectory: true,
-						presets: [
-							['@babel/env', { corejs: 3, useBuiltIns: 'usage' }],
-							'@babel/preset-react',
-							'@babel/typescript'
-						],
-						plugins: [
-							'lodash',
-							[
-								'@babel/plugin-transform-runtime',
-								{
-									absoluteRuntime: false,
-									corejs: 3
-								}
-							]
-						]
-					}
-				}
+				use: ['thread-loader', 'swc-loader']
 			},
 			//配置less
 			{
@@ -65,4 +48,4 @@ module.exports = {
 		extensions: ['.ts', '.tsx', '.js', '.jsx']
 	},
 	mode: 'production'
-}
+})

@@ -4,6 +4,9 @@
 
 const path = require('path')
 
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+const smp = new SpeedMeasurePlugin()
+
 /**@type {import('webpack').Configuration}*/
 const config = {
 	target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
@@ -14,7 +17,8 @@ const config = {
 		// the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
 		path: path.resolve(__dirname, '..', '..', 'dist'),
 		filename: 'server.js',
-		libraryTarget: 'commonjs2'
+		libraryTarget: 'commonjs2',
+		devtoolModuleFilenameTemplate: '../[resource-path]'
 	},
 	externals: {
 		vscode: 'commonjs vscode'
@@ -30,27 +34,9 @@ const config = {
 			{
 				test: /\.(t|j)s$/,
 				exclude: /node_modules/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						cacheDirectory: true,
-						presets: [
-							['@babel/env', { corejs: 3, useBuiltIns: 'usage' }],
-							'@babel/typescript'
-						],
-						plugins: [
-							[
-								'@babel/plugin-transform-runtime',
-								{
-									absoluteRuntime: false,
-									corejs: 3
-								}
-							]
-						]
-					}
-				}
+				use: ['thread-loader', 'swc-loader']
 			}
 		]
 	}
 }
-module.exports = config
+module.exports = smp.wrap(config)

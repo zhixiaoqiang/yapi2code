@@ -6,6 +6,7 @@ const path = require('path')
 
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 const smp = new SpeedMeasurePlugin()
+const TerserPlugin = require('terser-webpack-plugin')
 
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
@@ -33,34 +34,21 @@ const extensionConfig = {
 		// modules added here also need to be added in the .vsceignore file
 	},
 	resolve: {
-		extensions: ['.ts', '.js', '.tsx', '.jsx']
+		extensions: ['.ts', '.js', '.tsx', '.jsx'],
+		modules: [path.resolve(__dirname, 'node_modules')]
 	},
 	module: {
 		rules: [
 			{
 				test: /\.(t|j)s$/,
 				exclude: /node_modules/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						cacheDirectory: true,
-						presets: [
-							['@babel/env', { corejs: 3, useBuiltIns: 'usage' }],
-							'@babel/typescript'
-						],
-						plugins: [
-							[
-								'@babel/plugin-transform-runtime',
-								{
-									absoluteRuntime: false,
-									corejs: 3
-								}
-							]
-						]
-					}
-				}
+				use: ['thread-loader', 'swc-loader']
 			}
 		]
+	},
+	optimization: {
+		minimize: true,
+		minimizer: [new TerserPlugin()]
 	},
 	plugins: [
 		new CopyWebpackPlugin({
