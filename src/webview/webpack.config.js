@@ -10,6 +10,9 @@ module.exports = {
 		path: path.resolve(__dirname, '..', '..', 'dist'),
 		filename: '[name].js'
 	},
+	cache: {
+		type: 'filesystem'
+	},
 	module: {
 		rules: [
 			{
@@ -18,6 +21,7 @@ module.exports = {
 				use: {
 					loader: 'babel-loader',
 					options: {
+						cacheDirectory: true,
 						presets: [
 							['@babel/env', { corejs: 3, useBuiltIns: 'usage' }],
 							'@babel/preset-react',
@@ -60,6 +64,5 @@ module.exports = {
 	resolve: {
 		extensions: ['.ts', '.tsx', '.js', '.jsx']
 	},
-	mode: 'development',
-	devtool: 'hidden-source-map'
+	mode: 'production'
 }

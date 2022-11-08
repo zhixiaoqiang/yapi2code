@@ -1428,6 +1428,11 @@
     globby "^11.0.0"
     read-yaml-file "^1.1.0"
 
+"@modern-js/inspector-webpack-plugin@^1.0.5":
+  version "1.0.5"
+  resolved "http://npm.weimob.com/@modern-js%2finspector-webpack-plugin/-/inspector-webpack-plugin-1.0.5.tgz#249494a72a7ec9e5006037e693568903863ffb51"
+  integrity sha512-lzrN61veT0OFazvA0RKKlLnIK7uwX7e0vadZVkcyuyUZQcXT781NwqCiW/3pvfD59fLQB4ZDepqssY/zoURbcA==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "http://npm.weimob.com/@nodelib%2ffs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -5908,6 +5913,13 @@ spdx-license-ids@^3.0.0:
   version "3.0.12"
   resolved "http://npm.weimob.com/spdx-license-ids/-/spdx-license-ids-3.0.12.tgz#69077835abe2710b65f03969898b6637b505a779"
   integrity sha512-rr+VVSXtRhO4OHbXUiAF7xW3Bo9DuuF6C5jH+q/x15j2jniycgKbxU09Hr0WqlSLUs4i4ltHGXqTe7VHclYWyA==
+
+speed-measure-webpack-plugin@^1.5.0:
+  version "1.5.0"
+  resolved "http://npm.weimob.com/speed-measure-webpack-plugin/-/speed-measure-webpack-plugin-1.5.0.tgz#caf2c5bee24ab66c1c7c30e8daa7910497f7681a"
+  integrity sha1-yvLFvuJKtmwcfDDo2qeRBJf3aBo=
+  dependencies:
+    chalk "^4.1.0"
 
 split2@^3.0.0:
   version "3.2.2"

@@ -4,6 +4,9 @@
 
 const path = require('path')
 
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+const smp = new SpeedMeasurePlugin()
+
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
 
@@ -22,7 +25,9 @@ const extensionConfig = {
 		libraryTarget: 'commonjs2',
 		devtoolModuleFilenameTemplate: '../[resource-path]'
 	},
-	devtool: 'hidden-source-map',
+	cache: {
+		type: 'filesystem'
+	},
 	externals: {
 		vscode: 'commonjs vscode' // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
 		// modules added here also need to be added in the .vsceignore file
@@ -38,6 +43,7 @@ const extensionConfig = {
 				use: {
 					loader: 'babel-loader',
 					options: {
+						cacheDirectory: true,
 						presets: [
 							['@babel/env', { corejs: 3, useBuiltIns: 'usage' }],
 							'@babel/typescript'
@@ -70,4 +76,4 @@ const extensionConfig = {
 		level: 'log' // enables logging required for problem matchers
 	}
 }
-module.exports = [extensionConfig]
+module.exports = [smp.wrap(extensionConfig)]

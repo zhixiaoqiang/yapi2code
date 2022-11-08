@@ -6,8 +6,8 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "start": "webpack --mode development --watch",
+    "build": "webpack",
+    "start": "webpack --mode development --watch --devtool eval-source-map",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

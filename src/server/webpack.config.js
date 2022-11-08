@@ -16,12 +16,14 @@ const config = {
 		filename: 'server.js',
 		libraryTarget: 'commonjs2'
 	},
-	devtool: 'hidden-source-map',
 	externals: {
 		vscode: 'commonjs vscode'
 	},
 	resolve: {
 		extensions: ['.ts', '.js']
+	},
+	cache: {
+		type: 'filesystem'
 	},
 	module: {
 		rules: [
@@ -31,6 +33,7 @@ const config = {
 				use: {
 					loader: 'babel-loader',
 					options: {
+						cacheDirectory: true,
 						presets: [
 							['@babel/env', { corejs: 3, useBuiltIns: 'usage' }],
 							'@babel/typescript'
