@@ -19,7 +19,7 @@ module.exports = smp.wrap({
 	module: {
 		rules: [
 			{
-				test: /\.(ts|js)x?$/,
+				test: /\.(t|j)sx?$/,
 				exclude: /node_modules/,
 				use: ['thread-loader', 'swc-loader']
 			},
@@ -40,7 +40,7 @@ module.exports = smp.wrap({
 			},
 			{
 				test: /\.(png|svg|jpg|gif)$/,
-				use: ['file-loader']
+				type: 'asset/resource'
 			}
 		]
 	},
