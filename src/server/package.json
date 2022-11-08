@@ -9,12 +9,19 @@
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"dependencies": {
+		"@babel/runtime-corejs3": "^7.20.1",
+		"core-js": "^3.26.0",
 		"typescript": "^4.5.2",
 		"vscode-languageserver": "^7.0.0",
 		"vscode-languageserver-textdocument": "^1.0.1"
 	},
 	"devDependencies": {
-		"ts-loader": "^9.4.1",
+		"@babel/core": "^7.19.6",
+		"@babel/plugin-transform-runtime": "^7.19.6",
+		"@babel/preset-env": "^7.19.4",
+		"@babel/preset-typescript": "^7.18.6",
+		"@babel/runtime": "^7.20.1",
+		"babel-loader": "^9.0.1",
 		"webpack": "^5.64.4",
 		"webpack-cli": "^4.9.1"
 	},

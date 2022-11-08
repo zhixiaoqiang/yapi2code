@@ -11,7 +11,7 @@
 			"name": "Attach to Server",
 			"port": 6011,
 			"restart": true,
-			"outFiles": ["${workspaceRoot}/dist/**/server.js"],
+			"outFiles": ["${workspaceFolder}/dist/**/server.js"],
 		},
 		{
 			"name": "Launch Client",

@@ -7,7 +7,7 @@ const path = require('path')
 /**@type {import('webpack').Configuration}*/
 const config = {
 	target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
-	mode: 'none', // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
+	mode: 'production', // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
 
 	entry: './src/index.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
 	output: {
@@ -26,13 +26,26 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.ts$/,
+				test: /\.(t|j)s$/,
 				exclude: /node_modules/,
-				use: [
-					{
-						loader: 'ts-loader'
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: [
+							['@babel/env', { corejs: 3, useBuiltIns: 'usage' }],
+							'@babel/typescript'
+						],
+						plugins: [
+							[
+								'@babel/plugin-transform-runtime',
+								{
+									absoluteRuntime: false,
+									corejs: 3
+								}
+							]
+						]
 					}
-				]
+				}
 			}
 		]
 	}

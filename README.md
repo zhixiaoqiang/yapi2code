@@ -73,3 +73,31 @@ Yapi-To-Code 还提供了接口预览的功能，可以通过搜索选择接口�
     【新增】增加接口类型待办清单视图，仅扫描api文件夹下或api.ts文件
     【更新】去除yapi.config.json配置方式，减少文件频繁读写，默认methodGeneric方式，若需要使用YapiResponse方式，需要在settings.json配置为："yapi.responseType":""
     【修复】反引号、环境变量不识别 -->
+
+## 开发调试
+
+> 需要依赖 src/server src/webview 的资源
+
+### 编译前置依赖
+
+```bash
+yarn
+cd src/server && yarn && yarn start
+cd src/webview && yarn && yarn start
+```
+
+### 选择 Client + Server
+
+![debug](/public/debug.png)
+
+> Tips: node 日志在源码编辑器的调试控制台查看，webview 日志在唤起的编辑器唤起 devtool 查看
+
+## 打包发布
+
+> 通过 vsce 打包发布 VS Code Extension
+
+```bash
+yarn package
+
+yarn pub
+```
