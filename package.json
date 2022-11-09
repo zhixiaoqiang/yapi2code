@@ -27,7 +27,7 @@
     "start": "webpack --mode development --watch --devtool eval-source-map",
     "pretest": "pnpm compile-tests && pnpm compile && pnpm lint",
     "test": "node ./out/test/runTest.js",
-    "vscode:prepublish": "build:all",
+    "vscode:prepublish": "rimraf dist && yarn build:all",
     "watch": "webpack --mode development --watch --devtool eval-source-map",
     "watch-tests": "tsc -p . -w --outDir out"
   },
@@ -169,6 +169,6 @@
     "webpack-cli": "^4.10.0"
   },
   "engines": {
-    "vscode": "^1.72.0"
+    "vscode": "^1.73.0"
   }
 }

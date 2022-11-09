@@ -6,6 +6,7 @@ CHANGELOG.md
 node_modules/
 dist/*.map
 src
-src/webview/node_modules
-src/server/node_modules
 vsc-extension-quickstart.md
+.prettierrc.js
+commitlint.config.js
+lint-staged.config.js
