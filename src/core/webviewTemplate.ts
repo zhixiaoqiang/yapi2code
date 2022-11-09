@@ -46,11 +46,6 @@ export class SlideBarWebview implements vscode.WebviewViewProvider {
 				path.join(this.context.extensionPath, 'dist', 'slideBar.js')
 			)
 		)
-		const slideBarCssPath = panel.webview.asWebviewUri(
-			vscode.Uri.file(
-				path.join(this.context.extensionPath, 'dist', 'slideBar.css')
-			)
-		)
 
 		return `<!DOCTYPE html>
     <html lang="en">
@@ -58,9 +53,7 @@ export class SlideBarWebview implements vscode.WebviewViewProvider {
       <meta charset="UTF-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>webview</title>
-			<link href="${slideBarCssPath}"></link>
-
+      <title>Yapi To Code</title>
     </head>
     <body>
       <div id="app"></div>

@@ -11,7 +11,7 @@ import Dove from '../utils/dove'
 import { MAIN_MSG } from '../utils/constant'
 import { Client_Server_MsgTYpe } from '../utils/types'
 import { searchApi, getApiDetail, getDir } from '../service/api'
-import { data2Type } from '../utils/yapiData2type'
+import { data2Type } from '../utils/yapi2type'
 
 let client: LanguageClient
 let doveContext: Dove | null = null
