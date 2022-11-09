@@ -9,6 +9,7 @@ import { dove, useDoveReceiveMsg } from '../../util'
 import './index.less'
 import type {
 	ApiTypeList,
+	DirAndItemData,
 	DirData,
 	GroupData,
 	ItemData,
@@ -128,13 +129,57 @@ function DataTree() {
 					children: dirContainer
 				})
 
-				getDirData(
+				getDirAndItemData(
 					dirContainer,
 					item._id,
 					`${parentKey}-${item._id}`,
 					needFresh
 				)
 			})
+			updateTreeData()
+		},
+		[]
+	)
+
+	const getDirAndItemData = useCallback(
+		async (
+			dirContainer: TreeData[],
+			projectId: number,
+			parentKey: string | number,
+			needFresh = false
+		) => {
+			const [dirAndItemData] = await dove.sendMessage<[DirAndItemData[]]>(
+				MsgType.FETCH_DIR_AND_ITEM,
+				{
+					needFresh,
+					projectId
+				}
+			)
+
+			if (!dirAndItemData) {
+				getDirData(dirContainer, projectId, parentKey, needFresh)
+			} else {
+				console.log('dirAndItemData data', projectId, dirAndItemData)
+				dirAndItemData?.forEach((dirItem) => {
+					const key = `${parentKey}-${dirItem._id}`
+					dirContainer.push({
+						title: dirItem.name,
+						key,
+						children: dirItem.list?.map((apiItem) => {
+							return {
+								title: apiItem.title,
+								key: `${key}-${apiItem._id}`,
+								icon: <img src={fileIcon} className="leaf-icon" />,
+								isLeaf: true,
+								isDubbo: apiItem.method === 'DUBBO',
+								path: apiItem.path,
+								isApi: true
+							}
+						})
+					})
+				})
+			}
+
 			updateTreeData()
 		},
 		[]
@@ -349,7 +394,7 @@ function DataTree() {
 				{showApi ? (
 					<Input
 						size="small"
-						placeholder="搜索API全称"
+						placeholder="搜索API，例如：新增、/add"
 						value={filterText}
 						suffix={<SearchOutlined />}
 						className="search-bar"

@@ -45,6 +45,24 @@ export interface DirData {
 	_id: number
 }
 
+export interface DirAndItemData {
+	add_time: number
+	desc: string
+	index: number
+	name: string
+	project_id: ProjectData['_id']
+	uid: number
+	up_time: number
+	__v: number
+	_id: number
+	list: ItemData[]
+	sub: DirAndItemData[]
+	arr: ItemData[]
+	type: 'col'
+	parent: number
+	undo: boolean
+}
+
 export interface ItemData {
 	add_time: number
 	api_opened: boolean

@@ -9,7 +9,8 @@ import {
 	getProject,
 	getDir,
 	getItemList,
-	getApiDetail
+	getApiDetail,
+	getDirAndItemList
 } from '../service/api'
 import storage from '../utils/storage'
 import createFile from './createFile'
@@ -137,6 +138,22 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 						return data
 					} else {
 						return dirData
+					}
+				}
+			),
+			// 获取yapi文件夹及接口列表
+			dove.subscribe(
+				MsgType.FETCH_DIR_AND_ITEM,
+				async (params: { needFresh: boolean; projectId: number }) => {
+					const storageKey = `${StorageType.DATA_DIR_AND_ITEM}_${params.projectId}`
+					const dirAndItemData = storage.getStorage(storageKey)
+
+					if (!dirAndItemData || params.needFresh) {
+						const { data }: any = await getDirAndItemList(params.projectId)
+						storage.setStorage(storageKey, data)
+						return data
+					} else {
+						return dirAndItemData
 					}
 				}
 			),

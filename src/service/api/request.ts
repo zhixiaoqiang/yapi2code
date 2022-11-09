@@ -8,32 +8,26 @@ import { login } from './index'
 
 // 正在登录期间，把新来的登录放入登录池中，待登录完成后再完成后续登录
 // 是否正在登录
-let isLogining = false
+let isLoggingIn = false
 // 请求池
 const requestPool: any[] = []
-console.log('axios.create start')
 const request = axios.create({
 	withCredentials: true,
-	timeout: 3000, // 超时时间3秒
+	timeout: 30000, // 超时时间30秒
 	headers: {
 		'Content-Type': 'application/json;charset=UTF-8',
-		Cookie: (storage.getStorage(StorageType.COOKIE) as string) || ''
+		Cookie: storage.getStorage(StorageType.COOKIE) || ''
 	}
 })
-console.log('axios.create start12')
 
 request.interceptors.request.use((config) => {
 	console.log('发起请求：', config.url)
-	config.headers!.Cookie = storage.getStorage<string>(StorageType.COOKIE) || ''
-	return config
-})
-
-request.interceptors.request.use((config) => {
+	config.headers.Cookie = storage.getStorage<string>(StorageType.COOKIE) || ''
 	return config
 })
 
 request.interceptors.response.use(async (res) => {
-	const cookie = res?.headers?.['set-cookie']
+	const cookie = res.headers['set-cookie']
 		?.map((item) => item.split(';')[0])
 		.join('; ')
 	if (cookie) {
@@ -78,7 +72,7 @@ const yapiReq = {
 				.request(config)
 				.then(async (res) => {
 					console.log('登录成功')
-					isLogining = false
+					isLoggingIn = false
 					await storage.setStorage(StorageType.LOGIN_STAMP, Date.now())
 					for (const resolve of requestPool) {
 						resolve(true)
@@ -87,7 +81,7 @@ const yapiReq = {
 				})
 				.catch(() => {
 					console.log('登录失败')
-					isLogining = false
+					isLoggingIn = false
 					for (const resolve of requestPool) {
 						resolve(false)
 					}
@@ -106,8 +100,8 @@ const yapiReq = {
 		}
 		// 有效期2个小时，重新登录
 		if (!hasLoginCookie || lastLoginStamp + 2 * 3600 * 1000 < Date.now()) {
-			if (!isLogining) {
-				isLogining = true
+			if (!isLoggingIn) {
+				isLoggingIn = true
 				login({ email: username, password })
 			}
 			return new Promise((resolve) => {

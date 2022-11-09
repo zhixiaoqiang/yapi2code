@@ -36,6 +36,18 @@ export const getDir = composeRequest(
 		}),
 	600e3
 ) //合并请求10分钟
+
+/** 获取 yapi 文件夹列表及接口列表 */
+export const getDirAndItemList = composeRequest(
+	(projectId: number) =>
+		request.get(getUrl('/api/interface/list_menu'), {
+			params: {
+				project_id: projectId
+			}
+		}),
+	600e3
+) //合并请求10分钟
+
 /** 获取item列表 */
 export const getItemList = (itemId: number) =>
 	request.get(getUrl('/api/interface/list_cat'), {
