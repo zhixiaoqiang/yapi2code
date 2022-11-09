@@ -13,9 +13,9 @@ module.exports = smp.wrap({
 		path: path.resolve(__dirname, '..', '..', 'dist'),
 		filename: '[name].js'
 	},
-	// cache: {
-	// 	type: 'filesystem'
-	// },
+	cache: {
+		type: 'filesystem'
+	},
 	module: {
 		rules: [
 			{
