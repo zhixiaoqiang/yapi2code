@@ -27,15 +27,10 @@ module.exports = smp.wrap({
 			{
 				test: /\.(less|css)$/,
 				use: [
-					{
-						loader: 'style-loader'
-					},
-					{
-						loader: 'css-loader'
-					},
-					{
-						loader: 'less-loader'
-					}
+					// MiniCssExtractPlugin.loader,
+					'style-loader',
+					'css-loader',
+					'less-loader'
 				]
 			},
 			{

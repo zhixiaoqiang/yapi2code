@@ -20,9 +20,6 @@ const config = {
 		libraryTarget: 'commonjs2',
 		devtoolModuleFilenameTemplate: '../[resource-path]'
 	},
-	externals: {
-		vscode: 'commonjs vscode'
-	},
 	resolve: {
 		extensions: ['.ts', '.js']
 	},

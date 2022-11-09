@@ -1,4 +1,4 @@
-import * as ts from 'typescript'
+import { SourceFile } from 'typescript'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
 	CodeAction,
@@ -175,7 +175,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	const yapiConfig = await getDocumentSettings(textDocument.uri)
 
 	// 生成抽象语法树 AST
-	const ast: ts.SourceFile = getAST(text)
+	const ast: SourceFile = getAST(text)
 	// 遍历 AST 筛选符合标记的节点位置列表
 	const apiFnList: ApiFunctionStruct[] = getApiPositionList(ast, yapiConfig)
 
@@ -307,7 +307,7 @@ dove.subscribe(MsgType.API_FILE_HANDLER, async (apiFileList: any) => {
 			const text = await loadFile(file?.replace('file://', ''))
 
 			// 生成抽象语法树 AST
-			const ast: ts.SourceFile = getAST(text)
+			const ast: SourceFile = getAST(text)
 			// 遍历 AST 筛选符合标记的节点位置列表
 			const apiFnList: ApiFunctionStruct[] = getApiPositionList(ast, yapiConfig)
 			return {
