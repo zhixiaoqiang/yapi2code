@@ -23,9 +23,6 @@ export default function App() {
 		dove.sendMessage(MsgType.WEBVIEW_DONE, true)
 	}, [])
 	useDoveReceiveMsg(MsgType.LOGIN_STATUS, (isLogin: boolean) => {
-		console.log('useDoveReceiveMsg isLogin', {
-			isLogin
-		})
 		setIsLogin(Boolean(isLogin))
 	})
 	switch (isLogin) {

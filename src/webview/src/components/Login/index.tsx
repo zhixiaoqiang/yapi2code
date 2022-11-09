@@ -1,36 +1,40 @@
 import React, { useEffect, useState } from 'react'
-import { Input, Button } from 'antd'
-// import { GithubOutlined } from '@ant-design/icons'
+import { Input, Button, Typography } from 'antd'
+import { GithubOutlined } from '@ant-design/icons'
 
 import { dove } from '../../util'
 import { MsgType, Command, YAPI_DEFAULT_SERVER_URL } from '../../../../constant'
+
 import './index.less'
 
 interface LoginProps {
 	setIsLogin: React.Dispatch<React.SetStateAction<boolean | -1>>
 }
 
+const { Title } = Typography
+
 function Login(props: LoginProps) {
 	const { setIsLogin } = props
-	const [serverUrl, setServerUrl] = useState<string>(YAPI_DEFAULT_SERVER_URL)
-	const [username, setUsername] = useState<string>('')
-	const [password, setPassword] = useState<string>('')
+	const [serverUrl, setServerUrl] = useState(YAPI_DEFAULT_SERVER_URL)
+	const [username, setUsername] = useState('')
+	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
+
+	const toastInfo = (content: string) => {
+		dove.sendMessage(MsgType.COMMAND, {
+			command: Command.WARN_TOAST,
+			data: content
+		})
+	}
 
 	const onLogin = async () => {
 		// 登录校检
-		if (!serverUrl.startsWith('http://') && !serverUrl.startsWith('https://')) {
-			dove.sendMessage(MsgType.COMMAND, {
-				command: Command.WARN_TOAST,
-				data: '请输入正确的服务器地址'
-			})
+		if (!/^https?:\/\//.test(serverUrl)) {
+			toastInfo('请输入正确的服务器地址')
 			return
 		}
 		if (!username || !password) {
-			dove.sendMessage(MsgType.COMMAND, {
-				command: Command.WARN_TOAST,
-				data: '用户名和密码不能为空'
-			})
+			toastInfo('用户名和密码不能为空')
 			return
 		}
 		setLoading(true)
@@ -42,10 +46,7 @@ function Login(props: LoginProps) {
 		if (loginStatus) {
 			setIsLogin(loginStatus)
 		} else {
-			dove.sendMessage(MsgType.COMMAND, {
-				command: Command.WARN_TOAST,
-				data: '登录失败'
-			})
+			toastInfo('登录失败')
 		}
 	}
 
@@ -62,8 +63,9 @@ function Login(props: LoginProps) {
 
 	return (
 		<div className="container">
-			<div>yapi登录</div>
-			<div className="wrap"></div>
+			<Title level={5} className="title">
+				yapi登录
+			</Title>
 			<Input
 				placeholder="服务器地址"
 				value={serverUrl}
@@ -88,7 +90,7 @@ function Login(props: LoginProps) {
 			></Input>
 			<Button
 				onClick={onLogin}
-				block={true}
+				block
 				className="margin8"
 				type="primary"
 				loading={loading}
@@ -96,7 +98,7 @@ function Login(props: LoginProps) {
 				登录
 			</Button>
 			<Button type="link" className="margin8 text-right" onClick={onLearnMore}>
-				{/* <GithubOutlined /> */}
+				<GithubOutlined />
 				了解更多
 			</Button>
 		</div>
