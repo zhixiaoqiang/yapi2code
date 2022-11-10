@@ -18,7 +18,7 @@ interface Msg {
  * @description 通用消息收发器，带反馈功能
  */
 export default class Store {
-	private sender: any
+	private sender: ((...args: any[]) => void) | null
 	private messagePool: Map<string, (value: any) => void> = new Map()
 	// 使用下面两个变量储存消息，牺牲空间换时间
 	private subscribePool: Map<any, Set<symbol>> = new Map()
@@ -26,13 +26,16 @@ export default class Store {
 	constructor(sender: any) {
 		this.sender = sender
 	}
-	sendMessage<T = any>(msgType: any, data?: any): Promise<T> {
+	sendMessage<T = any>(
+		msgType: Msg['data']['msgType'],
+		data?: Msg['data']['data']
+	): Promise<T> {
 		return new Promise((resolve) => {
 			const key = uuid()
 			//注册消息，等待反馈
 			this.messagePool.set(key, resolve)
 			//发送消息
-			this.sender({
+			this.sender?.({
 				key,
 				type: MsgType.INITIATIVE,
 				data: {
@@ -56,7 +59,7 @@ export default class Store {
 			})
 			const result = await Promise.all(gather)
 			// 反馈消息
-			this.sender({
+			this.sender?.({
 				key: message.key,
 				type: MsgType.PASSIVE,
 				data: {

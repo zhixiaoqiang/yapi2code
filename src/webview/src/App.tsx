@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, version } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { Spin } from 'antd'
 
 import Login from './components/Login'

@@ -20,7 +20,7 @@ function Login(props: LoginProps) {
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
 
-	const toastInfo = (content: string) => {
+	const toastWarnInfo = (content: string) => {
 		dove.sendMessage(MsgType.COMMAND, {
 			command: Command.WARN_TOAST,
 			data: content
@@ -30,11 +30,11 @@ function Login(props: LoginProps) {
 	const onLogin = async () => {
 		// 登录校检
 		if (!/^https?:\/\//.test(serverUrl)) {
-			toastInfo('请输入正确的服务器地址')
+			toastWarnInfo('请输入正确的服务器地址')
 			return
 		}
 		if (!username || !password) {
-			toastInfo('用户名和密码不能为空')
+			toastWarnInfo('用户名和密码不能为空')
 			return
 		}
 		setLoading(true)
@@ -46,7 +46,7 @@ function Login(props: LoginProps) {
 		if (loginStatus) {
 			setIsLogin(loginStatus)
 		} else {
-			toastInfo('登录失败')
+			toastWarnInfo('登录失败')
 		}
 	}
 

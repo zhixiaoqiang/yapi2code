@@ -16,7 +16,6 @@ class Store {
 		return this.context?.globalState.get(key)
 	}
 	clear(key: StorageTypePlus) {
-		console.log(key)
 		this.context?.globalState.update(key, undefined)
 	}
 	clearAll() {
@@ -27,6 +26,7 @@ class Store {
 		this.setStorage(StorageType.DATA_GROUP, undefined)
 		this.setStorage(StorageType.DATA_PROJECT, undefined)
 		this.setStorage(StorageType.DATA_DIR, undefined)
+		this.setStorage(StorageType.DATA_DIR_AND_ITEM, undefined)
 		this.setStorage(StorageType.DATA_ITEM, undefined)
 		this.setStorage(StorageType.SERVER_URL, undefined)
 		this.setStorage(StorageType.API_DETAIL, undefined)

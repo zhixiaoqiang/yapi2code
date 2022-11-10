@@ -21,8 +21,8 @@ export class SlideBarWebview implements vscode.WebviewViewProvider {
 		const dove = new Dove((data: unknown) => {
 			webviewView.webview.postMessage(data)
 		})
-		webviewView.webview.onDidReceiveMessage((e) => {
-			dove.receiveMessage(e)
+		webviewView.webview.onDidReceiveMessage((message) => {
+			dove.receiveMessage(message)
 		})
 		this.dove = dove
 

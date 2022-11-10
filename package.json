@@ -2,7 +2,16 @@
   "name": "yapi-to-code",
   "displayName": "Yapi to Code",
   "version": "0.0.4",
-  "description": "YApi 生成 ts/dart/...",
+  "description": "基于 YApi 生成 ts/dart/...",
+  "categories": [
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "Yapi",
+    "Ts",
+    "dart"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/zhixiaoqiang/yapi2code.git"
@@ -170,5 +179,6 @@
   },
   "engines": {
     "vscode": "^1.73.0"
-  }
+  },
+  "icon": "dist/assets/logo.svg"
 }

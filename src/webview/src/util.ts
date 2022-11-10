@@ -11,7 +11,7 @@ export const dove = new Dove((data: any) => {
 
 export const useDoveReceiveMsg = (
 	msgType: MsgType,
-	callback: (data: any) => any
+	callback: (data?: any) => any
 ) => {
 	useEffect(() => {
 		const key = dove.subscribe(msgType, callback)
