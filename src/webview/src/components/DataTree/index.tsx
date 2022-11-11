@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ApiFilled, SearchOutlined, SelectOutlined } from '@ant-design/icons'
 import { Badge, Input, List, message, Spin, Tree } from 'antd'
 import debounce from 'lodash/debounce'
-import { DataNode } from 'antd/lib/tree/index'
+import type { DataNode, FieldDataNode } from 'rc-tree/lib/interface'
 import fileIcon from '../../../../assets/api-file.svg'
 import { Command, YAPI_DEFAULT_SERVER_URL, MsgType } from '../../../../constant'
 import { dove, useDoveReceiveMsg } from '../../util'
@@ -18,7 +18,16 @@ import type {
 
 const { DirectoryTree } = Tree
 
-type TreeData = DataNode & { isDubbo?: boolean; path?: string; isApi?: boolean }
+type TreeData = FieldDataNode<{
+	id: string | number
+	key: string | number
+	title?: React.ReactNode | ((data: DataNode) => React.ReactNode)
+}> & {
+	isDubbo?: boolean
+	path?: string
+	isApi?: boolean
+	id: string | number
+}
 
 function DataTree() {
 	const [loading, setLoading] = useState(true)
@@ -27,27 +36,25 @@ function DataTree() {
 	const [expandKeys, setExpendKeys] = useState<TreeData['key'][]>([])
 	const [autoExpandParent, setAutoExpandParent] = useState(true)
 
-	const onSelect = async (
-		keys: (string | number)[],
-		isApi = false,
-		blank = false
-	) => {
-		if (!isApi) {
-			return
-		}
+	const onSelect = useCallback(
+		async (id: string | number, isApi = false, blank = false) => {
+			if (!isApi) {
+				return
+			}
 
-		message.loading('加载中', 0)
-		const { length, [length - 1]: id } = String(keys[0]).split('-')
-		try {
-			await dove.sendMessage(MsgType.FETCH_DETAIL, {
-				id,
-				blank
-			})
-		} catch (error) {
-			// message.destroy()
-		}
-		message.destroy()
-	}
+			message.loading('加载中', 0)
+			try {
+				await dove.sendMessage(MsgType.FETCH_DETAIL, {
+					id,
+					blank
+				})
+			} catch (error) {
+				// message.destroy()
+			}
+			message.destroy()
+		},
+		[]
+	)
 
 	const updateTreeData = useCallback(
 		debounce(() => {
@@ -71,6 +78,7 @@ function DataTree() {
 				treeData.push({
 					title: group.group_name,
 					key: group._id,
+					id: group._id,
 					children: [
 						{
 							_id: group._id,
@@ -89,6 +97,7 @@ function DataTree() {
 						return {
 							title: group.group_name,
 							key: group.key || group._id,
+							id: group._id,
 							children: projectData
 						}
 					})
@@ -98,6 +107,7 @@ function DataTree() {
 				treeData.push({
 					title: group.group_name,
 					key: group._id,
+					id: group._id,
 					children: projectData
 				})
 				getProjectData(projectData, group._id, group._id, needFresh)
@@ -126,6 +136,7 @@ function DataTree() {
 				projectDataContainer.push({
 					title: item.name,
 					key: `${parentKey}-${item._id}`,
+					id: item._id,
 					children: dirContainer
 				})
 
@@ -165,9 +176,11 @@ function DataTree() {
 					dirContainer.push({
 						title: dirItem.name,
 						key,
+						id: dirItem._id,
 						children: dirItem.list?.map((apiItem) => {
 							return {
 								title: apiItem.title,
+								id: apiItem._id,
 								key: `${key}-${apiItem._id}`,
 								icon: <img src={fileIcon} className="leaf-icon" />,
 								isLeaf: true,
@@ -204,6 +217,7 @@ function DataTree() {
 				dirContainer.push({
 					title: item.name,
 					key: `${parentKey}-${item._id}`,
+					id: item._id,
 					children: itemContainer
 				})
 				getItemData(
@@ -234,6 +248,7 @@ function DataTree() {
 			)
 			itemData?.list?.forEach((item) => {
 				itemContainer.push({
+					id: item._id,
 					title: item.title,
 					key: `${parentKey}-${item._id}`,
 					icon: <img src={fileIcon} className="leaf-icon" />,
@@ -253,7 +268,7 @@ function DataTree() {
 		getTreeData(true)
 			.catch(() => {
 				dove.sendMessage(MsgType.COMMAND, {
-					commnad: Command.WARN_TOAST,
+					command: Command.WARN_TOAST,
 					data: '请求失败'
 				})
 			})
@@ -277,7 +292,7 @@ function DataTree() {
 		})
 	}, [])
 
-	const titleRender = (nodeData: TreeData) => {
+	const titleRender = useCallback((nodeData: TreeData) => {
 		return (
 			<div className="node-container">
 				<div className="node-container-content">
@@ -287,7 +302,7 @@ function DataTree() {
 							onClick={(e) => {
 								e.preventDefault()
 								e.stopPropagation()
-								onSelect([nodeData.key], nodeData.isApi, true)
+								onSelect(nodeData.id, nodeData.isApi, true)
 							}}
 						>
 							<SelectOutlined></SelectOutlined>
@@ -297,84 +312,66 @@ function DataTree() {
 				<div>{nodeData.isApi && nodeData.path}</div>
 			</div>
 		)
-	}
+	}, [])
 
 	const getFilterNode = (nodes: TreeData[], container: TreeData[] = []) => {
-		let isUrl = false
+		console.time('filterTime')
+		let isApiUrl = false
+		let hadFindApiNode = false
 		const urlInfo = {
 			projectId: '0',
-			key: '0'
+			id: '0'
 		}
 		if (filterText.startsWith(YAPI_DEFAULT_SERVER_URL)) {
 			const pt = /project\/(\d+)\/interface\/api\/(\d+)/.exec(filterText)
 			if (pt) {
-				isUrl = true
+				isApiUrl = true
 				urlInfo.projectId = pt[1]
-				urlInfo.key = pt[2]
+				urlInfo.id = pt[2]
 			}
 		}
 
 		// 筛选节点
-		for (const node of nodes) {
-			if (node.title?.toString().includes(filterText)) {
-				container.push(node)
-			} else {
-				// 不包含节点，向下查找
-				const hasSubTitle = !!node.path
-				if (hasSubTitle) {
-					// 有子标题
-					const [k1, k2, k3, k4] = node.key.toString().split('-')
-					const subTitle = node.path
-					if (!subTitle || subTitle === filterText) {
-						container.push(node)
-					} else if (isUrl && urlInfo.projectId === k2 && urlInfo.key === k4) {
-						container.push(node)
-					}
-				} else if (node.children && node.children.length) {
-					const children: TreeData[] = []
+		function filterNode(nodes: TreeData[], container: TreeData[] = []) {
+			for (const node of nodes) {
+				if (hadFindApiNode) {
+					return container
+				}
+
+				if (isApiUrl && node.isApi && urlInfo.id === node.id) {
+					container.push(node)
+					hadFindApiNode = true
+				} else if (
+					node.title?.toString().includes(filterText) ||
+					node.path?.includes(filterText)
+				) {
+					container.push(node)
+				} else if (node.children?.length) {
 					// 递归查找children
-					const childrenNode = getFilterNode(node.children, children)
+					const childrenNode = filterNode(node.children)
 					if (childrenNode.length) {
 						container.push({
 							...node,
-							children
+							children: childrenNode
 						})
 					}
-				} else {
-					continue
 				}
 			}
+			return container
 		}
-		return container
+		const result = filterNode(nodes, container)
+		console.timeEnd('filterTime')
+		return result
 	}
 
 	const treeDataAfterFilter = useMemo(
-		() => getFilterNode(treeData),
+		() => (filterText ? getFilterNode(treeData) : treeData),
 		[filterText, treeData]
 	)
 	const onExpand = (keys: TreeData['key'][]) => {
 		setExpendKeys(keys)
 		setAutoExpandParent(false)
 	}
-
-	useEffect(() => {
-		const expandContainer: TreeData['key'][] = []
-		if (treeDataAfterFilter.length === 1) {
-			// 搜索结果只包含一个时展开全部
-			const expandNodeKey = (nodes: TreeData[]) => {
-				for (const node of nodes) {
-					if (node.children) {
-						expandContainer.push(node.key)
-						expandNodeKey(node.children)
-					}
-				}
-			}
-			expandNodeKey(treeDataAfterFilter)
-		}
-		setExpendKeys((keys) => {
-			return [...new Set([...keys, ...expandContainer])]
-		})
-	}, [treeDataAfterFilter])
 
 	const [showApi, setShowApi] = useState<boolean>(true)
 	const navigationToFile = (item: { uri: string }) => {
@@ -423,7 +420,7 @@ function DataTree() {
 							expandedKeys={expandKeys}
 							treeData={treeDataAfterFilter}
 							titleRender={titleRender}
-							onSelect={(keys, { node }) => onSelect(keys, node.isApi)}
+							onSelect={(_, { node }) => onSelect(node.id, node.isApi)}
 							onExpand={onExpand}
 							autoExpandParent={autoExpandParent}
 						/>
