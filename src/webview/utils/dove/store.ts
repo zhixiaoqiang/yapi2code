@@ -5,7 +5,7 @@ enum MsgType {
 	PASSIVE //被动消息
 }
 
-interface Msg {
+export interface Msg {
 	key: string
 	type: MsgType
 	data: {

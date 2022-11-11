@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ApiFilled, SearchOutlined, SelectOutlined } from '@ant-design/icons'
 import { Badge, Input, List, message, Spin, Tree } from 'antd'
 import debounce from 'lodash/debounce'
-import type { DataNode, FieldDataNode } from 'rc-tree/lib/interface'
+import type { FieldDataNode } from 'rc-tree/lib/interface'
 import fileIcon from '../../../../assets/api-file.svg'
 import { Command, YAPI_DEFAULT_SERVER_URL, MsgType } from '../../../../constant'
 import { dove, useDoveReceiveMsg } from '../../util'
@@ -21,7 +21,7 @@ const { DirectoryTree } = Tree
 type TreeData = FieldDataNode<{
 	id: string | number
 	key: string | number
-	title?: React.ReactNode | ((data: DataNode) => React.ReactNode)
+	title?: React.ReactNode
 }> & {
 	isDubbo?: boolean
 	path?: string
@@ -170,7 +170,6 @@ function DataTree() {
 			if (!dirAndItemData) {
 				getDirData(dirContainer, projectId, parentKey, needFresh)
 			} else {
-				console.log('dirAndItemData data', projectId, dirAndItemData)
 				dirAndItemData?.forEach((dirItem) => {
 					const key = `${parentKey}-${dirItem._id}`
 					dirContainer.push({
@@ -278,7 +277,7 @@ function DataTree() {
 	})
 
 	const [fileList, setFileList] = useState<ApiTypeList>([])
-
+	console.log('render')
 	useDoveReceiveMsg(MsgType.API_FILE_HANDLER, (apiFileList) => {
 		setFileList(
 			apiFileList?.filter((file: ApiTypeList[0]) => file?.apiFnList?.length > 0)
@@ -315,7 +314,6 @@ function DataTree() {
 	}, [])
 
 	const getFilterNode = (nodes: TreeData[], container: TreeData[] = []) => {
-		console.time('filterTime')
 		let isApiUrl = false
 		let hadFindApiNode = false
 		const urlInfo = {
@@ -360,7 +358,6 @@ function DataTree() {
 			return container
 		}
 		const result = filterNode(nodes, container)
-		console.timeEnd('filterTime')
 		return result
 	}
 

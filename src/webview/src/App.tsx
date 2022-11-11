@@ -5,11 +5,14 @@ import Login from './components/Login'
 import DataTree from './components/DataTree'
 import { dove, useDoveReceiveMsg } from './util'
 import { MsgType } from '../../constant'
+
 import './App.less'
+
+import type { Msg } from '../utils/dove/store'
 
 export default function App() {
 	const [isLogin, setIsLogin] = useState<boolean | -1>(-1)
-	const messageEvent = useCallback((event) => {
+	const messageEvent = useCallback((event: { data: Msg }) => {
 		dove.receiveMessage(event.data) // 将消息转接给dove
 	}, [])
 	useEffect(() => {
