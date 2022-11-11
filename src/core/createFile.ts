@@ -21,7 +21,7 @@ const createFile = async (content: string, blank = false) => {
 		content
 	})
 
-	if (!cacheDocument) {
+	if (!blank && !cacheDocument) {
 		cacheDocument = document
 	}
 
