@@ -1,12 +1,12 @@
 # YAPI-TO-CODE
 
-一个基于 YAPI 生成 TS/Dart的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
+一个基于 YAPI 生成 TS/Dart 的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
 
 ## 登录 YAPI
 
-初次使用，输入 yapi 的账号密码，进行登录
+初次使用，输入 yapi 的服务地址 & 账号密码，进行登录
 
-<img src="https://qnm.hunliji.com/Fsv8vNWD-xUNyTlwtlKpeKIQAwCj" width="250" />
+<img src="/public/login.png" width="300" />
 
 ## 使用
 
