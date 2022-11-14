@@ -26,6 +26,7 @@
     "commit": "git-cz",
     "compile": "webpack",
     "compile-tests": "tsc -p . --outDir out",
+    "preinstall": "npx only-allow yarn",
     "lint": "eslint src --ext ts",
     "lint-fix": "eslint --fix './**/*.{js?(x),ts?(x),mjs}' --cache",
     "markdownlint-fix": "markdownlint-cli2-fix",
@@ -178,6 +179,8 @@
     "webpack-cli": "^4.10.0"
   },
   "engines": {
+    "node": ">=16.17.0",
+    "npm": ">=8.15.0",
     "vscode": "^1.73.0"
   },
   "icon": "dist/assets/logo.png"
