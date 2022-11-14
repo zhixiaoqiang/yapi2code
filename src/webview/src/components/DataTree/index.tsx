@@ -34,7 +34,7 @@ function DataTree() {
 	const [treeData, setTreeData] = useState<TreeData[]>([])
 	const [filterText, setFilterText] = useState('')
 	const [expandKeys, setExpendKeys] = useState<TreeData['key'][]>([])
-	const [autoExpandParent, setAutoExpandParent] = useState(true)
+	const [fileList, setFileList] = useState<ApiTypeList>([])
 
 	const onSelect = useCallback(
 		async (id: string | number, isApi = false, blank = false) => {
@@ -276,8 +276,6 @@ function DataTree() {
 			})
 	})
 
-	const [fileList, setFileList] = useState<ApiTypeList>([])
-	console.log('render')
 	useDoveReceiveMsg(MsgType.API_FILE_HANDLER, (apiFileList) => {
 		setFileList(
 			apiFileList?.filter((file: ApiTypeList[0]) => file?.apiFnList?.length > 0)
@@ -367,7 +365,6 @@ function DataTree() {
 	)
 	const onExpand = (keys: TreeData['key'][]) => {
 		setExpendKeys(keys)
-		setAutoExpandParent(false)
 	}
 
 	const [showApi, setShowApi] = useState<boolean>(true)
@@ -394,7 +391,6 @@ function DataTree() {
 						className="search-bar"
 						onChange={(e) => {
 							setFilterText(e.target.value)
-							setAutoExpandParent(true)
 						}}
 					></Input>
 				) : (
@@ -419,7 +415,6 @@ function DataTree() {
 							titleRender={titleRender}
 							onSelect={(_, { node }) => onSelect(node.id, node.isApi)}
 							onExpand={onExpand}
-							autoExpandParent={autoExpandParent}
 						/>
 					</div>
 				) : (

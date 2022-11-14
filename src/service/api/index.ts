@@ -16,16 +16,24 @@ export const login = (body: { email: string; password: string }): any =>
 	})
 
 /** 获取分组列表 */
-export const getGroupList = () => request.get(getUrl('/api/group/list'))
+export const getGroupList = composeRequest(
+	() => request.get(getUrl('/api/group/list')),
+	600e3
+) //合并请求10分钟
+
 /** 获取项目列表 */
-export const getProject = (groupId: number) =>
-	request.get(getUrl('/api/project/list'), {
-		params: {
-			group_id: groupId,
-			page: 1,
-			limit: 1000
-		}
-	})
+export const getProject = composeRequest(
+	(groupId: number) =>
+		request.get(getUrl('/api/project/list'), {
+			params: {
+				group_id: groupId,
+				page: 1,
+				limit: 1000
+			}
+		}),
+	600e3
+) //合并请求10分钟
+
 /** 获取文件夹列表 */
 export const getDir = composeRequest(
 	(dirId: number) =>
@@ -49,14 +57,18 @@ export const getDirAndItemList = composeRequest(
 ) //合并请求10分钟
 
 /** 获取item列表 */
-export const getItemList = (itemId: number) =>
-	request.get(getUrl('/api/interface/list_cat'), {
-		params: {
-			page: 1,
-			limit: 1000,
-			catid: itemId
-		}
-	})
+export const getItemList = composeRequest(
+	(itemId: number) =>
+		request.get(getUrl('/api/interface/list_cat'), {
+			params: {
+				page: 1,
+				limit: 1000,
+				catid: itemId
+			}
+		}),
+	600e3
+) //合并请求10分钟
+
 /** 获取接口详情 */
 export const getApiDetail = composeRequest(
 	(apiId: string) =>
@@ -67,6 +79,7 @@ export const getApiDetail = composeRequest(
 		}),
 	300e3
 ) // 合并请求5分钟
+
 /** 查找接口 */
 export const searchApi = composeRequest(
 	(path: string) =>

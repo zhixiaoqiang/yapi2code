@@ -22,7 +22,14 @@ const request = axios.create({
 
 request.interceptors.request.use((config) => {
 	console.log('发起请求：', config.url)
-	config.headers.Cookie = storage.getStorage<string>(StorageType.COOKIE) || ''
+	const cookie = storage.getStorage<string>(StorageType.COOKIE) || ''
+	if (config.headers) {
+		config.headers.Cookie = cookie
+	} else {
+		config.headers = {
+			Cookie: cookie
+		}
+	}
 	return config
 })
 
@@ -53,17 +60,16 @@ const yapiReq = {
 	},
 	request(config: AxiosRequestConfig): any {
 		const { url } = config
-		const defaultData: Record<string, any> = {}
 		// 是否是登录接口
-		const isLoginPath = url?.indexOf(LOGIN_PATH) !== -1
+		const isLoginPath = url?.includes(LOGIN_PATH)
 		// 判断是否存在cookie
-		const hasLoginCookie = storage.getStorage<string>(StorageType.COOKIE)
+		const hasLoginCookie = !!storage.getStorage<string>(StorageType.COOKIE)
 		// 判断上次登录时间
 		const lastLoginStamp =
 			storage.getStorage<number>(StorageType.LOGIN_STAMP) || 0
 		// 获取账号密码
 		const { username, password } =
-			storage.getStorage(StorageType.LOGIN_INFO) || defaultData
+			storage.getStorage(StorageType.LOGIN_INFO) || {}
 		// 获取服务器地址
 		const serverUrl = storage.getStorage<string>(StorageType.SERVER_URL)
 
