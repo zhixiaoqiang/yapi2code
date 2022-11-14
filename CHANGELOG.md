@@ -1,9 +1,9 @@
-<!-- # Change Log
+# Change Log
 
-All notable changes to the "yapi-mate" extension will be documented in this file.
+## 0.0.7
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### Patch Changes
 
-## [Unreleased]
-
-- Initial release -->
+- 支持接口预览 TS
+- 优化接口请求
+- 修复接口请求超时的问题

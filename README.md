@@ -2,6 +2,8 @@
 
 一个基于 YAPI 生成 TS/Dart 的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
 
+[marketplace.visualstudio](https://marketplace.visualstudio.com/items?itemName=zhixiaoqiang.yapi-to-code)
+
 ## 登录 YAPI
 
 初次使用，输入 yapi 的服务地址 & 账号密码，进行登录
