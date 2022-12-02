@@ -373,7 +373,7 @@ function DataTree() {
 	}
 
 	return (
-		<>
+		<div className="data-tree-container">
 			<div className="banner">
 				<div className="banner-inner" onClick={() => setShowApi(!showApi)}>
 					{!showApi ? (
@@ -439,7 +439,7 @@ function DataTree() {
 					</div>
 				)}
 			</Spin>
-		</>
+		</div>
 	)
 }
 

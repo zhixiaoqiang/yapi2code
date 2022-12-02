@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { MsgType } from '../../constant'
 import Dove from '../utils/dove'
 
-const vscode = (window as any).acquireVsCodeApi()
+const vscode = window.acquireVsCodeApi()
 
 export const dove = new Dove((data: any) => {
 	vscode.postMessage(data)

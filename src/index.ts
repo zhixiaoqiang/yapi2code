@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-// import { callWhenActivate, callWhenDeactivate } from './client'
+import { callWhenActivate, callWhenDeactivate } from './client'
 import {
 	Command,
 	ContextEnum,
@@ -121,18 +121,18 @@ export function activate(context: vscode.ExtensionContext): void {
 			storage.setStorage(StorageType.API_TYPE_LIST, newApiTypeList)
 		})
 	)
-	// // 创建LSP客户端连接服务器
-	// container.dove = callWhenActivate(context)
-	// // init fetch
-	// container.dove.subscribe(MsgType.LSP_DONE, () => {
-	// 	refreshApiFileList()
-	// })
-	// async function refreshApiFileList() {
-	// 	console.log('init request')
+	// 创建LSP客户端连接服务器
+	container.dove = callWhenActivate(context)
+	// init fetch
+	container.dove.subscribe(MsgType.LSP_DONE, () => {
+		refreshApiFileList()
+	})
+	async function refreshApiFileList() {
+		console.log('init request')
 
-	// 	const files = await getApiFileList()
-	// 	diagnoseBaseInputFiles(files)
-	// }
+		const files = await getApiFileList()
+		diagnoseBaseInputFiles(files)
+	}
 	// 根据传入列表对文件进行诊断
 	async function diagnoseBaseInputFiles(files: string[]) {
 		// 发送到LSP得到诊断信息
@@ -191,27 +191,27 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate() {
-	// return callWhenDeactivate()
+	return callWhenDeactivate()
 }
 
 // 获取所有待处理接口文件
-// async function getApiFileList() {
-// 	const fileList: string[] = []
-// 	const filesFromApiDir = await vscode.workspace.findFiles(
-// 		'**/api/**/*.ts',
-// 		'node_modules/*',
-// 		100
-// 	)
-// 	filesFromApiDir.forEach((file) =>
-// 		fileList.push(file.scheme + '://' + file.fsPath)
-// 	)
-// 	const filesFromApiFile = await vscode.workspace.findFiles(
-// 		'**/api.ts',
-// 		'node_modules/*',
-// 		100
-// 	)
-// 	filesFromApiFile.forEach((file) =>
-// 		fileList.push(file.scheme + ':' + file.fsPath)
-// 	)
-// 	return fileList
-// }
+async function getApiFileList() {
+	const fileList: string[] = []
+	const filesFromApiDir = await vscode.workspace.findFiles(
+		'**/api/**/*.ts',
+		'node_modules/*',
+		100
+	)
+	filesFromApiDir.forEach((file) =>
+		fileList.push(file.scheme + '://' + file.fsPath)
+	)
+	const filesFromApiFile = await vscode.workspace.findFiles(
+		'**/api.ts',
+		'node_modules/*',
+		100
+	)
+	filesFromApiFile.forEach((file) =>
+		fileList.push(file.scheme + ':' + file.fsPath)
+	)
+	return fileList
+}
