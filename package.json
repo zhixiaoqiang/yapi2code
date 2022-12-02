@@ -1,7 +1,7 @@
 {
   "name": "yapi-to-code",
   "displayName": "Yapi to Code",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "基于 YApi 生成 ts/dart/...",
   "categories": [
     "Snippets",
@@ -20,7 +20,7 @@
   "main": "./dist/extension.js",
   "scripts": {
     "build": "webpack --mode production",
-    "build:all": "yarn build & yarn build:webview & yarn build:server",
+    "build:all": "yarn build && yarn build:webview && yarn build:server",
     "build:server": "cd src/server && yarn build",
     "build:webview": "cd src/webview && yarn build",
     "commit": "git-cz",

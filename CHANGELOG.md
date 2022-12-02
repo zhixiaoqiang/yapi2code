@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.0.8
+
+### Patch Changes
+
+- fix: publish some resources was missing
+- chore: upgrade deps, adjust webview vscode types, adjust UI
+
 ## 0.0.7
 
 ### Patch Changes
