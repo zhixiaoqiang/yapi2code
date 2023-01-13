@@ -38,6 +38,8 @@ function Login(props: LoginProps) {
 			return
 		}
 		setLoading(true)
+		const { origin } = new URL(serverUrl)
+		dove.sendMessage(MsgType.SERVER_URL, origin)
 		const [loginStatus] = await dove.sendMessage(MsgType.LOGIN_NOW, {
 			username,
 			password
