@@ -164,7 +164,6 @@ documents.onDidClose((e) => {
 })
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-	console.log('change', textDocument.uri, textDocument)
 	// 获取文档纯文本
 	const text = textDocument.getText()
 

@@ -291,8 +291,8 @@ export function getYapiResponseInfo(ast: ts.SourceFile) {
 	)
 	for (const node of importNodes) {
 		const path = node.importClause as ts.ImportClause
-		const bindingNode = path.namedBindings
-		const name = path.name
+		const bindingNode = path?.namedBindings
+		const name = path?.name
 		if (bindingNode) {
 			for (const node of getTheChildNode<ts.ImportSpecifier>(
 				bindingNode,
