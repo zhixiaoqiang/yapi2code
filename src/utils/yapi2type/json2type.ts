@@ -131,6 +131,9 @@ function getTypeNode(
 	if (isBasicType(node.type)) {
 		return YapiTypeMapTsType[node.type] || 'any'
 	} else if (YapiDataType.Object === node.type) {
+		if (!node.properties) {
+			return '{}'
+		}
 		let result = '{'
 		for (const [key, value] of Object.entries(node.properties)) {
 			result += `${formatComment(
