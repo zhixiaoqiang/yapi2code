@@ -14,6 +14,7 @@ import { writeFile } from './server/src/fileSys'
 import Dove from './utils/dove'
 import storage from './utils/storage'
 import { ApiTypeList } from './utils/types'
+import { clearComposeRequestCache } from './utils/componse'
 
 const container: {
 	dove?: Dove
@@ -41,6 +42,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		}),
 		vscode.commands.registerCommand(Command.REFRESH, () => {
 			// 刷新接口
+			clearComposeRequestCache()
 			slideWebview.freshAll()
 		}),
 		vscode.commands.registerCommand(Command.GITHUB, () => {
@@ -49,6 +51,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		}),
 		vscode.commands.registerCommand(Command.LOGOUT, () => {
 			// 退出登录
+			clearComposeRequestCache()
 			storage.clearAll()
 			vscode.commands.executeCommand(
 				'setContext',

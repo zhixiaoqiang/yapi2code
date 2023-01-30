@@ -15,6 +15,15 @@ const store = new (class {
 })()
 
 /**
+ * 清除接口缓存
+ */
+export function clearComposeRequestCache() {
+	for (const [key] of store.tasks) {
+		store.tasks.get(key)?.clear()
+	}
+}
+
+/**
  * @func 接口缓存，短时间内相同的请求会合并到同一个请求
  * @param durTime 缓存时间，单位ms
  */

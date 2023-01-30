@@ -1,7 +1,7 @@
 import { login } from './api'
 
 export default async function (username: string, password: string) {
-	const { data, errcode, errmsg } = await login({
+	const result = await login({
 		email: username,
 		password: password
 	}).catch((e: any) => {
@@ -11,6 +11,7 @@ export default async function (username: string, password: string) {
 			msg: '登录失败，无法访问'
 		}
 	})
+	const { data, errcode, errmsg } = result
 	if (errcode === 0) {
 		return {
 			success: true,

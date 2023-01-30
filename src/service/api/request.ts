@@ -40,6 +40,7 @@ request.interceptors.response.use(async (res) => {
 	if (cookie) {
 		await storage.setStorage(StorageType.COOKIE, cookie)
 	}
+	console.log('res', res)
 	return res.data
 })
 
