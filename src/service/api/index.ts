@@ -2,7 +2,7 @@ import request from './request'
 
 import storage from '../../utils/storage'
 import { StorageType } from '../../constant'
-import { LOGIN_PATH } from './constant'
+import { LOGIN_PATH, LOGIN_PATH_BY_LDAP } from './constant'
 import { composeRequest } from '../../utils/componse'
 
 const getUrl = (path: string) => {
@@ -10,10 +10,12 @@ const getUrl = (path: string) => {
 }
 
 /** 登录 */
-export const login = (body: { email: string; password: string }): any =>
-	request.post(getUrl(LOGIN_PATH), {
+export const login = (body: { email: string; password: string }): any => {
+	const isLoginByLdap = storage.getStorage<boolean>(StorageType.LOGIN_BY_LDAP)
+	return request.post(getUrl(isLoginByLdap ? LOGIN_PATH_BY_LDAP : LOGIN_PATH), {
 		data: body
 	})
+}
 
 /** 获取分组列表 */
 export const getGroupList = composeRequest(

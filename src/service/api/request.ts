@@ -77,7 +77,7 @@ const yapiReq = {
 			return request
 				.request(config)
 				.then(async (res) => {
-					console.log('登录成功')
+					console.log('登录成功', res)
 					isLoggingIn = false
 					await storage.setStorage(StorageType.LOGIN_STAMP, Date.now())
 					for (const resolve of requestPool) {
@@ -85,8 +85,8 @@ const yapiReq = {
 					}
 					return res
 				})
-				.catch(() => {
-					console.log('登录失败')
+				.catch((error) => {
+					console.log('登录失败', error)
 					isLoggingIn = false
 					for (const resolve of requestPool) {
 						resolve(false)

@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Input, Button, Typography } from 'antd'
+import { Input, Button, Typography, Switch, Space } from 'antd'
 import { GithubOutlined } from '@ant-design/icons'
 
 import { dove } from '../../util'
-import { MsgType, Command, YAPI_DEFAULT_SERVER_URL } from '../../../../constant'
+import {
+	MsgType,
+	Command,
+	YAPI_DEFAULT_SERVER_URL,
+	LOGIN_BY_LDAP
+} from '../../../../constant'
 
 import './index.less'
 
@@ -16,6 +21,7 @@ const { Title } = Typography
 function Login(props: LoginProps) {
 	const { setIsLogin } = props
 	const [serverUrl, setServerUrl] = useState(YAPI_DEFAULT_SERVER_URL)
+	const [loginByLdap, setLoginByLdap] = useState(LOGIN_BY_LDAP)
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
@@ -40,6 +46,8 @@ function Login(props: LoginProps) {
 		setLoading(true)
 		const { origin } = new URL(serverUrl)
 		dove.sendMessage(MsgType.SERVER_URL, origin)
+		dove.sendMessage(MsgType.LOGIN_BY_LDAP, loginByLdap)
+
 		const [loginStatus] = await dove.sendMessage(MsgType.LOGIN_NOW, {
 			username,
 			password
@@ -90,6 +98,15 @@ function Login(props: LoginProps) {
 				className="margin8"
 				onChange={(e) => setPassword(e.target.value)}
 			></Input>
+
+			<div className="login-type-switch">
+				<Switch
+					checkedChildren="ldap 登录"
+					unCheckedChildren="默认登录"
+					checked={loginByLdap}
+					onChange={(loginByLdap) => setLoginByLdap(loginByLdap)}
+				/>
+			</div>
 			<Button
 				onClick={onLogin}
 				block

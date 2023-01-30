@@ -30,7 +30,8 @@ export enum MsgType {
 	API_FILE_HANDLER = 'API_FILE_HANDLER',
 	/** 导航到文件 */
 	OPEN_FILE = 'OPEN_FILE',
-	LSP_DONE = 'LSP_DONE'
+	LSP_DONE = 'LSP_DONE',
+	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP'
 }
 
 export enum SideBarView { // 左侧栏
@@ -55,7 +56,8 @@ export enum StorageType { // 储存类型
 	LOGIN_STAMP = 'LOGIN_STAMP',
 	LAST_CHECKVERSION_STAMP = 'LAST_CHECKVERSION_STAMP', // 上次检查更新的时间
 	WEBVIEW_DONE = 'WEBVIEW_DONE',
-	API_TYPE_LIST = 'API_TYPE_LIST'
+	API_TYPE_LIST = 'API_TYPE_LIST',
+	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP'
 }
 
 export const GIT_REMOTE_URL = 'https://github.com/zhixiaoqiang/yapi2code'
@@ -63,6 +65,8 @@ export const GIT_REMOTE_URL = 'https://github.com/zhixiaoqiang/yapi2code'
 export const YAPI_RESPONSE_NAME = 'YapiResponse'
 
 export const YAPI_DEFAULT_SERVER_URL = 'http://yapi.internal.weimob.com'
+
+export const LOGIN_BY_LDAP = true
 
 export enum YAPI_RESPONSE_TYPE {
 	RETURN = 'return',

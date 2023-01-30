@@ -211,7 +211,7 @@ function DataTree() {
 					dirId
 				}
 			)
-			dirData.cat?.forEach((item) => {
+			dirData?.cat?.forEach((item) => {
 				const itemContainer: TreeData[] = []
 				dirContainer.push({
 					title: item.name,

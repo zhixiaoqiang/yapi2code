@@ -35,6 +35,11 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 					storage.setStorage(StorageType.SERVER_URL, '')
 				}
 			}),
+			// loginByLdap 变化
+			dove.subscribe(MsgType.LOGIN_BY_LDAP, (loginByLdap) => {
+				storage.setStorage(StorageType.LOGIN_BY_LDAP, loginByLdap)
+			}),
+
 			// 监听登录类型
 			dove.subscribe(MsgType.LOGIN_NOW, ({ username, password }) => {
 				return login(username, password)
