@@ -1,8 +1,18 @@
-# YAPI-TO-CODE
+# YAPI TO CODE
 
 一个基于 YAPI 生成 TS/Dart 的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
 
 [marketplace.visualstudio](https://marketplace.visualstudio.com/items?itemName=zhixiaoqiang.yapi-to-code)
+
+**TODO:**
+
+1. 自定义生成模版 & 切换模版预览
+2. 项目组可选 - 加快请求 & 提高性能
+3. 请求异步加载
+4. 优化页面性能
+5. 支持自定义解析
+6. yarn 替换为 pnpm (vsce 不允许用 pnpm)
+7. ······
 
 ## 登录 YAPI
 
@@ -16,13 +26,13 @@
 
 #### 代码诊断功能
 
-Yapi-To-Code 对文档中未定义参数类型或返回值类型的接口进行波浪形警告，可以通过快速修复（quick fix）直接添加接口类型到项目中。
+Yapi To Code 对文档中未定义参数类型或返回值类型的接口进行波浪形警告，可以通过快速修复（quick fix）直接添加接口类型到项目中。
 
 <img src="https://qnm.hunliji.com/FnOC3c1bW5bzpRu23iArFXKTrMZH" width="800" />
 
 #### 接口浏览器
 
-Yapi-To-Code 还提供了接口预览的功能，可以通过搜索选择接口对接口类型进行预览，然后把类型复制到项目中。
+Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口对接口类型进行预览，然后把类型复制到项目中。
 
 这种方式比较笨拙，推荐使用代码诊断功能，一条龙完成
 

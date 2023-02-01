@@ -1,5 +1,5 @@
 module.exports = {
-	'./**/*.md': 'pnpm markdownlint-fix',
+	'./**/*.md': 'yarn markdownlint-fix',
 	'package.json': 'sort-package-json',
 	'./**/*.{js?(x),ts?(x),mjs}': 'eslint --fix --cache'
 }
