@@ -180,7 +180,7 @@ function getTheChildNode<T = ts.Node>(
  * @description 获取接口链接
  */
 function getUrlFromStringNode(node: ts.StringLiteral) {
-	return node.text
+	return node?.text || ''
 }
 
 /**
@@ -264,7 +264,7 @@ export async function getImportTypePosition(ast: ts.SourceFile) {
 	)
 
 	for (const node of importNodes) {
-		const path = (node.moduleSpecifier as ts.StringLiteral).text
+		const path = (node.moduleSpecifier as ts.StringLiteral)?.text
 		if (path === './types') {
 			return {
 				type: 'useOld',
