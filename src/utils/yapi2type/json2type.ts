@@ -51,7 +51,8 @@ const enum YapiDataType {
 	Null = 'null',
 	Number = 'number',
 	Object = 'object',
-	String = 'string'
+	String = 'string',
+	Long = 'long'
 }
 
 const YapiTypeMapBasicTsType = {
@@ -59,7 +60,8 @@ const YapiTypeMapBasicTsType = {
 	[YapiDataType.Integer]: 'number',
 	[YapiDataType.Null]: 'null',
 	[YapiDataType.Number]: 'number',
-	[YapiDataType.String]: 'string'
+	[YapiDataType.String]: 'string',
+	[YapiDataType.Long]: 'string | number'
 }
 
 const YapiTypeMapTsType = {
@@ -74,7 +76,8 @@ export function isBasicType(type: `${YapiDataType}`) {
 		YapiDataType.Integer,
 		YapiDataType.Null,
 		YapiDataType.Number,
-		YapiDataType.String
+		YapiDataType.String,
+		YapiDataType.Long
 	]
 	return basicTypeList.includes(type)
 }
@@ -128,9 +131,11 @@ function getTypeNode(
 	tabCount = 0,
 	hadAddTabCount = false
 ): string {
-	if (isBasicType(node.type)) {
-		return YapiTypeMapTsType[node.type] || 'any'
-	} else if (YapiDataType.Object === node.type) {
+	const typeToLowerCase = node.type.toLowerCase()
+
+	if (isBasicType(typeToLowerCase)) {
+		return YapiTypeMapTsType[typeToLowerCase] || 'any'
+	} else if (YapiDataType.Object === typeToLowerCase) {
 		if (!node.properties) {
 			return '{}'
 		}
@@ -140,12 +145,12 @@ function getTypeNode(
 				value.description,
 				tabCount
 			)}\n${formatTabSpace(tabCount + 1)}${encodeKey(key)}${
-				value.required?.includes(key) ? ': ' : '?: '
+				(value.required || node.required)?.includes(key) ? ': ' : '?: '
 			}${getTypeNode(value, tabCount + 1, true)}`
 		}
 		result += `\n${formatTabSpace(tabCount)}}`
 		return result
-	} else if (YapiDataType.Array === node.type) {
+	} else if (YapiDataType.Array === typeToLowerCase) {
 		return (
 			getTypeNode(node.items, tabCount + (hadAddTabCount ? 0 : 1)) +
 			YapiTypeMapTsType[YapiDataType.Array]
