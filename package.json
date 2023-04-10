@@ -50,7 +50,7 @@
     "commands": [
       {
         "command": "yapi.refresh",
-        "title": "刷新接口",
+        "title": "Yapi: 刷新接口",
         "icon": {
           "dark": "dist/assets/refresh-light.svg",
           "light": "dist/assets/refresh-dark.svg"
@@ -58,11 +58,11 @@
       },
       {
         "command": "yapi.logout",
-        "title": "退出登录"
+        "title": "Yapi: 退出登录"
       },
       {
         "command": "yapi.github",
-        "title": "github",
+        "title": "Yapi: github",
         "icon": {
           "dark": "dist/assets/github-light.svg",
           "light": "dist/assets/github-dark.svg"
