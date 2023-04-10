@@ -79,7 +79,7 @@ export function activate(context: vscode.ExtensionContext): void {
 				MsgType.FIX_ALL,
 				url
 			)
-			const diags = fixs.filter((item) => item.isPreferred)
+			const diags = fixs?.filter((item) => item.isPreferred) || []
 			const edit = new vscode.WorkspaceEdit()
 
 			for (let i = 0; i < diags.length; i++) {
@@ -200,8 +200,9 @@ export function deactivate() {
 // 获取所有待处理接口文件
 async function getApiFileList() {
 	const fileList: string[] = []
+	const currentRoot = vscode.workspace.workspaceFolders?.[0].uri.path
 	const filesFromApiDir = await vscode.workspace.findFiles(
-		'**/api/**/*.ts',
+		`${currentRoot}/**/api/**/*.ts`,
 		'node_modules/*',
 		100
 	)
@@ -209,10 +210,13 @@ async function getApiFileList() {
 		fileList.push(file.scheme + '://' + file.fsPath)
 	)
 	const filesFromApiFile = await vscode.workspace.findFiles(
-		'**/api.ts',
+		`${currentRoot}/**/api.ts`,
 		'node_modules/*',
 		100
 	)
+
+	console.log('filesFromApiDir', filesFromApiDir, filesFromApiFile, fileList)
+
 	filesFromApiFile.forEach((file) =>
 		fileList.push(file.scheme + ':' + file.fsPath)
 	)

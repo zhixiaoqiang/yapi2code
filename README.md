@@ -11,7 +11,7 @@
 3. 请求异步加载
 4. 优化页面性能
 5. 支持自定义解析
-6. yarn 替换为 pnpm (vsce 不允许用 pnpm)
+6. pnpm 替换为 pnpm (vsce 不允许用 pnpm)
 7. ······
 
 ## 登录 YAPI
@@ -48,9 +48,9 @@ Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口�
 ### 编译前置依赖
 
 ```bash
-yarn
-cd src/server && yarn && yarn start
-cd src/webview && yarn && yarn start
+pnpm i
+cd src/server && pnpm start
+cd src/webview && pnpm start
 ```
 
 ### 选择 Client + Server
@@ -64,7 +64,7 @@ cd src/webview && yarn && yarn start
 > 通过 vsce 打包发布 VS Code Extension
 
 ```bash
-yarn package
+pnpm package
 
-yarn pub
+pnpm pub
 ```

@@ -14,7 +14,7 @@ import storage from '../../utils/storage'
 import type { DetailData } from './type'
 
 /**
- * @description 获取名称
+ * @description 获取接口名称
  */
 const getApiName = (data: DetailData) => {
 	const paths = data?.path?.split(/[/.]/g) || []

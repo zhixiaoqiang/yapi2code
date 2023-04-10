@@ -220,9 +220,9 @@ function getApiUrlFromExpressionNode(
 		)
 	}
 
-	const apiPathList = strNodes.filter((str) => /^\/.+\/.+\/.+/.test(str))
+	const apiPathList = strNodes?.filter((str) => /^\/.+\/.+\/.+/.test(str))
 
-	if (apiPathList.length) {
+	if (apiPathList?.length) {
 		return apiPathList[0]
 	} else {
 		return false

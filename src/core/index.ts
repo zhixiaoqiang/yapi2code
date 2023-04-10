@@ -200,12 +200,7 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 				})
 
 				if (data?.method === 'DUBBO') {
-					return createFile(
-						[
-							formatDubboTips(data)
-							// data ? JSON.stringify(data, null, 2) : ''
-						].join('\n')
-					)
+					return createFile(formatDubboTips(data))
 				}
 
 				if (data?.path) {
@@ -213,7 +208,6 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 						const tsData = data2Type(data)
 						createFile(
 							[
-								// JSON.stringify(data, null, 2),
 								tsData.reqQueryType,
 								tsData.reqBodyType,
 								tsData.resBodyType,
@@ -236,7 +230,6 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 					return
 				}
 
-				// createFile([data ? JSON.stringify(data, null, 2) : ''].join('\n'))
 				vscode.commands.executeCommand(Command.WARN_TOAST, '无法预览')
 			}),
 			// 打开指定文件

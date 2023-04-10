@@ -172,7 +172,6 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 	// 获取项目yapi配置
 	const yapiConfig = await getDocumentSettings(textDocument.uri)
-
 	// 生成抽象语法树 AST
 	const ast: SourceFile = getAST(text)
 	// 遍历 AST 筛选符合标记的节点位置列表
@@ -309,6 +308,7 @@ dove.subscribe(MsgType.API_FILE_HANDLER, async (apiFileList: any) => {
 			const ast: SourceFile = getAST(text)
 			// 遍历 AST 筛选符合标记的节点位置列表
 			const apiFnList: ApiFunctionStruct[] = getApiPositionList(ast, yapiConfig)
+			console.log('yapiConfig', yapiConfig, apiFnList)
 			return {
 				uri: file,
 				apiFnList: apiFnList

@@ -7,7 +7,7 @@ type ReqBody = ResObjectBody
 
 /** 返回对象类型 */
 interface ResObjectBody {
-	type: YapiDataType.Object
+	type: `${YapiDataType.Object}`
 	properties: Record<string, AllTypeNode>
 	title?: string
 	description?: string
@@ -15,7 +15,7 @@ interface ResObjectBody {
 }
 /** 返回数组类型 */
 interface ResArrayBody {
-	type: YapiDataType.Array
+	type: `${YapiDataType.Array}`
 	items: ResObjectBody
 	description?: string
 	required?: string[]
@@ -24,12 +24,13 @@ interface ResArrayBody {
 /**json抽象语法树的节点 */
 type AllTypeNode =
 	| {
-			type:
+			type: `${
 				| YapiDataType.Number
 				| YapiDataType.Integer
 				| YapiDataType.String
 				| YapiDataType.Boolean
 				| YapiDataType.Null
+				| YapiDataType.Long}`
 			description?: string
 			required?: string
 	  }
@@ -110,11 +111,9 @@ export function reqQuery2type(typeName: string, queryList: ReqQuery) {
 	return `export interface I${firstCharUpperCase(typeName)}ReqQuery {${queryList
 		.map((query) => {
 			const linkSymbol = query.required === '0' ? '?: ' : ': '
-			const key = query.name
-			const comment = query.desc || ''
-			return `${formatComment(comment)}\n${formatTabSpace(
-				1
-			)}${key}${linkSymbol}string;`
+			return `${formatComment(query.desc || '')}\n${formatTabSpace(1)}${
+				query.name
+			}${linkSymbol}string;`
 		})
 		.join('')}\n}`
 }
@@ -131,11 +130,11 @@ function getTypeNode(
 	tabCount = 0,
 	hadAddTabCount = false
 ): string {
-	const typeToLowerCase = node.type.toLowerCase()
+	node.type = node.type.toLowerCase() as `${YapiDataType}`
 
-	if (isBasicType(typeToLowerCase)) {
-		return YapiTypeMapTsType[typeToLowerCase] || 'any'
-	} else if (YapiDataType.Object === typeToLowerCase) {
+	if (isBasicType(node.type)) {
+		return YapiTypeMapTsType[node.type] || 'any'
+	} else if (YapiDataType.Object === node.type) {
 		if (!node.properties) {
 			return '{}'
 		}
@@ -150,7 +149,7 @@ function getTypeNode(
 		}
 		result += `\n${formatTabSpace(tabCount)}}`
 		return result
-	} else if (YapiDataType.Array === typeToLowerCase) {
+	} else if (YapiDataType.Array === node.type) {
 		return (
 			getTypeNode(node.items, tabCount + (hadAddTabCount ? 0 : 1)) +
 			YapiTypeMapTsType[YapiDataType.Array]
