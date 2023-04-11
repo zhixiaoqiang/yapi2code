@@ -379,14 +379,18 @@ function getResponseGenericInsertPosition(node: ts.CallExpression) {
  * @returns { string[] } [a, b, c, d]
  */
 function getNameListFromImportClause(node: ts.ImportClause): string[] {
-	if (!node) {
+	try {
+		if (!node) {
+			return []
+		}
+		const nameBindingsNode = node.namedBindings as ts.NamedImports
+		if (!nameBindingsNode) {
+			return []
+		}
+		return nameBindingsNode.elements.map((elem) => {
+			return elem.name.escapedText.toString()
+		})
+	} catch (error) {
 		return []
 	}
-	const nameBindingsNode = node.namedBindings as ts.NamedImports
-	if (!nameBindingsNode) {
-		return []
-	}
-	return nameBindingsNode.elements.map((elem) => {
-		return elem.name.escapedText.toString()
-	})
 }
