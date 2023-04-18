@@ -1,8 +1,27 @@
-import * as vscode from 'vscode'
+import path from 'node:path'
+import fse from 'fs-extra'
+import {
+	Uri,
+	WorkspaceFolder,
+	ExtensionContext,
+	commands,
+	workspace,
+	window
+} from 'vscode'
 
 import { SlideBarWebview } from './webviewTemplate'
 import Dove from '../utils/dove'
-import { Command, MsgType, ContextEnum, StorageType } from '../constant'
+import {
+	Command,
+	MsgType,
+	ContextEnum,
+	StorageType,
+	ResponseKeyEnum,
+	ConfigKeyEnum,
+	CONFIG_PREFIX_NAME,
+	IConfig,
+	DEFAULT_CONFIG
+} from '../constant'
 import login from '../service/login'
 import {
 	getGroupList,
@@ -15,8 +34,9 @@ import {
 import storage from '../utils/storage'
 import createFile from './createFile'
 import { data2Type, formatBaseTips, formatDubboTips } from '../utils/yapi2type'
+import { getWorkspaceFolders } from '../common/vscodeapi'
 
-export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
+export const getSlideBarWebview = (context: ExtensionContext) => {
 	const wv = new SlideBarWebview(context)
 	const gatherKey: symbol[] = []
 	wv.onDidMount = (dove: Dove) => {
@@ -24,7 +44,7 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 		gatherKey.push(
 			// 监听命令类型
 			dove.subscribe(MsgType.COMMAND, ({ command, data }) => {
-				vscode.commands.executeCommand(command, data)
+				commands.executeCommand(command, data)
 			}),
 			// serverUrl变化
 			dove.subscribe(MsgType.SERVER_URL, (serverUrl) => {
@@ -50,9 +70,10 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 								username,
 								password
 							})
+
 							storage.setStorage(StorageType.USER_INFO, res.data?.userInfo)
 							// 切换webview
-							vscode.commands.executeCommand(
+							commands.executeCommand(
 								'setContext',
 								ContextEnum.SHOW_TREE_VIEW,
 								true
@@ -66,7 +87,7 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 							}
 							return true
 						} else {
-							vscode.commands.executeCommand(Command.WARN_TOAST, res.msg)
+							commands.executeCommand(Command.WARN_TOAST, res.msg)
 							return false
 						}
 					})
@@ -82,7 +103,7 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 				const isLogin = Boolean(storage.getStorage(StorageType.USER_INFO))
 				dove.sendMessage(MsgType.LOGIN_STATUS, isLogin)
 				/** 设置导航栏中的menu */
-				vscode.commands.executeCommand(
+				commands.executeCommand(
 					'setContext',
 					ContextEnum.SHOW_TREE_VIEW,
 					isLogin
@@ -138,7 +159,7 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 					)
 
 					if (!dirData || params.needFresh) {
-						const { data }: any = await getDir(params.dirId)
+						const { data } = await getDir(params.dirId)
 						storage.setStorage(`${StorageType.DATA_DIR}_${params.dirId}`, data)
 						return data
 					} else {
@@ -154,7 +175,7 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 						`${StorageType.DATA_DIR_AND_ITEM}_${params.projectId}` as const
 					const dirAndItemData = storage.getStorage(storageKey)
 					if (!dirAndItemData || params.needFresh) {
-						const { data }: any = await getDirAndItemList(params.projectId)
+						const { data } = await getDirAndItemList(params.projectId)
 						storage.setStorage(storageKey, data)
 						return data
 					} else {
@@ -171,7 +192,7 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 					)
 
 					if (!itemData || params.needFresh) {
-						const { data }: any = await getItemList(params.itemId)
+						const { data } = await getItemList(params.itemId)
 						storage.setStorage(
 							`${StorageType.DATA_ITEM}_${params.itemId}`,
 							data || {
@@ -188,12 +209,21 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 			),
 			// 获取详情数据
 			dove.subscribe(MsgType.FETCH_DETAIL, async ({ id, blank }) => {
-				const { data }: any = await getApiDetail(id).catch((e) => {
-					vscode.commands.executeCommand(
-						Command.WARN_TOAST,
-						'请求失败，无法预览'
-					)
-					vscode.commands.executeCommand(Command.WARN_TOAST, e?.toString())
+				let config = {
+					...DEFAULT_CONFIG,
+					...(storage.getStorage(StorageType.WORKSPACE_CONFIG) as IConfig)
+				}
+				try {
+					const projectConfig = await getProjectConfig()
+
+					config = { ...config, ...projectConfig }
+				} catch (error) {
+					console.error('get config error', error)
+				}
+
+				const { data } = await getApiDetail(id).catch((e) => {
+					commands.executeCommand(Command.WARN_TOAST, '请求失败，无法预览')
+					commands.executeCommand(Command.WARN_TOAST, e?.toString())
 					return {
 						data: null
 					}
@@ -205,12 +235,12 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 
 				if (data?.path) {
 					try {
-						const tsData = data2Type(data)
+						const tsData = data2Type(data, config)
 						createFile(
 							[
 								tsData.reqQueryType,
 								tsData.reqBodyType,
-								tsData.resBodyType,
+								tsData.resType,
 								tsData.requestContent
 							]
 								.filter(Boolean)
@@ -225,12 +255,12 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 								data ? JSON.stringify(data, null, 2) : ''
 							].join('\n')
 						)
-						vscode.commands.executeCommand(Command.WARN_TOAST, '无法预览')
+						commands.executeCommand(Command.WARN_TOAST, '无法预览')
 					}
 					return
 				}
 
-				vscode.commands.executeCommand(Command.WARN_TOAST, '无法预览')
+				commands.executeCommand(Command.WARN_TOAST, '无法预览')
 			}),
 			// 打开指定文件
 			dove.subscribe(MsgType.OPEN_FILE, async (data) => {
@@ -253,13 +283,75 @@ export const getSlideBarWebview = (context: vscode.ExtensionContext) => {
 
 export function openLocalFile(filePath: string) {
 	// 获取TextDocument对象
-	vscode.workspace.openTextDocument(filePath).then(
+	workspace.openTextDocument(filePath).then(
 		(doc) => {
 			// 在VSCode编辑窗口展示读取到的文本
-			vscode.window.showTextDocument(doc)
+			window.showTextDocument(doc)
 		},
 		(err) => {
 			console.log(`Open ${filePath} error, ${err}.`)
 		}
 	)
+}
+
+export async function getProjectRoot(): Promise<WorkspaceFolder> {
+	const workspaces: readonly WorkspaceFolder[] = getWorkspaceFolders()
+	if (workspaces.length === 0) {
+		return {
+			uri: Uri.file(process.cwd()),
+			name: path.basename(process.cwd()),
+			index: 0
+		}
+	} else if (workspaces.length === 1) {
+		return workspaces[0]
+	} else {
+		let rootWorkspace = workspaces[0]
+		let root = undefined
+		for (const w of workspaces) {
+			if (await fse.pathExists(w.uri.fsPath)) {
+				root = w.uri.fsPath
+				rootWorkspace = w
+				break
+			}
+		}
+
+		for (const w of workspaces) {
+			if (
+				root &&
+				root.length > w.uri.fsPath.length &&
+				(await fse.pathExists(w.uri.fsPath))
+			) {
+				root = w.uri.fsPath
+				rootWorkspace = w
+			}
+		}
+		return rootWorkspace
+	}
+}
+
+export async function getProjectConfig() {
+	const workspaceFolder = await getProjectRoot()
+	let config
+	if (workspaceFolder) {
+		return workspace.fs
+			.readFile(Uri.joinPath(workspaceFolder.uri, CONFIG_PREFIX_NAME))
+			.then(
+				(res) => {
+					try {
+						config = eval(res.toString())?.()
+						return config
+					} catch (error) {
+						console.log('配置异常，请检查配置项', error)
+						commands.executeCommand(
+							Command.WARN_TOAST,
+							`配置异常，请检查配置项 ${error}`
+						)
+					}
+				},
+				(err) => {
+					console.log('error', err)
+				}
+			)
+	}
+	return config
 }

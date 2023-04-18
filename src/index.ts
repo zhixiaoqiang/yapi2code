@@ -15,6 +15,7 @@ import Dove from './utils/dove'
 import storage from './utils/storage'
 import { ApiTypeList } from './utils/types'
 import { clearComposeRequestCache } from './utils/componse'
+import { getConfiguration } from './common/vscodeapi'
 
 const container: {
 	dove?: Dove
@@ -25,6 +26,14 @@ export function activate(context: vscode.ExtensionContext): void {
 	const slideWebview = getSlideBarWebview(context)
 	/** 初始化storage */
 	storage.init(context)
+
+	storage.setStorage(StorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
+
+	vscode.workspace.onDidChangeConfiguration((e) => {
+		if (e.affectsConfiguration('yapi')) {
+			storage.setStorage(StorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
+		}
+	})
 
 	/** 初始化vscode功能 */
 	context.subscriptions.push(
@@ -214,8 +223,6 @@ async function getApiFileList() {
 		'node_modules/*',
 		100
 	)
-
-	console.log('filesFromApiDir', filesFromApiDir, filesFromApiFile, fileList)
 
 	filesFromApiFile.forEach((file) =>
 		fileList.push(file.scheme + ':' + file.fsPath)

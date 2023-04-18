@@ -3,12 +3,17 @@ import {
 	reqQuery2type,
 	reqBody2type,
 	resBody2type,
-	formatTabSpace,
+	getTypeNameData,
 	resBodyData2type,
 	parseJson
 } from './json2type'
 
-import { StorageType } from '../../constant'
+import {
+	IConfig,
+	ResponseKeyEnum,
+	ResponseTypePositionEnum,
+	StorageType
+} from '../../constant'
 import storage from '../../utils/storage'
 
 import type { DetailData } from './type'
@@ -64,7 +69,16 @@ export const formatBaseTips = (data: DetailData, decs = '') => {
 */\n`
 }
 
-export const genRequest = (data: DetailData) => {
+type genRequestOptionsType = {
+	isReturnResDataProp?: boolean
+	hasResType?: boolean
+	hasReqType?: boolean
+} & Partial<IConfig>
+
+export const genRequest = (
+	data: DetailData,
+	options: genRequestOptionsType
+) => {
 	const paths = data?.path?.split(/[/.]/g) || []
 	const lastWord = paths[paths.length - 1]
 
@@ -74,25 +88,59 @@ export const genRequest = (data: DetailData) => {
 		GET: 'ReqQuery',
 		POST: 'ReqBody'
 	}
+	const { responseTypePosition, isReturnResDataProp, hasReqType, hasResType } =
+		options
+	const { name: resTypeName } = getTypeNameData(
+		interfaceName,
+		isReturnResDataProp
+			? parseJson(data.res_body)?.properties?.data
+			: parseJson(data.res_body),
+		isReturnResDataProp ? 'ResData' : 'ResBody'
+	)
+
+	const contentMap = {
+		comment: `/**
+	* @description ${data.title}
+	* @url ${getApiUrl(data)}
+	*/`,
+		fnName: lastWord,
+		IReqTypeName: `I${firstCharUpperCase(
+			interfaceName,
+			suffixMap[data.method] || ''
+		)}`,
+		IResTypeName: resTypeName,
+		requestFnName: data.method.toLowerCase(),
+		apiPath: data?.path
+	}
+
+	if (options.genRequest) {
+		return options.genRequest(contentMap, data)
+	}
+
+	const renderOuterFunctionType =
+		hasResType &&
+		responseTypePosition !== ResponseTypePositionEnum.FETCH_METHOD_GENERIC
+			? ': Promise<' + contentMap.IResTypeName + '>'
+			: ''
+
+	const renderFetchMethodGenericType =
+		hasResType &&
+		responseTypePosition === ResponseTypePositionEnum.FETCH_METHOD_GENERIC
+			? '<' + contentMap.IResTypeName + '>'
+			: ''
 
 	return (
-		`\n/**
-  * @description ${data.title}
-  * @url ${getApiUrl(data)}
-  */\n` +
-		`export async function ${lastWord}(params: I${firstCharUpperCase(
-			interfaceName
-		)}${suffixMap[data.method] || ''}): Promise<I${firstCharUpperCase(
-			interfaceName
-		)}ResBody> {
-	return request.${data.method.toLowerCase()}('${data?.path}', params)
+		`\n${contentMap.comment}\n` +
+		`export async function ${contentMap.fnName}(params${
+			hasReqType ? ': ' + contentMap.IReqTypeName : ''
+		})${renderOuterFunctionType} {
+	return request.${contentMap.requestFnName}${renderFetchMethodGenericType}('${
+			contentMap.apiPath
+		}', params)
 }`
 	)
 }
 
-/**
- *
- */
 export const getApiUrl = (data: DetailData) => {
 	return (
 		storage.getStorage(StorageType.SERVER_URL) +
@@ -102,7 +150,9 @@ export const getApiUrl = (data: DetailData) => {
 /**
  * @description 数据转类型
  */
-export function data2Type(data: DetailData) {
+export function data2Type(data: DetailData, config: Partial<IConfig> = {}) {
+	const { responseKey } = config
+
 	const interfaceName = getApiName(data)
 	const reqQueryType = data?.req_query?.length
 		? formatInterfaceComment(data, 'query请求参数') +
@@ -123,55 +173,27 @@ export function data2Type(data: DetailData) {
 				parseJson(data.res_body)?.properties?.data
 		  )
 		: ''
+	const isReturnResDataProp = responseKey === ResponseKeyEnum.DATA
 
-	const requestContent = genRequest(data)
+	const resType = isReturnResDataProp ? resBodyDataType : resBodyType
 
-	const wholeNamespace = `/**\n * @description ${
-		data.title
-	}\n * @url ${getApiUrl(data)}\n */\nexport namespace Yapi${firstCharUpperCase(
-		interfaceName
-	)}{\n${reqQueryType && '$1'}
-    ${reqBodyType && '$2'}
-    ${resBodyType && '$3'}
-  \n}\n`
+	const requestContent = genRequest(data, {
+		isReturnResDataProp,
+		hasReqType: !!(reqQueryType || reqBodyType),
+		hasResType: !!(reqBodyType || resBodyDataType),
+		...config
+	})
 
 	return {
 		reqQueryType,
 		reqBodyType,
 		resBodyType,
 		resBodyDataType,
+		resType,
 		requestContent,
-		reqQueryTitleUnderNamespace: 'ReqQuery',
-		reqQueryTitle: firstCharUpperCase(interfaceName) + 'ReqQuery',
-		reqBodyTitleUnderNamespace: 'ReqBody',
-		reqBodyTitle: firstCharUpperCase(interfaceName) + 'ReqBody',
-		resBodyTitleUnderNamespace: 'ResBody',
-		resBodyTitle: firstCharUpperCase(interfaceName) + 'ResBody',
-		resBodyDataTitleUnderNamespace: 'ResBodyData',
-		resBodyDataTitle: firstCharUpperCase(interfaceName) + 'ResBodyData',
-		namespaceTitle: `Yapi${firstCharUpperCase(interfaceName)}`,
-		/** 命名空间，对上面生成的类型进行切割重组 */
-		wholeNamespace: wholeNamespace
-			.replace(
-				'$1',
-				reqQueryType
-					.replace(firstCharUpperCase(interfaceName), '')
-					.split('\n')
-					.join(`\n${formatTabSpace(1)}`)
-			)
-			.replace(
-				'$2',
-				reqBodyType
-					.replace(firstCharUpperCase(interfaceName), '')
-					.split('\n')
-					.join(`\n${formatTabSpace(1)}`)
-			)
-			.replace(
-				'$3',
-				resBodyType
-					.replace(firstCharUpperCase(interfaceName), '')
-					.split('\n')
-					.join(`\n${formatTabSpace(1)}`)
-			)
+		reqQueryTitle: firstCharUpperCase(interfaceName, 'ReqQuery'),
+		reqBodyTitle: firstCharUpperCase(interfaceName, 'ReqBody'),
+		resBodyTitle: firstCharUpperCase(interfaceName, 'ResBody'),
+		resBodyDataTitle: firstCharUpperCase(interfaceName, 'ResData')
 	}
 }
