@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.17
+
+### Patch Changes
+
+- feat: 支持初级配置能力
+
 ## 0.0.14
 
 ### Patch Changes
