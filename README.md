@@ -6,13 +6,14 @@
 
 **TODO:**
 
-1. 自定义生成模版 & 切换模版预览
-2. 项目组可选 - 加快请求 & 提高性能
-3. 请求异步加载
-4. 优化页面性能
-5. 支持自定义解析
-6. pnpm 替换为 pnpm (vsce 不允许用 pnpm)
-7. ······
+- [ ] 1. 自定义生成模版 & 切换模版预览
+- [ ] 2. 项目组可选 - 加快请求 & 提高性能
+- [ ] 3. 请求异步加载
+- [ ] 4. 优化页面性能
+- [ ] 5. 支持自定义解析
+- [x] 6. yarn 替换为 pnpm
+
+1. ······
 
 ## 登录 YAPI
 
@@ -37,6 +38,48 @@ Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口�
 这种方式比较笨拙，推荐使用代码诊断功能，一条龙完成
 
 <img src="https://qnm.hunliji.com/FtK9IFJlRvKdPCA4jLNoEXs1xyKO" width="800" />
+
+#### 自定义渲染
+
+工作区配置：可以修改 输出的字段、类型填充的位置等
+
+<img src="/public/config.png" width="300" />
+
+</br>
+</br>
+
+配置文件：`yapi-to-code.config.cjs` **优先级更高**
+
+```js
+module.exports = () => {
+  return {
+    // resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型
+    // 'outerFunction' | 'fetchMethodGeneric'
+    responseTypePosition: 'outerFunction',
+    // 生成 res 包含的属性，默认 all, 可指定为 data
+    responseKey: 'all',
+    genRequest(
+      {
+        comment,
+        fnName,
+        IReqTypeName,
+        IResTypeName,
+        requestFnName,
+        apiPath,
+      },
+      data
+    ) {
+  return (
+      `\n${comment}\n` +
+      `export async function ${fnName}(params: I${IReqTypeName}) {
+  return request.${requestFnName}<${IResTypeName}>('${apiPath}', params)
+}`
+      )
+    }
+  }
+}
+
+```
 
 ## Webview & VS Code Data Flow.png
 

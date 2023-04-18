@@ -37,12 +37,7 @@ export interface ApiInterface {
 	resBodyTitle: string
 	resBodyDataTitle: string
 	title: string
-	reqQueryTitleUnderNamespace: string
-	reqBodyTitleUnderNamespace: string
-	resBodyTitleUnderNamespace: string
-	resBodyDataTitleUnderNamespace: string
 	wholeNamespace: string
-	namespaceTitle: string
 }
 
 export interface ImportPositionInfo {

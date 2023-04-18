@@ -1,3 +1,7 @@
+import { DetailData } from './utils/yapi2type/type'
+
+export const CONFIG_PREFIX_NAME = 'yapi-to-code.config.cjs'
+
 export enum Command {
 	WARN_TOAST = 'WARN_TOAST',
 	GITHUB = 'yapi.github',
@@ -57,7 +61,8 @@ export enum StorageType { // 储存类型
 	LAST_CHECKVERSION_STAMP = 'LAST_CHECKVERSION_STAMP', // 上次检查更新的时间
 	WEBVIEW_DONE = 'WEBVIEW_DONE',
 	API_TYPE_LIST = 'API_TYPE_LIST',
-	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP'
+	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP',
+	WORKSPACE_CONFIG = 'WORKSPACE_CONFIG'
 }
 
 export const GIT_REMOTE_URL = 'https://github.com/zhixiaoqiang/yapi2code'
@@ -71,4 +76,48 @@ export const LOGIN_BY_LDAP = true
 export enum YAPI_RESPONSE_TYPE {
 	RETURN = 'return',
 	GENERIC = 'methodGeneric'
+}
+
+/** 生成 res 包含的属性，默认 all, 可指定为 data */
+export enum ResponseKeyEnum {
+	/** 返回所有属性 */
+	ALL = 'all',
+	/** 仅返回 data 属性 */
+	DATA = 'data'
+}
+
+/** resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型 */
+export enum ResponseTypePositionEnum {
+	/** 类型将会放置在外层函数：Promise<T> */
+	OUTER_FUNCTION = 'outerFunction',
+	/** 类型将会放置在请求方法的泛型中：post<T> */
+	FETCH_METHOD_GENERIC = 'fetchMethodGeneric'
+}
+
+export enum ConfigKeyEnum {
+	RESPONSE_KEY = 'responseKey',
+	RESPONSE_TYPE_POSITION = 'responseTypePosition',
+	GEN_REQUEST = 'genRequest'
+}
+
+export interface IConfig {
+	[ConfigKeyEnum.RESPONSE_KEY]: `${ResponseKeyEnum}`
+	[ConfigKeyEnum.RESPONSE_TYPE_POSITION]: `${ResponseTypePositionEnum}`
+	genRequest?(
+		formData: {
+			comment: string
+			fnName: string
+			IReqTypeName: string
+			IResTypeName: string
+			requestFnName: string
+			apiPath: string
+		},
+		data: DetailData
+	): string
+}
+
+export const DEFAULT_CONFIG: IConfig = {
+	[ConfigKeyEnum.RESPONSE_KEY]: ResponseKeyEnum.ALL,
+	[ConfigKeyEnum.RESPONSE_TYPE_POSITION]:
+		ResponseTypePositionEnum.OUTER_FUNCTION
 }

@@ -86,11 +86,11 @@ export function isBasicType(type: `${YapiDataType}`) {
 /**
  * @description 首字母大写
  */
-export function firstCharUpperCase(word: string) {
+export function firstCharUpperCase(word: string, suffix = '') {
 	if (!word) {
 		return ''
 	}
-	return word[0].toUpperCase() + word.slice(1)
+	return word[0].toUpperCase() + word.slice(1) + suffix
 }
 /**
  * @description 格式化注释
@@ -108,7 +108,10 @@ export function formatTabSpace(tabCount: number) {
  * @description GET请求参数转化typescript interface
  */
 export function reqQuery2type(typeName: string, queryList: ReqQuery) {
-	return `export interface I${firstCharUpperCase(typeName)}ReqQuery {${queryList
+	return `export interface I${firstCharUpperCase(
+		typeName,
+		'ReqQuery'
+	)} {${queryList
 		.map((query) => {
 			const linkSymbol = query.required === '0' ? '?: ' : ': '
 			return `${formatComment(query.desc || '')}\n${formatTabSpace(1)}${
@@ -167,28 +170,55 @@ export function resBody2type(
 	suffix = 'ResBody'
 ) {
 	const result = `export interface I${firstCharUpperCase(
-		typeName
-	)}${suffix} ${getTypeNode(resBody)}`
+		typeName,
+		suffix
+	)} ${getTypeNode(resBody)}`
 
 	return result
+}
+
+export function getTypeNameData(
+	typeName: string,
+	resBody: AllTypeNode,
+	suffix = 'ResData'
+) {
+	try {
+		const isArrayType = resBody.type === YapiDataType.Array
+
+		const typeNameContent = `${firstCharUpperCase(typeName, suffix)}`
+
+		if (isBasicType(resBody.type) || isArrayType) {
+			return {
+				name: typeNameContent,
+				type: 'type'
+			}
+		}
+
+		return {
+			name: `I${typeNameContent}`,
+			type: 'interface'
+		}
+	} catch (error) {
+		return {
+			name: typeName,
+			type: 'interface'
+		}
+	}
 }
 
 export function resBodyData2type(
 	typeName: string,
 	resBody: AllTypeNode,
-	suffix = 'ResBodyData'
+	suffix = 'ResData'
 ) {
 	try {
-		const isArrayType = resBody.type === YapiDataType.Array
+		const typeNameData = getTypeNameData(typeName, resBody, suffix)
 
-		const prefix =
-			isBasicType(resBody.type) || isArrayType
-				? 'export type '
-				: 'export interface I'
+		const typeNode = getTypeNode(resBody)
 
-		return `${prefix}${firstCharUpperCase(typeName)}${suffix} ${getTypeNode(
-			resBody
-		)}`
+		return `export ${typeNameData.type} ${typeNameData.name} ${
+			typeNameData.type === 'type' ? '=' : ''
+		} ${typeNode}`
 	} catch (error) {
 		return ''
 	}
