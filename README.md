@@ -76,12 +76,11 @@ module.exports = () => {
     }
   }
 }
-
 ```
 
 ## Webview & VS Code Data Flow.png
 
-<img src="./public/WebviewAndVSCodeDataFlow.png" alt="Webview & VS Code Data Flow" />
+<img src="./public/webview-vscode-data-flow.png" alt="Webview & VS Code Data Flow" />
 
 ## 开发调试
 
@@ -97,7 +96,7 @@ cd src/webview && pnpm start
 
 ### 选择 Client + Server
 
-![debug](/public/debug.png)
+<img src="./public/debug.png" alt="debug" />
 
 > Tips: node 日志在源码编辑器的调试控制台查看，webview 日志在唤起的编辑器唤起 devtool 查看
 
