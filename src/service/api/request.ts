@@ -23,13 +23,10 @@ const request = axios.create({
 request.interceptors.request.use((config) => {
 	console.log('发起请求：', config.url)
 	const cookie = storage.getStorage<string>(StorageType.COOKIE) || ''
-	if (config.headers) {
-		config.headers.Cookie = cookie
-	} else {
-		config.headers = {
-			Cookie: cookie
-		}
-	}
+	Object.assign(config.headers, {
+		Cookie: cookie
+	})
+
 	return config
 })
 

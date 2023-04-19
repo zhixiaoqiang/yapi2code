@@ -16,8 +16,6 @@ import {
 	MsgType,
 	ContextEnum,
 	StorageType,
-	ResponseKeyEnum,
-	ConfigKeyEnum,
 	CONFIG_PREFIX_NAME,
 	IConfig,
 	DEFAULT_CONFIG

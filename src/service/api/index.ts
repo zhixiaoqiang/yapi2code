@@ -2,8 +2,8 @@ import request from './request'
 
 import storage from '../../utils/storage'
 import { StorageType } from '../../constant'
-import { LOGIN_PATH, LOGIN_PATH_BY_LDAP } from './constant'
 import { composeRequest } from '../../utils/componse'
+import { LOGIN_PATH, LOGIN_PATH_BY_LDAP } from './constant'
 
 const getUrl = (path: string) => {
 	return storage.getStorage<string>(StorageType.SERVER_URL) + path

@@ -18,7 +18,7 @@
 
 初次使用，输入 yapi 的服务地址 & 账号密码，进行登录
 
-<img src="/public/login.png" width="300" />
+<img src="./public/login.png" width="300" />
 
 ## 使用
 
@@ -42,9 +42,8 @@ Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口�
 
 工作区配置：可以修改 输出的字段、类型填充的位置等
 
-<img src="/public/config.png" width="300" />
+<img src="./public/config.png" width="300" />
 
-</br>
 </br>
 
 配置文件：`yapi-to-code.config.cjs` **优先级更高**
@@ -82,7 +81,8 @@ module.exports = () => {
 
 ## Webview & VS Code Data Flow.png
 
-![Webview & VS Code Data Flow](public/Webview%20&%20VS%20Code%20Data%20Flow.png)
+<img src="./public/WebviewAndVSCodeDataFlow.png" alt="Webview & VS Code Data Flow" />
+
 ## 开发调试
 
 > 需要依赖 src/server src/webview 的资源

@@ -11,7 +11,6 @@
     "sourceMap": true,                           /* Generates corresponding '.map' file. */
     "removeComments": true,                      /* Do not emit comments to output. */
     "strict": true,                                 /* Enable all strict type-checking options. */
-    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,        /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
 
     /* Advanced Options */
