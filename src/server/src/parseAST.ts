@@ -1,7 +1,7 @@
 import * as ts from 'typescript'
 
 import type { FunctionStruct, ApiFunctionStruct } from './types'
-import { YAPI_RESPONSE_NAME, YAPI_RESPONSE_TYPE } from '../../constant'
+import { YAPI_RESPONSE_NAME, YAPI_RESPONSE_TYPE } from '../../constant/config'
 
 type FunctionNode =
 	| ts.ArrowFunction

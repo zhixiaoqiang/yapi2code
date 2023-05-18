@@ -8,15 +8,15 @@ import {
 	parseJson
 } from './json2type'
 
-import {
-	IConfig,
-	ResponseKeyEnum,
-	ResponseTypePositionEnum,
-	StorageType
-} from '../../constant'
 import storage from '../../utils/storage'
 
 import type { DetailData } from './type'
+import {
+	ResponseKeyEnum,
+	ResponseTypePositionEnum,
+	IConfig
+} from '../../constant/config'
+import { AllStorageType } from '../../constant/storage'
 
 /**
  * @description 获取接口名称
@@ -143,7 +143,7 @@ export const genRequest = (
 
 export const getApiUrl = (data: DetailData) => {
 	return (
-		storage.getStorage(StorageType.SERVER_URL) +
+		storage.getStorage(AllStorageType.SERVER_URL) +
 		`/project/${data.project_id}/interface/api/${data._id}`
 	)
 }

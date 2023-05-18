@@ -3,14 +3,14 @@ import { Input, Button, Typography, Switch, Space } from 'antd'
 import { GithubOutlined } from '@ant-design/icons'
 
 import { dove } from '../../util'
-import {
-	MsgType,
-	Command,
-	YAPI_DEFAULT_SERVER_URL,
-	LOGIN_BY_LDAP
-} from '../../../../constant'
 
 import './index.less'
+import { MsgType } from '../../../../constant/msg'
+import { Command } from '../../../../constant/vscode'
+import {
+	YAPI_DEFAULT_SERVER_URL,
+	LOGIN_BY_LDAP
+} from '../../../../constant/yapi'
 
 interface LoginProps {
 	setIsLogin: React.Dispatch<React.SetStateAction<boolean | -1>>

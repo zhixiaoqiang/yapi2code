@@ -2,8 +2,7 @@ import * as vscode from 'vscode'
 import * as path from 'path'
 
 import Dove from '../utils/dove'
-
-import { MsgType } from '../constant'
+import { MsgType } from '../constant/msg'
 
 // type lifeCycleFnType = (dove: Dove) => void
 

@@ -1,17 +1,19 @@
 import request from './request'
 
 import storage from '../../utils/storage'
-import { StorageType } from '../../constant'
+import { AllStorageType } from '../../constant/storage'
 import { composeRequest } from '../../utils/componse'
-import { LOGIN_PATH, LOGIN_PATH_BY_LDAP } from './constant'
+import { LOGIN_PATH, LOGIN_PATH_BY_LDAP } from '../../constant/yapi'
 
 const getUrl = (path: string) => {
-	return storage.getStorage<string>(StorageType.SERVER_URL) + path
+	return storage.getStorage<string>(AllStorageType.SERVER_URL) + path
 }
 
 /** 登录 */
 export const login = (body: { email: string; password: string }): any => {
-	const isLoginByLdap = storage.getStorage<boolean>(StorageType.LOGIN_BY_LDAP)
+	const isLoginByLdap = storage.getStorage<boolean>(
+		AllStorageType.LOGIN_BY_LDAP
+	)
 	return request.post(getUrl(isLoginByLdap ? LOGIN_PATH_BY_LDAP : LOGIN_PATH), {
 		data: body
 	})

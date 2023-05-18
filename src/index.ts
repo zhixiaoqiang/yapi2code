@@ -1,14 +1,7 @@
 import * as vscode from 'vscode'
 
 import { callWhenActivate, callWhenDeactivate } from './client'
-import {
-	Command,
-	ContextEnum,
-	GIT_REMOTE_URL,
-	MsgType,
-	SideBarView,
-	StorageType
-} from './constant'
+
 import { getSlideBarWebview } from './core'
 import { writeFile } from './server/src/fileSys'
 import Dove from './utils/dove'
@@ -16,24 +9,36 @@ import storage from './utils/storage'
 import { ApiTypeList } from './utils/types'
 import { clearComposeRequestCache } from './utils/componse'
 import { getConfiguration } from './common/vscodeapi'
+import { Command, ContextEnum, SideBarView } from './constant/vscode'
+import { GIT_REMOTE_URL } from './constant/github'
+import { MsgType } from './constant/msg'
+import { AllStorageType } from './constant/storage'
 
 const container: {
 	dove?: Dove
 } = {}
 
-export function activate(context: vscode.ExtensionContext): void {
-	/** 初始化webview */
-	const slideWebview = getSlideBarWebview(context)
+function initStorage(context: vscode.ExtensionContext) {
 	/** 初始化storage */
 	storage.init(context)
 
-	storage.setStorage(StorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
+	storage.setStorage(AllStorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
 
 	vscode.workspace.onDidChangeConfiguration((e) => {
 		if (e.affectsConfiguration('yapi')) {
-			storage.setStorage(StorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
+			storage.setStorage(
+				AllStorageType.WORKSPACE_CONFIG,
+				getConfiguration('yapi')
+			)
 		}
 	})
+}
+
+export function activate(context: vscode.ExtensionContext): void {
+	/** 初始化webview */
+	const slideWebview = getSlideBarWebview(context)
+
+	initStorage(context)
 
 	/** 初始化vscode功能 */
 	context.subscriptions.push(
@@ -125,12 +130,12 @@ export function activate(context: vscode.ExtensionContext): void {
 				(file) => file.scheme + '://' + file.fsPath
 			)
 			const oldApiTypeList = storage.getStorage(
-				StorageType.API_TYPE_LIST
+				AllStorageType.API_TYPE_LIST
 			) as ApiTypeList
 			const newApiTypeList = oldApiTypeList?.filter(
 				(file) => deleteFiles?.indexOf(file?.uri) === -1
 			)
-			storage.setStorage(StorageType.API_TYPE_LIST, newApiTypeList)
+			storage.setStorage(AllStorageType.API_TYPE_LIST, newApiTypeList)
 		})
 	)
 	// 创建LSP客户端连接服务器
@@ -170,7 +175,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		 * 增量去重新诊断文件列表
 		 */
 		const oldApiTypeList = storage.getStorage(
-			StorageType.API_TYPE_LIST
+			AllStorageType.API_TYPE_LIST
 		) as ApiTypeList
 		const newApiTypeList: ApiTypeList = []
 		if (!oldApiTypeList?.[0]) {
@@ -193,12 +198,12 @@ export function activate(context: vscode.ExtensionContext): void {
 		 * 2. 列表已加载，直接发送
 		 */
 		if (
-			storage.getStorage(StorageType.WEBVIEW_DONE) &&
-			Boolean(storage.getStorage(StorageType.LOGIN_INFO))
+			storage.getStorage(AllStorageType.WEBVIEW_DONE) &&
+			Boolean(storage.getStorage(AllStorageType.LOGIN_INFO))
 		) {
 			slideWebview.dove?.sendMessage(MsgType.API_FILE_HANDLER, newApiTypeList)
 		}
-		storage.setStorage(StorageType.API_TYPE_LIST, newApiTypeList)
+		storage.setStorage(AllStorageType.API_TYPE_LIST, newApiTypeList)
 	}
 }
 

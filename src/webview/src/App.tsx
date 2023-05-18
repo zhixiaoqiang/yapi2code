@@ -4,7 +4,7 @@ import { Spin } from 'antd'
 import Login from './components/Login'
 import DataTree from './components/DataTree'
 import { dove, useDoveReceiveMsg } from './util'
-import { MsgType } from '../../constant'
+import { MsgType } from '../../constant/msg'
 
 import './App.less'
 

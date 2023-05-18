@@ -1,10 +1,12 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import * as vscode from 'vscode'
 
-import { StorageType, ContextEnum } from '../../constant'
 import storage from '../../utils/storage'
-import { LOGIN_PATH } from './constant'
+
 import { login } from './index'
+import { LOGIN_PATH } from '../../constant/yapi'
+import { AllStorageType } from '../../constant/storage'
+import { ContextEnum } from '../../constant/vscode'
 
 // 正在登录期间，把新来的登录放入登录池中，待登录完成后再完成后续登录
 // 是否正在登录
@@ -16,13 +18,13 @@ const request = axios.create({
 	timeout: 30000, // 超时时间30秒
 	headers: {
 		'Content-Type': 'application/json;charset=UTF-8',
-		Cookie: storage.getStorage(StorageType.COOKIE) || ''
+		Cookie: storage.getStorage(AllStorageType.COOKIE) || ''
 	}
 })
 
 request.interceptors.request.use((config) => {
 	console.log('发起请求：', config.url)
-	const cookie = storage.getStorage<string>(StorageType.COOKIE) || ''
+	const cookie = storage.getStorage<string>(AllStorageType.COOKIE) || ''
 	Object.assign(config.headers, {
 		Cookie: cookie
 	})
@@ -35,7 +37,7 @@ request.interceptors.response.use(async (res) => {
 		?.map((item) => item.split(';')[0])
 		.join('; ')
 	if (cookie) {
-		await storage.setStorage(StorageType.COOKIE, cookie)
+		await storage.setStorage(AllStorageType.COOKIE, cookie)
 	}
 	console.log('res', res)
 	return res.data
@@ -61,15 +63,15 @@ const yapiReq = {
 		// 是否是登录接口
 		const isLoginPath = url?.includes(LOGIN_PATH)
 		// 判断是否存在cookie
-		const hasLoginCookie = !!storage.getStorage<string>(StorageType.COOKIE)
+		const hasLoginCookie = !!storage.getStorage<string>(AllStorageType.COOKIE)
 		// 判断上次登录时间
 		const lastLoginStamp =
-			storage.getStorage<number>(StorageType.LOGIN_STAMP) || 0
+			storage.getStorage<number>(AllStorageType.LOGIN_STAMP) || 0
 		// 获取账号密码
 		const { username, password } =
-			storage.getStorage(StorageType.LOGIN_INFO) || {}
+			storage.getStorage(AllStorageType.LOGIN_INFO) || {}
 		// 获取服务器地址
-		const serverUrl = storage.getStorage<string>(StorageType.SERVER_URL)
+		const serverUrl = storage.getStorage<string>(AllStorageType.SERVER_URL)
 
 		if (isLoginPath) {
 			return request
@@ -77,7 +79,7 @@ const yapiReq = {
 				.then(async (res) => {
 					console.log('登录成功', res)
 					isLoggingIn = false
-					await storage.setStorage(StorageType.LOGIN_STAMP, Date.now())
+					await storage.setStorage(AllStorageType.LOGIN_STAMP, Date.now())
 					for (const resolve of requestPool) {
 						resolve(true)
 					}

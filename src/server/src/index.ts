@@ -14,7 +14,7 @@ import {
 	TextDocuments,
 	TextDocumentSyncKind
 } from 'vscode-languageserver/node'
-import { Command, MsgType } from '../../constant'
+
 import { API_NOT_DEFINED, MAIN_MSG } from '../../utils/constant'
 import Dove from '../../utils/dove'
 import { YapiVSCodeConfig } from '../../utils/types'
@@ -28,6 +28,8 @@ import {
 import { quickfix } from './quickfix'
 import store from './store'
 import type { ApiFunctionStruct, ImportPositionInfo } from './types'
+import { Command } from '../../constant/vscode'
+import { MsgType } from '../../constant/msg'
 
 // 初始化 LSP 连接对象
 export const connection = createConnection(ProposedFeatures.all)
@@ -308,7 +310,6 @@ dove.subscribe(MsgType.API_FILE_HANDLER, async (apiFileList: any) => {
 			const ast: SourceFile = getAST(text)
 			// 遍历 AST 筛选符合标记的节点位置列表
 			const apiFnList: ApiFunctionStruct[] = getApiPositionList(ast, yapiConfig)
-			console.log('yapiConfig', yapiConfig, apiFnList)
 			return {
 				uri: file,
 				apiFnList: apiFnList

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
 
-import { StorageType } from '../constant'
+import { AllStorageType } from '../constant/storage'
 
-type StorageTypePlus = `${StorageType}` | `${StorageType}_${string}`
+type StorageTypePlus = `${AllStorageType}` | `${AllStorageType}_${string}`
 
 class Store {
 	context: vscode.ExtensionContext | null = null
@@ -20,23 +20,22 @@ class Store {
 	}
 	clearAll() {
 		// 清空储存
-		this.setStorage(StorageType.USER_INFO, undefined)
-		this.setStorage(StorageType.LOGIN_INFO, undefined)
-		this.setStorage(StorageType.COOKIE, undefined)
-		this.setStorage(StorageType.DATA_GROUP, undefined)
-		this.setStorage(StorageType.DATA_PROJECT, undefined)
-		this.setStorage(StorageType.DATA_DIR, undefined)
+		this.setStorage(AllStorageType.USER_INFO, undefined)
+		this.setStorage(AllStorageType.LOGIN_INFO, undefined)
+		this.setStorage(AllStorageType.COOKIE, undefined)
+		this.setStorage(AllStorageType.DATA_GROUP, undefined)
+		this.setStorage(AllStorageType.DATA_PROJECT, undefined)
+		this.setStorage(AllStorageType.DATA_DIR, undefined)
 		this.context?.globalState.keys().forEach((key) => {
 			if (
-				key.startsWith(StorageType.DATA_DIR_AND_ITEM) ||
-				key.startsWith(StorageType.DATA_ITEM)
+				key.startsWith(AllStorageType.DATA_DIR_AND_ITEM) ||
+				key.startsWith(AllStorageType.DATA_ITEM)
 			) {
 				this.setStorage(key as any, undefined)
 			}
 		})
-		this.setStorage(StorageType.SERVER_URL, undefined)
-		this.setStorage(StorageType.API_DETAIL, undefined)
-		this.setStorage(StorageType.LOGIN_STAMP, undefined)
+		this.setStorage(AllStorageType.LOGIN_STAMP, undefined)
+		this.setStorage(AllStorageType.WEBVIEW_DONE, undefined)
 	}
 }
 

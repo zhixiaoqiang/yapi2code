@@ -4,9 +4,14 @@ import { Badge, Input, List, message, Spin, Tree } from 'antd'
 import debounce from 'lodash/debounce'
 import type { FieldDataNode } from 'rc-tree/lib/interface'
 import fileIcon from '../../../../assets/api-file.svg'
-import { Command, YAPI_DEFAULT_SERVER_URL, MsgType } from '../../../../constant'
+
 import { dove, useDoveReceiveMsg } from '../../util'
 import './index.less'
+
+import { Command } from '../../../../constant/vscode'
+import { YAPI_DEFAULT_SERVER_URL } from '../../../../constant/yapi'
+import { MsgType } from '../../../../constant/msg'
+
 import type {
 	ApiTypeList,
 	DirAndItemData,

@@ -11,15 +11,7 @@ import {
 
 import { SlideBarWebview } from './webviewTemplate'
 import Dove from '../utils/dove'
-import {
-	Command,
-	MsgType,
-	ContextEnum,
-	StorageType,
-	CONFIG_PREFIX_NAME,
-	IConfig,
-	DEFAULT_CONFIG
-} from '../constant'
+
 import login from '../service/login'
 import {
 	getGroupList,
@@ -33,6 +25,10 @@ import storage from '../utils/storage'
 import createFile from './createFile'
 import { data2Type, formatBaseTips, formatDubboTips } from '../utils/yapi2type'
 import { getWorkspaceFolders } from '../common/vscodeapi'
+import { Command, ContextEnum } from '../constant/vscode'
+import { MsgType } from '../constant/msg'
+import { AllStorageType } from '../constant/storage'
+import { CONFIG_FILE_NAME, DEFAULT_CONFIG, IConfig } from '../constant/config'
 
 export const getSlideBarWebview = (context: ExtensionContext) => {
 	const wv = new SlideBarWebview(context)
@@ -48,14 +44,14 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 			dove.subscribe(MsgType.SERVER_URL, (serverUrl) => {
 				try {
 					const { origin } = new URL(serverUrl)
-					storage.setStorage(StorageType.SERVER_URL, origin)
+					storage.setStorage(AllStorageType.SERVER_URL, origin)
 				} catch (e) {
-					storage.setStorage(StorageType.SERVER_URL, '')
+					storage.setStorage(AllStorageType.SERVER_URL, '')
 				}
 			}),
 			// loginByLdap 变化
 			dove.subscribe(MsgType.LOGIN_BY_LDAP, (loginByLdap) => {
-				storage.setStorage(StorageType.LOGIN_BY_LDAP, loginByLdap)
+				storage.setStorage(AllStorageType.LOGIN_BY_LDAP, loginByLdap)
 			}),
 
 			// 监听登录类型
@@ -64,12 +60,12 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 					.then((res) => {
 						if (res.success) {
 							// 储存登录信息
-							storage.setStorage(StorageType.LOGIN_INFO, {
+							storage.setStorage(AllStorageType.LOGIN_INFO, {
 								username,
 								password
 							})
 
-							storage.setStorage(StorageType.USER_INFO, res.data?.userInfo)
+							storage.setStorage(AllStorageType.USER_INFO, res.data?.userInfo)
 							// 切换webview
 							commands.executeCommand(
 								'setContext',
@@ -77,9 +73,9 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 								true
 							)
 							// 设置是否可以接收
-							if (storage.getStorage(StorageType.WEBVIEW_DONE)) {
+							if (storage.getStorage(AllStorageType.WEBVIEW_DONE)) {
 								const apiTypeList = storage.getStorage(
-									StorageType.API_TYPE_LIST
+									AllStorageType.API_TYPE_LIST
 								)
 								dove.sendMessage(MsgType.API_FILE_HANDLER, apiTypeList)
 							}
@@ -98,7 +94,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 				console.log('webview loaded')
 
 				// 判断当前是否登录
-				const isLogin = Boolean(storage.getStorage(StorageType.USER_INFO))
+				const isLogin = Boolean(storage.getStorage(AllStorageType.USER_INFO))
 				dove.sendMessage(MsgType.LOGIN_STATUS, isLogin)
 				/** 设置导航栏中的menu */
 				commands.executeCommand(
@@ -108,21 +104,21 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 				)
 				// 设置是否可以接收
 				if (isLogin) {
-					const apiTypeList = storage.getStorage(StorageType.API_TYPE_LIST)
+					const apiTypeList = storage.getStorage(AllStorageType.API_TYPE_LIST)
 					dove.sendMessage(MsgType.API_FILE_HANDLER, apiTypeList)
 				}
 				// 加载完毕
-				storage.setStorage(StorageType.WEBVIEW_DONE, true)
+				storage.setStorage(AllStorageType.WEBVIEW_DONE, true)
 			}),
 			// 监听webview主动获取组
 			dove.subscribe(
 				MsgType.FETCH_GROUP,
 				async (params: { needFresh: boolean }) => {
-					const groupData = storage.getStorage(StorageType.DATA_GROUP)
+					const groupData = storage.getStorage(AllStorageType.DATA_GROUP)
 
 					if (!groupData || params.needFresh) {
 						const { data } = await getGroupList()
-						storage.setStorage(StorageType.DATA_GROUP, data)
+						storage.setStorage(AllStorageType.DATA_GROUP, data)
 						return data
 					} else {
 						return groupData
@@ -134,12 +130,12 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 				MsgType.FETCH_PROJECT,
 				async (params: { needFresh: boolean; groupId: number }) => {
 					const projectData = storage.getStorage(
-						`${StorageType.DATA_PROJECT}_${params.groupId}`
+						`${AllStorageType.DATA_PROJECT}_${params.groupId}`
 					)
 					if (!projectData || params.needFresh) {
 						const { data } = await getProject(params.groupId)
 						storage.setStorage(
-							`${StorageType.DATA_PROJECT}_${params.groupId}`,
+							`${AllStorageType.DATA_PROJECT}_${params.groupId}`,
 							data
 						)
 						return data
@@ -153,12 +149,15 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 				MsgType.FETCH_DIR,
 				async (params: { needFresh: boolean; dirId: number }) => {
 					const dirData = storage.getStorage(
-						`${StorageType.DATA_DIR}_${params.dirId}`
+						`${AllStorageType.DATA_DIR}_${params.dirId}`
 					)
 
 					if (!dirData || params.needFresh) {
 						const { data } = await getDir(params.dirId)
-						storage.setStorage(`${StorageType.DATA_DIR}_${params.dirId}`, data)
+						storage.setStorage(
+							`${AllStorageType.DATA_DIR}_${params.dirId}`,
+							data
+						)
 						return data
 					} else {
 						return dirData
@@ -170,7 +169,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 				MsgType.FETCH_DIR_AND_ITEM,
 				async (params: { needFresh: boolean; projectId: number }) => {
 					const storageKey =
-						`${StorageType.DATA_DIR_AND_ITEM}_${params.projectId}` as const
+						`${AllStorageType.DATA_DIR_AND_ITEM}_${params.projectId}` as const
 					const dirAndItemData = storage.getStorage(storageKey)
 					if (!dirAndItemData || params.needFresh) {
 						const { data } = await getDirAndItemList(params.projectId)
@@ -186,13 +185,13 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 				MsgType.FETCH_ITEM,
 				async (params: { needFresh: boolean; itemId: number }) => {
 					const itemData = storage.getStorage(
-						`${StorageType.DATA_ITEM}_${params.itemId}`
+						`${AllStorageType.DATA_ITEM}_${params.itemId}`
 					)
 
 					if (!itemData || params.needFresh) {
 						const { data } = await getItemList(params.itemId)
 						storage.setStorage(
-							`${StorageType.DATA_ITEM}_${params.itemId}`,
+							`${AllStorageType.DATA_ITEM}_${params.itemId}`,
 							data || {
 								count: 0,
 								total: 0,
@@ -209,7 +208,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 			dove.subscribe(MsgType.FETCH_DETAIL, async ({ id, blank }) => {
 				let config = {
 					...DEFAULT_CONFIG,
-					...(storage.getStorage(StorageType.WORKSPACE_CONFIG) as IConfig)
+					...(storage.getStorage(AllStorageType.WORKSPACE_CONFIG) as IConfig)
 				}
 				try {
 					const projectConfig = await getProjectConfig()
@@ -271,7 +270,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 	wv.onUnMount = (dove: Dove) => {
 		// 卸载消息监听
 		console.log('卸载消息')
-		storage.setStorage(StorageType.WEBVIEW_DONE, false)
+		storage.setStorage(AllStorageType.WEBVIEW_DONE, false)
 		gatherKey.map((key) => {
 			dove.unSubscribe(key)
 		})
@@ -332,7 +331,7 @@ export async function getProjectConfig() {
 	let config
 	if (workspaceFolder) {
 		return workspace.fs
-			.readFile(Uri.joinPath(workspaceFolder.uri, CONFIG_PREFIX_NAME))
+			.readFile(Uri.joinPath(workspaceFolder.uri, CONFIG_FILE_NAME))
 			.then(
 				(res) => {
 					try {

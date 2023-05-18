@@ -6,13 +6,15 @@ import {
 	Diagnostic,
 	DiagnosticSeverity
 } from 'vscode-languageserver'
-import { Command, YAPI_RESPONSE_NAME } from '../../constant'
+
 import { API_NOT_DEFINED } from '../../utils/constant'
 import Dove from '../../utils/dove'
 import { Client_Server_MsgTYpe } from '../../utils/types'
 import { getFileCurrentWorkSpace } from './fileSys'
 import store from './store'
 import type { ApiInterface } from './types'
+import { YAPI_RESPONSE_NAME } from '../../constant/config'
+import { Command } from '../../constant/vscode'
 
 async function checkApiTypeExist(
 	typeFilePath: string,
