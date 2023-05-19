@@ -1,5 +1,5 @@
 import path from 'node:path'
-import fse from 'fs-extra'
+import { pathExists } from 'fs-extra'
 import {
 	Uri,
 	WorkspaceFolder,
@@ -303,22 +303,9 @@ export async function getProjectRoot(): Promise<WorkspaceFolder> {
 		return workspaces[0]
 	} else {
 		let rootWorkspace = workspaces[0]
-		let root = undefined
-		for (const w of workspaces) {
-			if (await fse.pathExists(w.uri.fsPath)) {
-				root = w.uri.fsPath
-				rootWorkspace = w
-				break
-			}
-		}
 
 		for (const w of workspaces) {
-			if (
-				root &&
-				root.length > w.uri.fsPath.length &&
-				(await fse.pathExists(w.uri.fsPath))
-			) {
-				root = w.uri.fsPath
+			if (await pathExists(w.uri.fsPath)) {
 				rootWorkspace = w
 			}
 		}

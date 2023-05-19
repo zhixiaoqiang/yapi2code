@@ -63,7 +63,6 @@ export function activate(context: vscode.ExtensionContext): void {
 		vscode.commands.registerCommand(
 			Command.INSERT_TYPE,
 			async ({ filePath, text }) => {
-				console.log(filePath, text.slice(1, 10))
 				// 写入类型文本到文件
 				await writeFile(filePath, text)
 			}
@@ -136,7 +135,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		const files = await getApiFileList()
 		diagnoseBaseInputFiles(files)
 	}
-	// 根据传入列表对文件进行诊断
+	/** 根据传入列表对文件进行诊断 */
 	async function diagnoseBaseInputFiles(files: string[]) {
 		// 发送到LSP得到诊断信息
 		/**
@@ -160,23 +159,23 @@ export function activate(context: vscode.ExtensionContext): void {
 		/**
 		 * 增量去重新诊断文件列表
 		 */
-		const oldApiTypeList = storage.getStorage(
-			AllStorageType.API_TYPE_LIST
-		) as ApiTypeList
-		const newApiTypeList: ApiTypeList = []
-		if (!oldApiTypeList?.[0]) {
-			newApiTypeList.push(...finalRet)
-		} else {
-			newApiTypeList.push(...oldApiTypeList)
-			finalRet?.forEach((file) => {
-				const index = newApiTypeList?.findIndex((old) => old?.uri === file?.uri)
-				if (index > -1) {
-					newApiTypeList?.splice(index, 1, file)
-				} else {
-					newApiTypeList.push(file)
-				}
-			})
-		}
+		// const oldApiTypeList = storage.getStorage(
+		// 	AllStorageType.API_TYPE_LIST
+		// ) as ApiTypeList
+		// const newApiTypeList: ApiTypeList = []
+		// if (!oldApiTypeList?.[0]) {
+		// 	newApiTypeList.push(...finalRet)
+		// } else {
+		// 	newApiTypeList.push(...oldApiTypeList)
+		// 	finalRet?.forEach((file) => {
+		// 		const index = newApiTypeList?.findIndex((old) => old?.uri === file?.uri)
+		// 		if (index > -1) {
+		// 			newApiTypeList?.splice(index, 1, file)
+		// 		} else {
+		// 			newApiTypeList.push(file)
+		// 		}
+		// 	})
+		// }
 		/**
 		 * 两种情况：
 		 * 1. 列表未加载
@@ -187,9 +186,9 @@ export function activate(context: vscode.ExtensionContext): void {
 			storage.getStorage(AllStorageType.WEBVIEW_DONE) &&
 			Boolean(storage.getStorage(AllStorageType.LOGIN_INFO))
 		) {
-			slideWebview.dove?.sendMessage(MsgType.API_FILE_HANDLER, newApiTypeList)
+			slideWebview.dove?.sendMessage(MsgType.API_FILE_HANDLER, finalRet)
 		}
-		storage.setStorage(AllStorageType.API_TYPE_LIST, newApiTypeList)
+		storage.setStorage(AllStorageType.API_TYPE_LIST, finalRet)
 	}
 }
 
@@ -213,23 +212,15 @@ function initWorkspaceConfig() {
 // 获取所有待处理接口文件
 async function getApiFileList() {
 	const fileList: string[] = []
-
-	const filesFromApiDir = await vscode.workspace.findFiles(
-		`**/services/**/*.ts`,
-		'**​/node_modules/**',
-		100
-	)
-	filesFromApiDir.forEach((file) =>
-		fileList.push(file.scheme + '://' + file.fsPath)
-	)
+	// '**/*{.ts,.tsx}'
+	// '**/*[!(.d)]{.ts,.tsx}'
 	const filesFromApiFile = await vscode.workspace.findFiles(
-		`**/services.ts`,
+		'**/*[!(.d)]{.ts,.tsx}',
 		'**​/node_modules/**',
-		100
+		200
 	)
 
-	filesFromApiFile.forEach((file) =>
-		fileList.push(file.scheme + ':' + file.fsPath)
-	)
+	filesFromApiFile.forEach((file) => fileList.push(file._formatted!))
+	console.log('fileList', fileList)
 	return fileList
 }

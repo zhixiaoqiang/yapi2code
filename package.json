@@ -169,8 +169,6 @@
   ],
   "dependencies": {
     "axios": "^1.4.0",
-    "cheerio": "^1.0.0-rc.12",
-    "copy-webpack-plugin": "^11.0.0",
     "fs-extra": "^11.1.1",
     "vscode-languageclient": "^7.0.0"
   },
@@ -192,6 +190,7 @@
     "@vscode/vsce": "^2.19.0",
     "commitizen": "4.3.0",
     "conventional-changelog-cli": "2.2.2",
+    "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "^8.40.0",

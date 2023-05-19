@@ -47,8 +47,8 @@ function clientRun(context: ExtensionContext): [LanguageClient, Dove] {
 
 	// 创建语言服务器并启动客户端
 	client = new LanguageClient(
-		'languageServerApiMate',
-		'Language Server Api Mate',
+		'languageServerYapiToCode',
+		'Language Server Yapi to code',
 		serverOptions,
 		clientOptions
 	)
@@ -73,8 +73,6 @@ function clientRun(context: ExtensionContext): [LanguageClient, Dove] {
 		dove.subscribe(
 			Client_Server_MsgTYpe.GIVE_INFO_FROM_PATH__SERVER,
 			(apiPath: string) => {
-				// 顺便检查更新
-				// checkVersion()
 				return searchApiUntilDone(apiPath).catch(() => {
 					return null
 				})
