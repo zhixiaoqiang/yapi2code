@@ -26,6 +26,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "build:all": "pnpm build && pnpm build:webview && pnpm build:server",
+    "build:rs": "rspack build",
     "build:server": "cd src/server && pnpm build",
     "build:webview": "cd src/webview && pnpm build",
     "commit": "git-cz",
@@ -40,6 +41,7 @@
     "pub": "vsce publish --no-dependencies",
     "sort-package-json": "sort-package-json '**/package.json'",
     "start": "webpack --mode development --watch --devtool eval-source-map",
+    "start:rs": "rspack serve --mode development --watch --devtool eval-source-map",
     "pretest": "pnpm compile-tests && pnpm compile && pnpm lint",
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "rimraf dist && pnpm build:all",
@@ -177,6 +179,7 @@
     "@commitlint/cli": "^17.6.3",
     "@commitlint/config-conventional": "^17.6.3",
     "@modern-js/inspector-webpack-plugin": "^1.0.6",
+    "@rspack/cli": "^0.1.11",
     "@swc/core": "^1.3.58",
     "@types/fs-extra": "^11.0.1",
     "@types/glob": "^8.1.0",
