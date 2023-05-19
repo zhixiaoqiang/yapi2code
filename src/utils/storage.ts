@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import { AllStorageType } from '../constant/storage'
+import { AllStorageType, StorageType } from '../constant/storage'
 
 type StorageTypePlus = `${AllStorageType}` | `${AllStorageType}_${string}`
 
@@ -20,22 +20,18 @@ class Store {
 	}
 	clearAll() {
 		// 清空储存
-		this.setStorage(AllStorageType.USER_INFO, undefined)
-		this.setStorage(AllStorageType.LOGIN_INFO, undefined)
-		this.setStorage(AllStorageType.COOKIE, undefined)
-		this.setStorage(AllStorageType.DATA_GROUP, undefined)
-		this.setStorage(AllStorageType.DATA_PROJECT, undefined)
-		this.setStorage(AllStorageType.DATA_DIR, undefined)
+		Object.values(StorageType).forEach((key) => {
+			this.clear(key)
+		})
+
 		this.context?.globalState.keys().forEach((key) => {
 			if (
-				key.startsWith(AllStorageType.DATA_DIR_AND_ITEM) ||
-				key.startsWith(AllStorageType.DATA_ITEM)
+				key.startsWith(StorageType.DATA_DIR_AND_ITEM) ||
+				key.startsWith(StorageType.DATA_ITEM)
 			) {
-				this.setStorage(key as any, undefined)
+				this.clear(key as any)
 			}
 		})
-		this.setStorage(AllStorageType.LOGIN_STAMP, undefined)
-		this.setStorage(AllStorageType.WEBVIEW_DONE, undefined)
 	}
 }
 

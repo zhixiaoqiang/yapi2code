@@ -18,27 +18,13 @@ const container: {
 	dove?: Dove
 } = {}
 
-function initStorage(context: vscode.ExtensionContext) {
-	/** 初始化storage */
-	storage.init(context)
-
-	storage.setStorage(AllStorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
-
-	vscode.workspace.onDidChangeConfiguration((e) => {
-		if (e.affectsConfiguration('yapi')) {
-			storage.setStorage(
-				AllStorageType.WORKSPACE_CONFIG,
-				getConfiguration('yapi')
-			)
-		}
-	})
-}
-
 export function activate(context: vscode.ExtensionContext): void {
 	/** 初始化webview */
 	const slideWebview = getSlideBarWebview(context)
+	/** 初始化storage */
+	storage.init(context)
 
-	initStorage(context)
+	initWorkspaceConfig()
 
 	/** 初始化vscode功能 */
 	context.subscriptions.push(
@@ -209,6 +195,19 @@ export function activate(context: vscode.ExtensionContext): void {
 
 export function deactivate() {
 	return callWhenDeactivate()
+}
+
+function initWorkspaceConfig() {
+	storage.setStorage(AllStorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
+
+	vscode.workspace.onDidChangeConfiguration((e) => {
+		if (e.affectsConfiguration('yapi')) {
+			storage.setStorage(
+				AllStorageType.WORKSPACE_CONFIG,
+				getConfiguration('yapi')
+			)
+		}
+	})
 }
 
 // 获取所有待处理接口文件
