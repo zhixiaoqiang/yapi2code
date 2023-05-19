@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.0.20
+
+### Patch Changes
+
+- feat: 调整检测待补全接口范围为当前工作区的.ts/.tsx文件,且不包含.d.ts文件
+- chore: 调整 storage.clearAll 清除范围
+- 添加 rspack 打包（未完成）
+
 ## 0.0.17
 
 ### Patch Changes
