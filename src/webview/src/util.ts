@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import Dove from '../utils/dove'
+import Dove from '../../utils/dove'
 import { MsgType } from '../../constant/msg'
 
 const vscode = window.acquireVsCodeApi()

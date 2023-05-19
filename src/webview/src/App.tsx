@@ -8,7 +8,7 @@ import { MsgType } from '../../constant/msg'
 
 import './App.less'
 
-import type { Msg } from '../utils/dove/store'
+import type { Msg } from '../../utils/dove/store'
 
 export default function App() {
 	const [isLogin, setIsLogin] = useState<boolean | -1>(-1)
