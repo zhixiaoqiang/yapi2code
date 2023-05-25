@@ -212,15 +212,14 @@ function initWorkspaceConfig() {
 // 获取所有待处理接口文件
 async function getApiFileList() {
 	const fileList: string[] = []
-	// '**/*{.ts,.tsx}'
-	// '**/*[!(.d)]{.ts,.tsx}'
+	// '**/*{.ts,.tsx}' 检测所有的 ts tsx 文件
+	// '**/*[!(.d)]{.ts,.tsx}' 检测所有的不包含 .d 的 ts tsx 文件
 	const filesFromApiFile = await vscode.workspace.findFiles(
 		'**/*[!(.d)]{.ts,.tsx}',
 		'**​/node_modules/**',
 		200
 	)
 
-	filesFromApiFile.forEach((file) => fileList.push(file._formatted!))
-	console.log('fileList', fileList)
+	filesFromApiFile.forEach((file) => fileList.push(file._formatted))
 	return fileList
 }

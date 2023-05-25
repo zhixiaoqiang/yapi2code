@@ -4,7 +4,7 @@
       {
           // 定义 npm: watch
           "type": "npm",
-          "script": "watch",
+          "script": "watch:rs",
           "problemMatcher": {
               "owner": "typescript",
               "pattern":[
@@ -18,8 +18,8 @@
               "background": {
                   "activeOnStart": true,
                   // 通过对 Webpack 的输出内容进行匹配，得知编译是否完成
-                  "beginsPattern": "extension\\.*",
-                  "endsPattern": "successfully"
+                  "beginsPattern": "Time:.*",
+                  "endsPattern": "ms"
               }
           },
           "isBackground": true,

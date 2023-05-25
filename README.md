@@ -23,7 +23,7 @@
 - [ ] 4. 优化页面性能
 - [ ] 5. 支持自定义解析
 - [x] 6. yarn 替换为 pnpm
-- [ ] 7. 迁移到 Rspack
+- [x] 7. 迁移到 Rspack
 - [ ] ...
 
 ## 登录 YAPI
@@ -99,6 +99,16 @@ module.exports = () => {
 > 需要依赖 src/server src/webview 的资源
 
 ### 编译前置依赖
+
+#### Rspack ⚡️⚡️⚡️
+
+```bash
+pnpm i
+cd src/server && pnpm start:rs
+cd src/webview && pnpm start:rs
+```
+
+#### Webpack
 
 ```bash
 pnpm i

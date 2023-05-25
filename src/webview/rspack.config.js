@@ -7,13 +7,7 @@ module.exports = {
 	target: 'web',
 	output: {
 		filename: '[name].js',
-		path: path.resolve(__dirname, '..', '..', 'dist'),
-		library: {
-			type: 'module'
-		}
-	},
-	css: {
-		extract: false
+		path: path.resolve(__dirname, '..', '..', 'dist')
 	},
 	module: {
 		rules: [
@@ -21,7 +15,11 @@ module.exports = {
 				test: /\.css$/i,
 				type: 'css' // this is enabled by default for .css, so you don't need to specify it
 			},
-			{ test: /.less$/, use: [{ loader: 'less-loader' }], type: 'css' },
+			{
+				test: /.less$/,
+				use: [{ loader: require.resolve('less-loader') }],
+				type: 'css'
+			},
 			{
 				test: /\.(png|svg|jpe?g|gif)$/i,
 				type: 'asset/resource'
@@ -32,11 +30,16 @@ module.exports = {
 		extensions: ['.ts', '.tsx', '.js', '.jsx']
 	},
 	mode: 'production',
-	builtins: {
-		css: {
-			modules: {
-				exportsOnly: true
-			}
-		}
-	}
+	// builtins: {
+	// 	css: {
+	// 		modules: {
+	// 			exportsOnly: true
+	// 		}
+	// 	}
+	// },
+	watchOptions: {
+		ignored: /node_modules/,
+		poll: true
+	},
+	devtool: false
 }
