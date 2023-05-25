@@ -25,10 +25,10 @@
   ],
   "scripts": {
     "build": "webpack --mode production",
-    "build:all": "pnpm build && pnpm build:webview && pnpm build:server",
+    "build:all": "pnpm build:rs && pnpm build:webview && pnpm build:server",
     "build:rs": "rspack build",
-    "build:server": "cd src/server && pnpm build",
-    "build:webview": "cd src/webview && pnpm build",
+    "build:server": "cd src/server && pnpm build:rs",
+    "build:webview": "cd src/webview && pnpm build:rs",
     "commit": "git-cz",
     "compile": "webpack",
     "compile-tests": "tsc -p . --outDir out",
@@ -221,5 +221,5 @@
     "npm": ">=8.15.0",
     "vscode": "^1.78.0"
   },
-  "icon": "dist/assets/logo1.png"
+  "icon": "dist/assets/logo.png"
 }
