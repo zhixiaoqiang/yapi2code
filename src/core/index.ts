@@ -1,13 +1,6 @@
 import path from 'node:path'
 import { pathExists } from 'fs-extra'
-import {
-	Uri,
-	WorkspaceFolder,
-	ExtensionContext,
-	commands,
-	workspace,
-	window
-} from 'vscode'
+import { ExtensionContext, commands, workspace, window } from 'vscode'
 
 import { SlideBarWebview } from './webviewTemplate'
 import Dove from '../utils/dove'
@@ -24,11 +17,11 @@ import {
 import storage from '../utils/storage'
 import createFile from './createFile'
 import { data2Type, formatBaseTips, formatDubboTips } from '../utils/yapi2type'
-import { getWorkspaceFolders } from '../common/vscodeapi'
+import { getProjectConfig } from '../common/vscodeapi'
 import { Command, ContextEnum } from '../constant/vscode'
 import { MsgType } from '../constant/msg'
 import { AllStorageType } from '../constant/storage'
-import { CONFIG_FILE_NAME, DEFAULT_CONFIG, IConfig } from '../constant/config'
+import { DEFAULT_CONFIG, IConfig } from '../constant/config'
 
 export const getSlideBarWebview = (context: ExtensionContext) => {
 	const wv = new SlideBarWebview(context)
@@ -289,53 +282,4 @@ export function openLocalFile(filePath: string) {
 			console.log(`Open ${filePath} error, ${err}.`)
 		}
 	)
-}
-
-export async function getProjectRoot(): Promise<WorkspaceFolder> {
-	const workspaces: readonly WorkspaceFolder[] = getWorkspaceFolders()
-	if (workspaces.length === 0) {
-		return {
-			uri: Uri.file(process.cwd()),
-			name: path.basename(process.cwd()),
-			index: 0
-		}
-	} else if (workspaces.length === 1) {
-		return workspaces[0]
-	} else {
-		let rootWorkspace = workspaces[0]
-
-		for (const w of workspaces) {
-			if (await pathExists(w.uri.fsPath)) {
-				rootWorkspace = w
-			}
-		}
-		return rootWorkspace
-	}
-}
-
-export async function getProjectConfig() {
-	const workspaceFolder = await getProjectRoot()
-	let config
-	if (workspaceFolder) {
-		return workspace.fs
-			.readFile(Uri.joinPath(workspaceFolder.uri, CONFIG_FILE_NAME))
-			.then(
-				(res) => {
-					try {
-						config = eval(res.toString())?.()
-						return config
-					} catch (error) {
-						console.log('配置异常，请检查配置项', error)
-						commands.executeCommand(
-							Command.WARN_TOAST,
-							`配置异常，请检查配置项 ${error}`
-						)
-					}
-				},
-				(err) => {
-					console.log('error', err)
-				}
-			)
-	}
-	return config
 }

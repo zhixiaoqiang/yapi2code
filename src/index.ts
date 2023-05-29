@@ -8,7 +8,7 @@ import Dove from './utils/dove'
 import storage from './utils/storage'
 import { ApiTypeList } from './utils/types'
 import { clearComposeRequestCache } from './utils/componse'
-import { getConfiguration } from './common/vscodeapi'
+import { getConfiguration, getWorkspaceFolder } from './common/vscodeapi'
 import { Command, ContextEnum, SideBarView } from './constant/vscode'
 import { GIT_REMOTE_URL } from './constant/github'
 import { MsgType } from './constant/msg'
@@ -67,6 +67,7 @@ export function activate(context: vscode.ExtensionContext): void {
 				await writeFile(filePath, text)
 			}
 		),
+
 		vscode.commands.registerCommand(Command.FIX_ALL, async () => {
 			const uri = vscode.window.activeTextEditor?.document.uri
 			if (!container.dove || !uri) {
@@ -145,12 +146,14 @@ export function activate(context: vscode.ExtensionContext): void {
 		 *  不存在列表中，诊断后添加
 		 */
 		const fileTypeList =
-			(await container?.dove?.sendMessage(MsgType.API_FILE_HANDLER, files)) ||
-			[]
-		const results = (fileTypeList as ApiTypeList[])?.[0]?.map((file) => file)
-		const rootPath = vscode.workspace.getWorkspaceFolder(
-			vscode.Uri.parse(results?.[0]?.uri)
-		)
+			(await container?.dove?.sendMessage<ApiTypeList[]>(
+				MsgType.API_FILE_HANDLER,
+				files
+			)) || []
+
+		const results = fileTypeList?.[0]?.map((file) => file)
+		const rootPath = getWorkspaceFolder(vscode.Uri.parse(results?.[0]?.uri))
+
 		const replaceRex = rootPath?.uri?.scheme + '://' + rootPath?.uri?.fsPath
 		const finalRet: ApiTypeList = results?.map((i) => ({
 			...i,

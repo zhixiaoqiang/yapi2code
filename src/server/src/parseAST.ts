@@ -15,10 +15,8 @@ export function getApiPositionList(ast: ts.SourceFile, config?: any) {
 		context: ts.TransformationContext
 	) => {
 		return function visitor(node: ts.Node | ts.CallExpression): ts.Node {
-			if (isFunction(node) || isCreateApi(node)) {
-				const apiNode = isFunction(node)
-					? getApiNode(node as FunctionNode, config)
-					: getApiNodeWhenCreateApi(node as ts.CallExpression, config)
+			if (isFunction(node)) {
+				const apiNode = getApiNode(node as FunctionNode, config)
 				if (apiNode) {
 					result.push({
 						...apiNode,
@@ -36,32 +34,12 @@ export function getApiPositionList(ast: ts.SourceFile, config?: any) {
 	return result
 }
 
-function getApiNodeWhenCreateApi(
-	node: ts.CallExpression,
-	config?: any
-): false | FunctionStruct {
-	const result: FunctionStruct = { apiPath: '', requestFn: 'any' }
-	// request() 形式
-	const hasMethodGeneric = !!node?.typeArguments?.length
-
-	if (!hasMethodGeneric) {
-		result.methodGenericInsertPosition = getResponseGenericInsertPosition(node)
-		const apiPath = getApiUrlFromExpressionNode(node)
-		if (apiPath) {
-			result.apiPath = apiPath
-			result.requestFn = getFnName(node)
-			return result
-		}
-	}
-	return false
-}
-
 function getApiNode(node: FunctionNode, config?: any): false | FunctionStruct {
 	const result: FunctionStruct = { apiPath: '', requestFn: 'any' }
 	// 获取参数节点
 	const paramNodes = getTheChildNode(node, ts.isParameter)
 
-	// 参数的数量
+	// 参数大于一的时候不是个正常的接口传参，所以直接返回
 	if (paramNodes.length > 1) {
 		return false
 	}
@@ -144,19 +122,6 @@ function isFunction(node: ts.Node): boolean {
 		ts.isArrowFunction(node) ||
 		ts.isFunctionExpression(node) ||
 		ts.isFunctionDeclaration(node)
-	)
-}
-
-function isCreateApi(node: ts.Node): boolean {
-	return (
-		(ts.isCallExpression(node) &&
-			(node.expression as any)?.escapedText === 'createApi') ||
-		(
-			getTheChildNode<ts.PropertyAccessExpression>(
-				node,
-				ts.isPropertyAccessExpression
-			)?.[0]?.expression as any
-		)?.escapedText === 'createApi'
 	)
 }
 

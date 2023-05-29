@@ -1,13 +1,13 @@
-import * as fs from 'fs'
+import { readFile, existsSync, writeFile as fseWriteFile } from 'fs-extra'
 
 /**
  * @description 读取文本文件
  */
 export function loadFile(absPath: string): Promise<string> {
 	return new Promise((resolve, reject) => {
-		if (fs.existsSync(absPath)) {
+		if (existsSync(absPath)) {
 			// 文件存在-打开
-			fs.readFile(absPath, (err, data) => {
+			readFile(absPath, (err, data) => {
 				if (err) {
 					reject(err)
 					return console.log(err)
@@ -38,7 +38,7 @@ export const getFileCurrentWorkSpace = (
  */
 export const writeFile = (fileAbsPath: string, fileText: string) => {
 	return new Promise((resolve, reject) => {
-		fs.writeFile(
+		fseWriteFile(
 			fileAbsPath.replace('file://', ''),
 			fileText,
 			{ flag: 'a' },

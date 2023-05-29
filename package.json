@@ -211,6 +211,7 @@
     "swc-loader": "^0.2.3",
     "terser-webpack-plugin": "^5.3.9",
     "thread-loader": "^4.0.2",
+    "tsx": "^3.12.7",
     "typescript": "^5.0.4",
     "webpack": "^5.84.0",
     "webpack-cli": "^5.1.1"
