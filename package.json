@@ -64,6 +64,14 @@
         "title": "Yapi: 退出登录"
       },
       {
+        "command": "yapi.configuration",
+        "title": "Yapi: 设置"
+      },
+      {
+        "command": "yapi.configuration-preview",
+        "title": "Yapi: 设置-预览完整配置项"
+      },
+      {
         "command": "yapi.github",
         "title": "Yapi: github",
         "icon": {
@@ -133,6 +141,14 @@
         },
         {
           "command": "yapi.logout",
+          "when": "tree.view.show && view == yapi.view"
+        },
+        {
+          "command": "yapi.configuration",
+          "when": "tree.view.show && view == yapi.view"
+        },
+        {
+          "command": "yapi.configuration-preview",
           "when": "tree.view.show && view == yapi.view"
         }
       ],

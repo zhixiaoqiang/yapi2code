@@ -1,12 +1,11 @@
 import * as ts from 'typescript'
-import { resolve } from 'path'
 
 /**
  * 获取节点的类型
  * @param node 要获取类型的节点
  * @param program TypeScript 程序
  */
-function getTypeFor(node: ts.Node, program: ts.Program): ts.Type {
+function getType(node: ts.Node, program: ts.Program): ts.Type {
 	return program.getTypeChecker().getTypeAtLocation(node)
 }
 
@@ -15,8 +14,8 @@ function getTypeFor(node: ts.Node, program: ts.Program): ts.Type {
  * @param node 要获取类型的节点
  * @param program TypeScript 程序
  */
-function getTypeStringFor(node: ts.Node, program: ts.Program): string {
-	const type = getTypeFor(node, program)
+function getTypeString(node: ts.Node, program: ts.Program): string {
+	const type = getType(node, program)
 
 	if (!type) {
 		return 'any'
@@ -37,7 +36,7 @@ function getTypeStringFor(node: ts.Node, program: ts.Program): string {
  * @param node 要获取返回值类型的函数节点
  * @param program TypeScript 程序
  */
-function getReturnTypeFor(node: ts.Node, program: ts.Program): string {
+function getReturnType(node: ts.Node, program: ts.Program): string {
 	if (
 		ts.isFunctionDeclaration(node) ||
 		ts.isFunctionExpression(node) ||
@@ -54,33 +53,27 @@ function getReturnTypeFor(node: ts.Node, program: ts.Program): string {
 					const statement = statements[0]
 					if (statement.expression) {
 						// 处理 return 语句中的表达式
-						return getTypeStringFor(statement.expression, program)
+						return getTypeString(statement.expression, program)
 					}
 				}
 			} else {
 				// 函数体为一个表达式，例如箭头函数
-				return getTypeStringFor(body, program)
+				return getTypeString(body, program)
 			}
 		}
 	}
 
-	return getTypeStringFor(node, program) || 'any'
+	return getTypeString(node, program) || 'any'
 }
 
 /**
  * 分析代码文件中的函数返回值类型
  * @param fileName 要分析类型的代码文件名
  */
-export function analyzeFunctionReturnType(fileName: string) {
-	// 解析代码，获取 AST
-
-	const program = ts.createProgram({
-		rootNames: [fileName],
-		options: ts.getDefaultCompilerOptions()
-	})
-
-	const sourceFile = program.getSourceFile(fileName)
-
+export function analyzeFunctionReturnType(
+	sourceFile: ts.SourceFile,
+	program: ts.Program
+) {
 	if (sourceFile) {
 		const types: string[] = []
 
@@ -90,7 +83,7 @@ export function analyzeFunctionReturnType(fileName: string) {
 				ts.isArrowFunction(node) ||
 				ts.isFunctionExpression(node)
 			) {
-				types.push(getReturnTypeFor(node, program))
+				types.push(getReturnType(node, program))
 			} else if (ts.isVariableStatement(node)) {
 				node.declarationList.declarations.forEach((decl) => {
 					if (
@@ -98,7 +91,7 @@ export function analyzeFunctionReturnType(fileName: string) {
 						(ts.isArrowFunction(decl.initializer) ||
 							ts.isFunctionExpression(decl.initializer))
 					) {
-						types.push(getReturnTypeFor(decl.initializer, program))
+						types.push(getReturnType(decl.initializer, program))
 					}
 				})
 			}
@@ -108,8 +101,3 @@ export function analyzeFunctionReturnType(fileName: string) {
 	}
 	return []
 }
-
-const returnType = analyzeFunctionReturnType(
-	resolve(__dirname, './analyze-test-file.ts')
-)
-console.log(returnType) // 输出 [ 'string', 'string', 'number', 'Promise<number>', 'number' ]

@@ -9,21 +9,17 @@ import {
 	Uri,
 	window,
 	workspace,
-	WorkspaceConfiguration,
 	WorkspaceFolder
 } from 'vscode'
 import { Command } from '../constant/vscode'
-import { CONFIG_FILE_NAME } from '../constant/config'
+import { CONFIG_FILE_NAME, IConfig } from '../constant/config'
 
 export function createOutputChannel(name: string): LogOutputChannel {
 	return window.createOutputChannel(name, { log: true })
 }
 
-export function getConfiguration(
-	config?: string,
-	scope?: ConfigurationScope
-): WorkspaceConfiguration {
-	return workspace.getConfiguration(config, scope)
+export function getConfiguration(config?: string, scope?: ConfigurationScope) {
+	return workspace.getConfiguration(config, scope) as unknown as IConfig
 }
 
 export function registerCommand(

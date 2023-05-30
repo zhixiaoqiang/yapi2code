@@ -372,7 +372,7 @@ function DataTree() {
 		setExpendKeys(keys)
 	}
 
-	const [showApi, setShowApi] = useState<boolean>(true)
+	const [showApiList, setShowApi] = useState<boolean>(true)
 	const navigationToFile = (item: { uri: string }) => {
 		dove.sendMessage(MsgType.OPEN_FILE, item?.uri)
 	}
@@ -380,14 +380,14 @@ function DataTree() {
 	return (
 		<div className="data-tree-container">
 			<div className="banner">
-				<div className="banner-inner" onClick={() => setShowApi(!showApi)}>
-					{!showApi ? (
+				<div className="banner-inner" onClick={() => setShowApi(!showApiList)}>
+					{!showApiList ? (
 						<ApiFilled />
 					) : (
 						<Badge count={fileList.length} className="badge" />
 					)}
 				</div>
-				{showApi ? (
+				{showApiList ? (
 					<Input
 						size="small"
 						placeholder="搜索API，例如：新增、/add"
@@ -411,7 +411,7 @@ function DataTree() {
 				)}
 			</div>
 			<Spin spinning={loading}>
-				{showApi ? (
+				{showApiList ? (
 					<div className="tree-body">
 						<DirectoryTree
 							blockNode

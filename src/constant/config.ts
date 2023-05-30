@@ -52,3 +52,34 @@ export const DEFAULT_CONFIG: IConfig = {
 }
 
 export const YAPI_RESPONSE_NAME = 'YapiResponse'
+
+export const genConfigTemplate = (config: IConfig = DEFAULT_CONFIG) => {
+	return `module.exports = () => {
+	return {
+		// resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型
+		// 'outerFunction' | 'fetchMethodGeneric'
+		responseTypePosition: '${config.responseTypePosition}',
+		// 生成 res 包含的属性，默认 all, 可指定为 data
+		responseKey: '${config.responseKey}',
+		// 自定义生成 request 方法
+		genRequest(
+			{
+				comment,
+				fnName,
+				IReqTypeName,
+				IResTypeName,
+				requestFnName,
+				apiPath,
+			},
+			data
+		) {
+			return (
+				\`\\n\${comment}\\n\` +
+				\`export async function \${fnName}(params: I\${IReqTypeName}) {
+					return request.\${requestFnName}<\${IResTypeName}>('\${apiPath}', params)
+				}\`
+			)
+		}
+	}
+}`
+}

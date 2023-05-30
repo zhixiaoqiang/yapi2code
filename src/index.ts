@@ -14,6 +14,9 @@ import { GIT_REMOTE_URL } from './constant/github'
 import { MsgType } from './constant/msg'
 import { AllStorageType } from './constant/storage'
 
+import { getProjectRoot } from './common/vscodeapi'
+import { CONFIG_FILE_NAME, genConfigTemplate } from './constant/config'
+
 const container: {
 	dove?: Dove
 } = {}
@@ -60,6 +63,49 @@ export function activate(context: vscode.ExtensionContext): void {
 			)
 			slideWebview.dove?.sendMessage(MsgType.LOGIN_STATUS, false)
 		}),
+		vscode.commands.registerCommand(Command.CONFIGURATION, async () => {
+			const rootWorkspace = await getProjectRoot()
+			const configFile = vscode.Uri.joinPath(
+				rootWorkspace.uri,
+				CONFIG_FILE_NAME
+			)
+
+			const exists = await vscode.workspace.fs.stat(configFile).then(
+				() => true,
+				() => false
+			)
+			if (exists) {
+				await vscode.window.showTextDocument(configFile)
+			} else {
+				const answer = await vscode.window.showWarningMessage(
+					`${configFile.fsPath} 不存在，是否创建?`,
+					'是',
+					'否',
+					'预览'
+				)
+				if (answer === '是') {
+					const encoder = new TextEncoder()
+
+					await vscode.workspace.fs.writeFile(
+						configFile,
+						encoder.encode(genConfigTemplate(getConfiguration('yapi')))
+					)
+					await vscode.window.showTextDocument(configFile)
+				} else if (answer === '预览') {
+					vscode.commands.executeCommand(Command.CONFIGURATION_PREVIEW)
+				}
+			}
+		}),
+		vscode.commands.registerCommand(Command.CONFIGURATION_PREVIEW, async () => {
+			const content = genConfigTemplate(getConfiguration('yapi'))
+			const document = await vscode.workspace.openTextDocument({
+				language: 'typescript',
+				content
+			})
+
+			vscode.window.showTextDocument(document)
+		}),
+
 		vscode.commands.registerCommand(
 			Command.INSERT_TYPE,
 			async ({ filePath, text }) => {

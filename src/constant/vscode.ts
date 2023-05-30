@@ -6,6 +6,10 @@ export enum Command {
 	GITHUB = 'yapi.github',
 	/** 退出登录 */
 	LOGOUT = 'yapi.logout',
+	/** 配置 */
+	CONFIGURATION = 'yapi.configuration',
+	/** 设置-预览完整配置项 */
+	CONFIGURATION_PREVIEW = 'yapi.configuration-preview',
 	/** 刷新接口 */
 	REFRESH = 'yapi.refresh',
 	/** 注入类型 */
