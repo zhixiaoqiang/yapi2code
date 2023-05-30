@@ -5,8 +5,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "rspack build",
-		"start": "rspack build --watch true",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"start": "rspack build --watch true"
 	},
 	"dependencies": {
 		"typescript": "^5.0.4",

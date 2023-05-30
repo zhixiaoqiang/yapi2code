@@ -7,12 +7,11 @@
   "main": "index.js",
   "scripts": {
     "build": "rspack build",
-    "start": "rspack build --watch true",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "rspack build --watch true"
   },
   "dependencies": {
-    "@ant-design/icons": "^4.8.0",
-    "antd": "^4.24.10",
+    "@ant-design/icons": "^5.1.4",
+    "antd": "^5.5.2",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
