@@ -68,6 +68,7 @@ module.exports = () => {
     responseTypePosition: 'outerFunction',
     // 生成 res 包含的属性，默认 all, 可指定为 data
     responseKey: 'all',
+    // 自定义生成 request 方法
     genRequest(
       {
         comment,
@@ -79,11 +80,11 @@ module.exports = () => {
       },
       data
     ) {
-  return (
-      `\n${comment}\n` +
-      `export async function ${fnName}(params: I${IReqTypeName}) {
-  return request.${requestFnName}<${IResTypeName}>('${apiPath}', params)
-}`
+      return (
+        `\n${comment}\n` +
+        `export async function ${fnName}(params: I${IReqTypeName}) {
+          return request.${requestFnName}<${IResTypeName}>('${apiPath}', params)
+        }`
       )
     }
   }

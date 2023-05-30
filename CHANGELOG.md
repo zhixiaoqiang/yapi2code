@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.0.21
+
+### Patch Changes
+
+- feat: menus 支持添加\预览配置文件
+- feat: 默认使用 rspack 打包
+
 ## 0.0.20
 
 ### Patch Changes
