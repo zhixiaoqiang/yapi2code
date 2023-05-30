@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { Input, Button, Typography, Switch, Space } from 'antd'
+import { Input, Button, Typography, Switch, message } from 'antd'
 import { GithubOutlined } from '@ant-design/icons'
 
 import { dove } from '../../util'
 
-import './index.less'
 import { MsgType } from '../../../../constant/msg'
 import { Command } from '../../../../constant/vscode'
 import {
 	YAPI_DEFAULT_SERVER_URL,
 	LOGIN_BY_LDAP
 } from '../../../../constant/yapi'
+
+import './index.less'
 
 interface LoginProps {
 	setIsLogin: React.Dispatch<React.SetStateAction<boolean | -1>>
@@ -26,21 +27,28 @@ function Login(props: LoginProps) {
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
 
-	const toastWarnInfo = (content: string) => {
-		dove.sendMessage(MsgType.COMMAND, {
-			command: Command.WARN_TOAST,
-			data: content
+	// const toastWarnInfo = (content: string) => {
+	// 	dove.sendMessage(MsgType.COMMAND, {
+	// 		command: Command.WARN_TOAST,
+	// 		data: content
+	// 	})
+	// }
+
+	const warning = (content: string) => {
+		message.open({
+			type: 'warning',
+			content
 		})
 	}
 
 	const onLogin = async () => {
 		// 登录校检
 		if (!/^https?:\/\//.test(serverUrl)) {
-			toastWarnInfo('请输入正确的服务器地址')
+			warning('请输入正确的服务器地址')
 			return
 		}
 		if (!username || !password) {
-			toastWarnInfo('用户名和密码不能为空')
+			warning('用户名和密码不能为空')
 			return
 		}
 		setLoading(true)
@@ -56,7 +64,7 @@ function Login(props: LoginProps) {
 		if (loginStatus) {
 			setIsLogin(loginStatus)
 		} else {
-			toastWarnInfo('登录失败')
+			warning('登录失败')
 		}
 	}
 
@@ -74,7 +82,7 @@ function Login(props: LoginProps) {
 	return (
 		<div className="container">
 			<Title level={5} className="title">
-				yapi登录
+				yapi to code 登录
 			</Title>
 			<Input
 				placeholder="服务器地址"

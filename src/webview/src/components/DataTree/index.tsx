@@ -298,7 +298,7 @@ function DataTree() {
 		return (
 			<div className="node-container">
 				<div className="node-container-content">
-					<span>{nodeData.title}</span>
+					<span className="line1">{nodeData.title}</span>
 					{nodeData.isApi && !nodeData.isDubbo && (
 						<span
 							onClick={(e) => {
@@ -384,7 +384,7 @@ function DataTree() {
 					{!showApiList ? (
 						<ApiFilled />
 					) : (
-						<Badge count={fileList.length} className="badge" />
+						<Badge count={fileList.length} showZero />
 					)}
 				</div>
 				{showApiList ? (
