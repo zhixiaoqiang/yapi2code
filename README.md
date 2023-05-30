@@ -12,7 +12,7 @@
 4. 😼 多种登录方式
 5. ⚡️ 高性能
 6. ✍️ 支持 js 配置自定义输出
-7. 💡 webpack 5 (计划迁移到 Rspack)
+7. ⚡️ 极速的开发体验 - Rspack
 8. ...
 
 **TODO:**
@@ -105,8 +105,8 @@ module.exports = () => {
 
 ```bash
 pnpm i
-cd src/server && pnpm start:rs
-cd src/webview && pnpm start:rs
+cd src/server && pnpm start
+cd src/webview && pnpm start
 ```
 
 #### Webpack

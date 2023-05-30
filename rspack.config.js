@@ -5,7 +5,6 @@ module.exports = {
 	mode: 'production',
 	entry: './src/index.ts',
 	output: {
-		// the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
 		path: path.resolve(__dirname, 'dist'),
 		filename: 'extension.js',
 		library: {
@@ -13,8 +12,7 @@ module.exports = {
 		}
 	},
 	externals: {
-		vscode: 'commonjs vscode' // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
-		// modules added here also need to be added in the .vsceignore file
+		vscode: 'commonjs vscode'
 	},
 	resolve: {
 		extensions: ['.ts', '.js', '.tsx', '.jsx'],

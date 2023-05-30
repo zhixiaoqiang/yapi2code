@@ -4,10 +4,8 @@
 	"description": "yapi to code of a language server in node.",
 	"license": "MIT",
 	"scripts": {
-		"build": "webpack",
-		"build:rs": "rspack build",
-		"start": "webpack --mode development --watch --devtool eval-source-map",
-		"start:rs": "rspack build --watch true",
+		"build": "rspack build",
+		"start": "rspack build --watch true",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"dependencies": {
