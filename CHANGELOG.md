@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.22
+
+### Patch Changes
+
+- feat: 可以通过在 tree 组件上按右键进行数据刷新、清除
+
 ## 0.0.21
 
 ### Patch Changes
