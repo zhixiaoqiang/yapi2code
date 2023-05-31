@@ -46,9 +46,21 @@ Yapi To Code 对文档中未定义参数类型或返回值类型的接口进行�
 
 Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口对接口类型进行预览，然后把类型复制到项目中。
 
-这种方式比较笨拙，推荐使用代码诊断功能，一条龙完成
-
 <img src="https://qnm.hunliji.com/FtK9IFJlRvKdPCA4jLNoEXs1xyKO" width="800" />
+
+##### 新窗口中打开
+
+默认接口都会在一个窗口预览，有时候需要在新窗口中预览则可以点击如下 Icon
+
+<img src="./public/api-blank.png" width="300" />
+
+##### 定向刷新 & 清除
+
+有时候部分接口更新了，需要单独刷新部分的接口则可以在 tree 上按右键进行重新请求操作
+
+清除操作仅静态删除子项内容
+
+<img src="./public/tree-contextMenu.png" width="300" />
 
 #### 自定义渲染
 

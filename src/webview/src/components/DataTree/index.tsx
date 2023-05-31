@@ -571,7 +571,7 @@ function DataTree() {
 					禁用
 				</Item> */}
 				<Item onClick={handleItemClick} data={{ type: 'delete' }}>
-					清楚
+					清除子项
 				</Item>
 			</Menu>
 		</div>
