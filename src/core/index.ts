@@ -110,7 +110,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 					const groupData = storage.getStorage(AllStorageType.DATA_GROUP)
 
 					if (!groupData || params.needFresh) {
-						const { data } = await getGroupList()
+						const { data } = await getGroupList(undefined, params.needFresh)
 						storage.setStorage(AllStorageType.DATA_GROUP, data)
 						return data
 					} else {
@@ -126,7 +126,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 						`${AllStorageType.DATA_PROJECT}_${params.groupId}`
 					)
 					if (!projectData || params.needFresh) {
-						const { data } = await getProject(params.groupId)
+						const { data } = await getProject(params.groupId, params.needFresh)
 						storage.setStorage(
 							`${AllStorageType.DATA_PROJECT}_${params.groupId}`,
 							data
@@ -146,7 +146,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 					)
 
 					if (!dirData || params.needFresh) {
-						const { data } = await getDir(params.dirId)
+						const { data } = await getDir(params.dirId, params.needFresh)
 						storage.setStorage(
 							`${AllStorageType.DATA_DIR}_${params.dirId}`,
 							data
@@ -165,7 +165,10 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 						`${AllStorageType.DATA_DIR_AND_ITEM}_${params.projectId}` as const
 					const dirAndItemData = storage.getStorage(storageKey)
 					if (!dirAndItemData || params.needFresh) {
-						const { data } = await getDirAndItemList(params.projectId)
+						const { data } = await getDirAndItemList(
+							params.projectId,
+							params.needFresh
+						)
 						storage.setStorage(storageKey, data)
 						return data
 					} else {
@@ -182,7 +185,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 					)
 
 					if (!itemData || params.needFresh) {
-						const { data } = await getItemList(params.itemId)
+						const { data } = await getItemList(params.itemId, params.needFresh)
 						storage.setStorage(
 							`${AllStorageType.DATA_ITEM}_${params.itemId}`,
 							data || {
@@ -198,60 +201,66 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 				}
 			),
 			// 获取详情数据
-			dove.subscribe(MsgType.FETCH_DETAIL, async ({ id, blank }) => {
-				let config = {
-					...DEFAULT_CONFIG,
-					...(storage.getStorage(AllStorageType.WORKSPACE_CONFIG) as IConfig)
-				}
-				try {
-					const projectConfig = await getProjectConfig()
-
-					config = { ...config, ...projectConfig }
-				} catch (error) {
-					console.error('get config error', error)
-				}
-
-				const { data } = await getApiDetail(id).catch((e) => {
-					commands.executeCommand(Command.WARN_TOAST, '请求失败，无法预览')
-					commands.executeCommand(Command.WARN_TOAST, e?.toString())
-					return {
-						data: null
+			dove.subscribe(
+				MsgType.FETCH_DETAIL,
+				async (params: { id: string; blank: boolean; needFresh: boolean }) => {
+					let config = {
+						...DEFAULT_CONFIG,
+						...(storage.getStorage(AllStorageType.WORKSPACE_CONFIG) as IConfig)
 					}
-				})
-
-				if (data?.method === 'DUBBO') {
-					return createFile(formatDubboTips(data))
-				}
-
-				if (data?.path) {
 					try {
-						const tsData = data2Type(data, config)
-						createFile(
-							[
-								tsData.reqQueryType,
-								tsData.reqBodyType,
-								tsData.resType,
-								tsData.requestContent
-							]
-								.filter(Boolean)
-								.join('\n'),
-							blank
-						)
-					} catch (error) {
-						console.log('preview code', error)
-						createFile(
-							[
-								formatBaseTips(data, '生成异常'),
-								data ? JSON.stringify(data, null, 2) : ''
-							].join('\n')
-						)
-						commands.executeCommand(Command.WARN_TOAST, '无法预览')
-					}
-					return
-				}
+						const projectConfig = await getProjectConfig()
 
-				commands.executeCommand(Command.WARN_TOAST, '无法预览')
-			}),
+						config = { ...config, ...projectConfig }
+					} catch (error) {
+						console.error('get config error', error)
+					}
+
+					const { data } = await getApiDetail(
+						params.id,
+						params.needFresh
+					).catch((e) => {
+						commands.executeCommand(Command.WARN_TOAST, '请求失败，无法预览')
+						commands.executeCommand(Command.WARN_TOAST, e?.toString())
+						return {
+							data: null
+						}
+					})
+
+					if (data?.method === 'DUBBO') {
+						return createFile(formatDubboTips(data))
+					}
+
+					if (data?.path) {
+						try {
+							const tsData = data2Type(data, config)
+							createFile(
+								[
+									tsData.reqQueryType,
+									tsData.reqBodyType,
+									tsData.resType,
+									tsData.requestContent
+								]
+									.filter(Boolean)
+									.join('\n'),
+								params.blank
+							)
+						} catch (error) {
+							console.log('preview code', error)
+							createFile(
+								[
+									formatBaseTips(data, '生成异常'),
+									data ? JSON.stringify(data, null, 2) : ''
+								].join('\n')
+							)
+							commands.executeCommand(Command.WARN_TOAST, '无法预览')
+						}
+						return
+					}
+
+					commands.executeCommand(Command.WARN_TOAST, '无法预览')
+				}
+			),
 			// 打开指定文件
 			dove.subscribe(MsgType.OPEN_FILE, async (data) => {
 				if (data) {

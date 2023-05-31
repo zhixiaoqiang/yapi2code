@@ -20,7 +20,7 @@ export interface ProjectData {
 		global: any[]
 		header: any[]
 		name: string
-		_id: string
+		_id: number
 	}[]
 	follow: boolean
 	group_id: GroupData['_id']
@@ -74,8 +74,8 @@ export interface ItemData {
 	status: string
 	tag: string[]
 	title: string
-	uid: string
-	_id: string
+	uid: number
+	_id: number
 }
 
 export type ApiTypeList = {

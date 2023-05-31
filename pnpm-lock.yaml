@@ -98,12 +98,14 @@ importers:
       less-loader: ^11.1.1
       lodash: ^4.17.21
       react: ^18.2.0
+      react-contexify: ^6.0.0
       react-dom: ^18.2.0
     dependencies:
       '@ant-design/icons': 5.1.4_biqbaboplfbrettd7655fr4n2y
       antd: 5.5.2_biqbaboplfbrettd7655fr4n2y
       lodash: 4.17.21
       react: 18.2.0
+      react-contexify: 6.0.0_biqbaboplfbrettd7655fr4n2y
       react-dom: 18.2.0_react@18.2.0
     devDependencies:
       '@types/lodash': 4.14.195
@@ -2767,6 +2769,11 @@ packages:
     resolution: {integrity: sha1-2jCcwmPfFZlMaIypAheco8fNfH4=}
     engines: {node: '>=0.8'}
     dev: true
+
+  /clsx/1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
+    dev: false
 
   /color-convert/1.9.3:
     resolution: {integrity: sha1-u3GFBpDh8TZWfeYp0tVHHe2kweg=}
@@ -7040,6 +7047,17 @@ packages:
       strip-json-comments: 2.0.1
     dev: true
     optional: true
+
+  /react-contexify/6.0.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-jMhz6yZI81Jv3UDj7TXqCkhdkCFEEmvwGCPXsQuA2ZUC8EbCuVQ6Cy8FzKMXa0y454XTDClBN2YFvvmoFlrFkg==}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      clsx: 1.2.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
 
   /react-dom/18.2.0_react@18.2.0:
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}

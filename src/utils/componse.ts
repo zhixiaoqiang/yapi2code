@@ -6,7 +6,7 @@ const store = new (class {
 		Map<
 			string,
 			{
-				lastVisitTime: number
+				lastFetchTime: number
 				execResult: any
 				durTime: number
 			}
@@ -29,15 +29,15 @@ export function clearComposeRequestCache() {
  */
 export function composeRequest(task: taskType, durTime = 1000) {
 	store.tasks.set(task, new Map())
-	return async (...args: any[]) => {
+	return async (params?: any, needFresh = false) => {
 		const item = store.tasks.get(task)
 		if (!item) {
 			return
 		}
-		const key = JSON.stringify(args)
+		const key = JSON.stringify([params])
 		if (!item.get(key)) {
 			item.set(key, {
-				lastVisitTime: 0,
+				lastFetchTime: 0,
 				execResult: null,
 				durTime
 			})
@@ -46,11 +46,11 @@ export function composeRequest(task: taskType, durTime = 1000) {
 		if (!current) {
 			return
 		}
-		if (Date.now() - current.lastVisitTime > current.durTime) {
-			current.lastVisitTime = Date.now()
-			current.execResult = task(...args).catch(() => {
+		if (Date.now() - current.lastFetchTime > current.durTime || needFresh) {
+			current.lastFetchTime = Date.now()
+			current.execResult = task(params).catch(() => {
 				// 出错则清除
-				current.lastVisitTime = 0
+				current.lastFetchTime = 0
 				return new TypeError('error')
 			})
 		}

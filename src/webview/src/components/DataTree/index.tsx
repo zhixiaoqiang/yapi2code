@@ -1,16 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { ApiFilled, SearchOutlined, SelectOutlined } from '@ant-design/icons'
 import { Badge, Input, List, message, Spin, Tree } from 'antd'
 import debounce from 'lodash/debounce'
-import type { FieldDataNode } from 'rc-tree/lib/interface'
+import type { FieldDataNode, EventDataNode } from 'rc-tree/lib/interface'
 import fileIcon from '../../../../assets/api-file.svg'
 
 import { dove, useDoveReceiveMsg } from '../../util'
-import './index.less'
 
 import { Command } from '../../../../constant/vscode'
 import { YAPI_DEFAULT_SERVER_URL } from '../../../../constant/yapi'
 import { MsgType } from '../../../../constant/msg'
+
+import {
+	Menu,
+	Item,
+	ItemParams,
+	TriggerEvent,
+	useContextMenu
+} from 'react-contexify'
+import 'react-contexify/dist/ReactContexify.css'
+
+import './index.less'
 
 import type {
 	ApiTypeList,
@@ -20,29 +30,67 @@ import type {
 	ItemData,
 	ProjectData
 } from './types'
+import { keyLengthMapEnum } from './constants'
 
 const { DirectoryTree } = Tree
+const MENU_ID = 'menu-id'
 
 type TreeData = FieldDataNode<{
-	id: string | number
+	id: number
 	key: string | number
 	title?: React.ReactNode
 }> & {
 	isDubbo?: boolean
 	path?: string
 	isApi?: boolean
-	id: string | number
+	id: number
 }
 
 function DataTree() {
+	const [showApiList, setShowApi] = useState<boolean>(true)
 	const [loading, setLoading] = useState(true)
 	const [treeData, setTreeData] = useState<TreeData[]>([])
 	const [filterText, setFilterText] = useState('')
 	const [expandKeys, setExpendKeys] = useState<TreeData['key'][]>([])
 	const [fileList, setFileList] = useState<ApiTypeList>([])
 
+	const currentTreeNode = useRef<EventDataNode<TreeData>>(null)
+
+	// 🔥 you can use this hook from everywhere. All you need is the menu id
+	const { show } = useContextMenu({
+		id: MENU_ID
+	})
+
+	const handleItemClick = useCallback(
+		({
+			event,
+			triggerEvent,
+			data
+		}: ItemParams<any, { type: 'refresh' | 'disable' | 'delete' }>) => {
+			console.log(event, triggerEvent, currentTreeNode.current, treeData)
+			if (data?.type === 'refresh') {
+				currentTreeNode.current && refreshData(currentTreeNode.current)
+			} else if (data?.type === 'delete') {
+				setTreeData((origin) =>
+					updateTreeDataByKey(origin, currentTreeNode.current?.key || '', [])
+				)
+			}
+		},
+		[treeData]
+	)
+
+	const displayMenu = useCallback((e: TriggerEvent) => {
+		show({
+			event: e
+		})
+	}, [])
+
 	const onSelect = useCallback(
-		async (id: string | number, isApi = false, blank = false) => {
+		async (
+			id: string | number,
+			isApi = false,
+			{ needFresh = false, blank = false } = {}
+		) => {
 			if (!isApi) {
 				return
 			}
@@ -51,7 +99,8 @@ function DataTree() {
 			try {
 				await dove.sendMessage(MsgType.FETCH_DETAIL, {
 					id,
-					blank
+					blank,
+					needFresh
 				})
 			} catch (error) {
 				// message.destroy()
@@ -267,6 +316,68 @@ function DataTree() {
 		[]
 	)
 
+	const refreshData = useCallback((node: TreeData) => {
+		const keys = String(node.key).split('-')
+		if (keys.length) {
+			switch (keys.length) {
+				case keyLengthMapEnum.project: {
+					const projectData: TreeData[] = []
+					getProjectData(projectData, node.id, node.key, true)
+					setTreeData((origin) =>
+						updateTreeDataByKey(origin, node.key, projectData)
+					)
+					break
+				}
+
+				case keyLengthMapEnum.dirAndItem: {
+					const dirContainer: TreeData[] = []
+					getDirAndItemData(dirContainer, node.id, node.key, true)
+					setTreeData((origin) =>
+						updateTreeDataByKey(origin, node.key, dirContainer)
+					)
+					break
+				}
+				case keyLengthMapEnum.item: {
+					const itemData: TreeData[] = []
+					getItemData(itemData, node.id, node.key, true)
+					setTreeData((origin) =>
+						updateTreeDataByKey(origin, node.key, itemData)
+					)
+					break
+				}
+				case keyLengthMapEnum.api: {
+					onSelect(node.id, node.isApi, {
+						needFresh: true
+					})
+					break
+				}
+			}
+		}
+	}, [])
+	const updateTreeDataByKey = useCallback(
+		(
+			list: TreeData[],
+			key: React.Key,
+			children: TreeData['children']
+		): TreeData[] =>
+			list.map((node) => {
+				if (node.key === key) {
+					return {
+						...node,
+						children
+					}
+				}
+
+				if (String(key).includes(String(node.key)) && node.children) {
+					return {
+						...node,
+						children: updateTreeDataByKey(node.children, key, children)
+					}
+				}
+				return node
+			}),
+		[]
+	)
 	useDoveReceiveMsg(MsgType.FRESH_DATA, () => {
 		setLoading(true)
 		getTreeData(true)
@@ -304,7 +415,7 @@ function DataTree() {
 							onClick={(e) => {
 								e.preventDefault()
 								e.stopPropagation()
-								onSelect(nodeData.id, nodeData.isApi, true)
+								onSelect(nodeData.id, nodeData.isApi, { blank: true })
 							}}
 						>
 							<SelectOutlined></SelectOutlined>
@@ -316,66 +427,68 @@ function DataTree() {
 		)
 	}, [])
 
-	const getFilterNode = (nodes: TreeData[], container: TreeData[] = []) => {
-		let isApiUrl = false
-		let hadFindApiNode = false
-		const urlInfo = {
-			projectId: '0',
-			id: '0'
-		}
-		if (filterText.startsWith(YAPI_DEFAULT_SERVER_URL)) {
-			const pt = /project\/(\d+)\/interface\/api\/(\d+)/.exec(filterText)
-			if (pt) {
-				isApiUrl = true
-				urlInfo.projectId = pt[1]
-				urlInfo.id = pt[2]
+	const getFilterNode = useCallback(
+		(nodes: TreeData[], container: TreeData[] = []) => {
+			let isApiUrl = false
+			let hadFindApiNode = false
+			const urlInfo = {
+				projectId: 0,
+				id: 0
 			}
-		}
-
-		// 筛选节点
-		function filterNode(nodes: TreeData[], container: TreeData[] = []) {
-			for (const node of nodes) {
-				if (hadFindApiNode) {
-					return container
+			if (filterText.startsWith(YAPI_DEFAULT_SERVER_URL)) {
+				const pt = /project\/(\d+)\/interface\/api\/(\d+)/.exec(filterText)
+				if (pt) {
+					isApiUrl = true
+					urlInfo.projectId = Number(pt[1])
+					urlInfo.id = Number(pt[2])
 				}
+			}
 
-				if (isApiUrl && node.isApi && urlInfo.id === node.id) {
-					container.push(node)
-					hadFindApiNode = true
-				} else if (
-					node.title?.toString().includes(filterText) ||
-					node.path?.includes(filterText)
-				) {
-					container.push(node)
-				} else if (node.children?.length) {
-					// 递归查找children
-					const childrenNode = filterNode(node.children)
-					if (childrenNode.length) {
-						container.push({
-							...node,
-							children: childrenNode
-						})
+			// 筛选节点
+			function filterNode(nodes: TreeData[], container: TreeData[] = []) {
+				for (const node of nodes) {
+					if (hadFindApiNode) {
+						return container
+					}
+
+					if (isApiUrl && node.isApi && urlInfo.id === node.id) {
+						container.push(node)
+						hadFindApiNode = true
+					} else if (
+						node.title?.toString().includes(filterText) ||
+						node.path?.includes(filterText)
+					) {
+						container.push(node)
+					} else if (node.children?.length) {
+						// 递归查找children
+						const childrenNode = filterNode(node.children)
+						if (childrenNode.length) {
+							container.push({
+								...node,
+								children: childrenNode
+							})
+						}
 					}
 				}
+				return container
 			}
-			return container
-		}
-		const result = filterNode(nodes, container)
-		return result
-	}
+			const result = filterNode(nodes, container)
+			return result
+		},
+		[]
+	)
 
 	const treeDataAfterFilter = useMemo(
 		() => (filterText ? getFilterNode(treeData) : treeData),
 		[filterText, treeData]
 	)
-	const onExpand = (keys: TreeData['key'][]) => {
+	const onExpand = useCallback((keys: TreeData['key'][]) => {
 		setExpendKeys(keys)
-	}
+	}, [])
 
-	const [showApiList, setShowApi] = useState<boolean>(true)
-	const navigationToFile = (item: { uri: string }) => {
+	const navigationToFile = useCallback((item: { uri: string }) => {
 		dove.sendMessage(MsgType.OPEN_FILE, item?.uri)
-	}
+	}, [])
 
 	return (
 		<div className="data-tree-container">
@@ -414,7 +527,12 @@ function DataTree() {
 				{showApiList ? (
 					<div className="tree-body">
 						<DirectoryTree
+							// checkable
 							blockNode
+							onRightClick={({ event, node }) => {
+								displayMenu(event)
+								currentTreeNode.current = node
+							}}
 							expandedKeys={expandKeys}
 							treeData={treeDataAfterFilter}
 							titleRender={titleRender}
@@ -444,6 +562,18 @@ function DataTree() {
 					</div>
 				)}
 			</Spin>
+
+			<Menu id={MENU_ID} theme="dark">
+				<Item onClick={handleItemClick} data={{ type: 'refresh' }}>
+					重新请求
+				</Item>
+				{/* <Item onClick={handleItemClick} data={{ type: 'disable' }}>
+					禁用
+				</Item> */}
+				<Item onClick={handleItemClick} data={{ type: 'delete' }}>
+					清楚
+				</Item>
+			</Menu>
 		</div>
 	)
 }
