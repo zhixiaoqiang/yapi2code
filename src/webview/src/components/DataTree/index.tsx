@@ -316,13 +316,13 @@ function DataTree() {
 		[]
 	)
 
-	const refreshData = useCallback((node: TreeData) => {
+	const refreshData = useCallback(async (node: TreeData) => {
 		const keys = String(node.key).split('-')
 		if (keys.length) {
 			switch (keys.length) {
 				case keyLengthMapEnum.project: {
 					const projectData: TreeData[] = []
-					getProjectData(projectData, node.id, node.key, true)
+					await getProjectData(projectData, node.id, node.key, true)
 					setTreeData((origin) =>
 						updateTreeDataByKey(origin, node.key, projectData)
 					)
@@ -331,7 +331,7 @@ function DataTree() {
 
 				case keyLengthMapEnum.dirAndItem: {
 					const dirContainer: TreeData[] = []
-					getDirAndItemData(dirContainer, node.id, node.key, true)
+					await getDirAndItemData(dirContainer, node.id, node.key, true)
 					setTreeData((origin) =>
 						updateTreeDataByKey(origin, node.key, dirContainer)
 					)
@@ -339,7 +339,7 @@ function DataTree() {
 				}
 				case keyLengthMapEnum.item: {
 					const itemData: TreeData[] = []
-					getItemData(itemData, node.id, node.key, true)
+					await getItemData(itemData, node.id, node.key, true)
 					setTreeData((origin) =>
 						updateTreeDataByKey(origin, node.key, itemData)
 					)
