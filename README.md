@@ -24,6 +24,7 @@
 - [ ] 5. 支持自定义解析
 - [x] 6. yarn 替换为 pnpm
 - [x] 7. 迁移到 Rspack
+- [ ] 8. 函数类型检测由 `typescript` 替换为 `ts-morph`，有效减少 90% 体积
 - [ ] ...
 
 ## 登录 YAPI
