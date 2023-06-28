@@ -1,5 +1,3 @@
-import path from 'node:path'
-import { pathExists } from 'fs-extra'
 import { ExtensionContext, commands, workspace, window } from 'vscode'
 
 import { SlideBarWebview } from './webviewTemplate'

@@ -318,11 +318,54 @@ function DataTree() {
 
 	const refreshData = useCallback(async (node: TreeData) => {
 		const keys = String(node.key).split('-')
+
 		if (keys.length) {
 			switch (keys.length) {
 				case keyLengthMapEnum.project: {
 					const projectData: TreeData[] = []
-					await getProjectData(projectData, node.id, node.key, true)
+
+					const [groupRes] = await dove.sendMessage<[GroupData[]]>(
+						MsgType.FETCH_GROUP,
+						{
+							needFresh: true
+						}
+					)
+					for (const group of groupRes) {
+						if (group._id === node.id) {
+							if (group.sub?.length) {
+								const result = await Promise.all(
+									[
+										{
+											_id: group._id,
+											key: `self_${group._id}`,
+											group_name: `self_${group.group_name}`
+										},
+										...group.sub
+									].map(async (group) => {
+										const tempProjectData: TreeData[] = []
+										await getProjectData(
+											tempProjectData,
+											group._id,
+											group.key || group._id,
+											true
+										)
+										return {
+											title: group.group_name,
+											key: group.key || group._id,
+											id: group._id,
+											children: tempProjectData
+										}
+									})
+								)
+								projectData.push(...result)
+							} else {
+								await getProjectData(projectData, group._id, group._id, true)
+							}
+						}
+					}
+
+					console.log('projectData', projectData)
+
 					setTreeData((origin) =>
 						updateTreeDataByKey(origin, node.key, projectData)
 					)
