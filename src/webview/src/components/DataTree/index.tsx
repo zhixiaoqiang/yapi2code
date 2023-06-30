@@ -30,7 +30,7 @@ import type {
 	ItemData,
 	ProjectData
 } from './types'
-import { keyLengthMapEnum } from './constants'
+import { treeLevelTypeEnum } from './constants'
 
 const { DirectoryTree } = Tree
 const MENU_ID = 'menu-id'
@@ -39,6 +39,7 @@ type TreeData = FieldDataNode<{
 	id: number
 	key: string | number
 	title?: React.ReactNode
+	dataType: keyof typeof treeLevelTypeEnum
 }> & {
 	isDubbo?: boolean
 	path?: string
@@ -54,7 +55,7 @@ function DataTree() {
 	const [expandKeys, setExpendKeys] = useState<TreeData['key'][]>([])
 	const [fileList, setFileList] = useState<ApiTypeList>([])
 
-	const currentTreeNode = useRef<EventDataNode<TreeData>>(null)
+	const currentTreeNode = useRef<EventDataNode<TreeData | null>>(null)
 
 	// 🔥 you can use this hook from everywhere. All you need is the menu id
 	const { show } = useContextMenu({
@@ -67,7 +68,6 @@ function DataTree() {
 			triggerEvent,
 			data
 		}: ItemParams<any, { type: 'refresh' | 'disable' | 'delete' }>) => {
-			console.log(event, triggerEvent, currentTreeNode.current, treeData)
 			if (data?.type === 'refresh') {
 				currentTreeNode.current && refreshData(currentTreeNode.current)
 			} else if (data?.type === 'delete') {
@@ -131,27 +131,30 @@ function DataTree() {
 			if (group.sub?.length) {
 				treeData.push({
 					title: group.group_name,
+					dataType: treeLevelTypeEnum.group,
 					key: group._id,
 					id: group._id,
 					children: [
 						{
 							_id: group._id,
-							key: `self_${group._id}`,
+							key: `${group._id}-self`,
 							group_name: `self_${group.group_name}`
 						},
 						...group.sub
-					].map((group) => {
+					].map((subGroup) => {
 						const projectData: TreeData[] = []
+						const key = `${group._id}-${subGroup._id}`
 						getProjectData(
 							projectData,
-							group._id,
-							group.key || group._id,
+							subGroup._id,
+							subGroup.key || key,
 							needFresh
 						)
 						return {
-							title: group.group_name,
-							key: group.key || group._id,
-							id: group._id,
+							title: subGroup.group_name,
+							dataType: treeLevelTypeEnum.subGroup,
+							key: subGroup.key || key,
+							id: subGroup._id,
 							children: projectData
 						}
 					})
@@ -160,6 +163,7 @@ function DataTree() {
 				const projectData: TreeData[] = []
 				treeData.push({
 					title: group.group_name,
+					dataType: treeLevelTypeEnum.group,
 					key: group._id,
 					id: group._id,
 					children: projectData
@@ -189,6 +193,7 @@ function DataTree() {
 				const dirContainer: TreeData[] = []
 				projectDataContainer.push({
 					title: item.name,
+					dataType: treeLevelTypeEnum.project,
 					key: `${parentKey}-${item._id}`,
 					id: item._id,
 					children: dirContainer
@@ -228,11 +233,13 @@ function DataTree() {
 					const key = `${parentKey}-${dirItem._id}`
 					dirContainer.push({
 						title: dirItem.name,
+						dataType: treeLevelTypeEnum.dir,
 						key,
 						id: dirItem._id,
 						children: dirItem.list?.map((apiItem) => {
 							return {
 								title: apiItem.title,
+								dataType: treeLevelTypeEnum.item,
 								id: apiItem._id,
 								key: `${key}-${apiItem._id}`,
 								icon: <img src={fileIcon} className="leaf-icon" />,
@@ -269,6 +276,7 @@ function DataTree() {
 				const itemContainer: TreeData[] = []
 				dirContainer.push({
 					title: item.name,
+					dataType: treeLevelTypeEnum.dir,
 					key: `${parentKey}-${item._id}`,
 					id: item._id,
 					children: itemContainer
@@ -302,6 +310,7 @@ function DataTree() {
 			itemData?.list?.forEach((item) => {
 				itemContainer.push({
 					id: item._id,
+					dataType: treeLevelTypeEnum.item,
 					title: item.title,
 					key: `${parentKey}-${item._id}`,
 					icon: <img src={fileIcon} className="leaf-icon" />,
@@ -317,11 +326,12 @@ function DataTree() {
 	)
 
 	const refreshData = useCallback(async (node: TreeData) => {
-		const keys = String(node.key).split('-')
+		const { dataType } = node
 
-		if (keys.length) {
-			switch (keys.length) {
-				case keyLengthMapEnum.project: {
+		if (dataType) {
+			switch (dataType) {
+				case treeLevelTypeEnum.group:
+				case treeLevelTypeEnum.subGroup: {
 					const projectData: TreeData[] = []
 
 					const [groupRes] = await dove.sendMessage<[GroupData[]]>(
@@ -337,22 +347,25 @@ function DataTree() {
 									[
 										{
 											_id: group._id,
-											key: `self_${group._id}`,
+											key: `${group._id}-self`,
 											group_name: `self_${group.group_name}`
 										},
 										...group.sub
-									].map(async (group) => {
+									].map(async (subGroup) => {
 										const tempProjectData: TreeData[] = []
-										await getProjectData(
+										const key = `${group._id}-${subGroup._id}`
+										getProjectData(
 											tempProjectData,
-											group._id,
-											group.key || group._id,
+											subGroup._id,
+											subGroup.key || key,
 											true
 										)
 										return {
-											title: group.group_name,
-											key: group.key || group._id,
-											id: group._id,
+											title: subGroup.group_name,
+											dataType: treeLevelTypeEnum.subGroup,
+
+											key: subGroup.key || key,
+											id: subGroup._id,
 											children: tempProjectData
 										}
 									})
@@ -372,7 +385,7 @@ function DataTree() {
 					break
 				}
 
-				case keyLengthMapEnum.dirAndItem: {
+				case treeLevelTypeEnum.project: {
 					const dirContainer: TreeData[] = []
 					await getDirAndItemData(dirContainer, node.id, node.key, true)
 					setTreeData((origin) =>
@@ -380,7 +393,7 @@ function DataTree() {
 					)
 					break
 				}
-				case keyLengthMapEnum.item: {
+				case treeLevelTypeEnum.dir: {
 					const itemData: TreeData[] = []
 					await getItemData(itemData, node.id, node.key, true)
 					setTreeData((origin) =>
@@ -388,7 +401,7 @@ function DataTree() {
 					)
 					break
 				}
-				case keyLengthMapEnum.api: {
+				case treeLevelTypeEnum.item: {
 					onSelect(node.id, node.isApi, {
 						needFresh: true
 					})
@@ -397,6 +410,7 @@ function DataTree() {
 			}
 		}
 	}, [])
+
 	const updateTreeDataByKey = useCallback(
 		(
 			list: TreeData[],
@@ -421,6 +435,7 @@ function DataTree() {
 			}),
 		[]
 	)
+
 	useDoveReceiveMsg(MsgType.FRESH_DATA, () => {
 		setLoading(true)
 		getTreeData(true)

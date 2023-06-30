@@ -1,6 +1,8 @@
-export enum keyLengthMapEnum {
-	'project' = 1,
-	'dirAndItem' = 2,
-	'item' = 3,
-	'api' = 4
+/** 接口层级类型枚举 */
+export enum treeLevelTypeEnum {
+	group = 'group',
+	subGroup = 'subGroup',
+	'project' = 'project',
+	'dir' = 'dir',
+	'item' = 'item'
 }
