@@ -330,8 +330,7 @@ function DataTree() {
 
 		if (dataType) {
 			switch (dataType) {
-				case treeLevelTypeEnum.group:
-				case treeLevelTypeEnum.subGroup: {
+				case treeLevelTypeEnum.group: {
 					const projectData: TreeData[] = []
 
 					const [groupRes] = await dove.sendMessage<[GroupData[]]>(
@@ -377,14 +376,21 @@ function DataTree() {
 						}
 					}
 
-					console.log('projectData', projectData)
+					setTreeData((origin) =>
+						updateTreeDataByKey(origin, node.key, projectData)
+					)
+					break
+				}
+				case treeLevelTypeEnum.subGroup: {
+					const projectData: TreeData[] = []
+
+					await getProjectData(projectData, node.id, node.key, true)
 
 					setTreeData((origin) =>
 						updateTreeDataByKey(origin, node.key, projectData)
 					)
 					break
 				}
-
 				case treeLevelTypeEnum.project: {
 					const dirContainer: TreeData[] = []
 					await getDirAndItemData(dirContainer, node.id, node.key, true)
