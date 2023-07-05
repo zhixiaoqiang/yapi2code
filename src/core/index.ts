@@ -15,11 +15,11 @@ import {
 import storage from '../utils/storage'
 import createFile from './createFile'
 import { data2Type, formatBaseTips, formatDubboTips } from '../utils/yapi2type'
-import { getProjectConfig } from '../common/vscodeapi'
+import { getConfiguration, getProjectConfig } from '../common/vscodeapi'
 import { Command, ContextEnum } from '../constant/vscode'
 import { MsgType } from '../constant/msg'
 import { AllStorageType } from '../constant/storage'
-import { DEFAULT_CONFIG, IConfig } from '../constant/config'
+import { DEFAULT_CONFIG } from '../constant/config'
 
 export const getSlideBarWebview = (context: ExtensionContext) => {
 	const wv = new SlideBarWebview(context)
@@ -202,14 +202,14 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 			dove.subscribe(
 				MsgType.FETCH_DETAIL,
 				async (params: { id: string; blank: boolean; needFresh: boolean }) => {
-					let config = {
+					const config = {
 						...DEFAULT_CONFIG,
-						...(storage.getStorage(AllStorageType.WORKSPACE_CONFIG) as IConfig)
+						...getConfiguration('yapi')
 					}
 					try {
 						const projectConfig = await getProjectConfig()
 
-						config = { ...config, ...projectConfig }
+						Object.assign(config, projectConfig)
 					} catch (error) {
 						console.error('get config error', error)
 					}

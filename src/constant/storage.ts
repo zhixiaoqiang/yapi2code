@@ -16,8 +16,7 @@ export enum StorageType { // 储存类型
 export enum StorageTypeLong {
 	SERVER_URL = 'SERVER_URL',
 	API_TYPE_LIST = 'API_TYPE_LIST',
-	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP',
-	WORKSPACE_CONFIG = 'WORKSPACE_CONFIG'
+	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP'
 }
 
 export enum AllStorageType {
@@ -33,6 +32,5 @@ export enum AllStorageType {
 	WEBVIEW_DONE = 'WEBVIEW_DONE',
 	SERVER_URL = 'SERVER_URL',
 	API_TYPE_LIST = 'API_TYPE_LIST',
-	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP',
-	WORKSPACE_CONFIG = 'WORKSPACE_CONFIG'
+	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP'
 }
