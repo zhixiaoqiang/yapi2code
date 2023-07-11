@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.26
+
+### Patch Changes
+
+- fix: 过滤无效
+
 ## 0.0.22
 
 ### Patch Changes
