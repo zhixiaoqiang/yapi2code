@@ -131,12 +131,12 @@ export const genRequest = (
 
 	return (
 		`\n${contentMap.comment}\n` +
-		`export async function ${contentMap.fnName}(params${
-			hasReqType ? ': ' + contentMap.IReqTypeName : ''
+		`export async function ${contentMap.fnName}(${
+			hasReqType ? 'params: ' + contentMap.IReqTypeName : ''
 		})${renderOuterFunctionType} {
 	return request.${contentMap.requestFnName}${renderFetchMethodGenericType}('${
 			contentMap.apiPath
-		}', params)
+		}'${hasReqType ? ', params' : ''})
 }`
 	)
 }
