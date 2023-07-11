@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { ApiFilled, SearchOutlined, SelectOutlined } from '@ant-design/icons'
 import { Badge, Input, List, message, Spin, Tree } from 'antd'
 import debounce from 'lodash/debounce'
-import type { FieldDataNode, EventDataNode } from 'rc-tree/lib/interface'
+import type { FieldDataNode } from 'rc-tree/lib/interface'
 import fileIcon from '../../../../assets/api-file.svg'
 
 import { dove, useDoveReceiveMsg } from '../../util'
@@ -55,7 +55,7 @@ function DataTree() {
 	const [expandKeys, setExpendKeys] = useState<TreeData['key'][]>([])
 	const [fileList, setFileList] = useState<ApiTypeList>([])
 
-	const currentTreeNode = useRef<EventDataNode<TreeData | null>>(null)
+	const currentTreeNode = useRef<TreeData | null>(null)
 
 	// 🔥 you can use this hook from everywhere. All you need is the menu id
 	const { show } = useContextMenu({
@@ -63,11 +63,7 @@ function DataTree() {
 	})
 
 	const handleItemClick = useCallback(
-		({
-			event,
-			triggerEvent,
-			data
-		}: ItemParams<any, { type: 'refresh' | 'disable' | 'delete' }>) => {
+		({ data }: ItemParams<any, { type: 'refresh' | 'disable' | 'delete' }>) => {
 			if (data?.type === 'refresh') {
 				currentTreeNode.current && refreshData(currentTreeNode.current)
 			} else if (data?.type === 'delete') {
@@ -491,59 +487,57 @@ function DataTree() {
 		)
 	}, [])
 
-	const getFilterNode = useCallback(
-		(nodes: TreeData[], container: TreeData[] = []) => {
-			let isApiUrl = false
-			let hadFindApiNode = false
-			const urlInfo = {
-				projectId: 0,
-				id: 0
+	const getFilterNode = useCallback((nodes: TreeData[], filterText: string) => {
+		let isApiUrl = false
+		let hadFindApiNode = false
+		const urlInfo = {
+			projectId: 0,
+			id: 0
+		}
+
+		if (filterText.startsWith(YAPI_DEFAULT_SERVER_URL)) {
+			const pt = /project\/(\d+)\/interface\/api\/(\d+)/.exec(filterText)
+			if (pt) {
+				isApiUrl = true
+				urlInfo.projectId = Number(pt[1])
+				urlInfo.id = Number(pt[2])
 			}
-			if (filterText.startsWith(YAPI_DEFAULT_SERVER_URL)) {
-				const pt = /project\/(\d+)\/interface\/api\/(\d+)/.exec(filterText)
-				if (pt) {
-					isApiUrl = true
-					urlInfo.projectId = Number(pt[1])
-					urlInfo.id = Number(pt[2])
+		}
+		const container: TreeData[] = []
+		// 筛选节点
+		function filterNode(nodes: TreeData[], container: TreeData[] = []) {
+			for (const node of nodes) {
+				if (hadFindApiNode) {
+					return container
+				}
+
+				if (isApiUrl && node.isApi && urlInfo.id === node.id) {
+					container.push(node)
+					hadFindApiNode = true
+				} else if (
+					node.title?.toString().includes(filterText) ||
+					node.path?.includes(filterText)
+				) {
+					container.push(node)
+				} else if (node.children?.length) {
+					// 递归查找children
+					const childrenNode = filterNode(node.children)
+					if (childrenNode.length) {
+						container.push({
+							...node,
+							children: childrenNode
+						})
+					}
 				}
 			}
-
-			// 筛选节点
-			function filterNode(nodes: TreeData[], container: TreeData[] = []) {
-				for (const node of nodes) {
-					if (hadFindApiNode) {
-						return container
-					}
-
-					if (isApiUrl && node.isApi && urlInfo.id === node.id) {
-						container.push(node)
-						hadFindApiNode = true
-					} else if (
-						node.title?.toString().includes(filterText) ||
-						node.path?.includes(filterText)
-					) {
-						container.push(node)
-					} else if (node.children?.length) {
-						// 递归查找children
-						const childrenNode = filterNode(node.children)
-						if (childrenNode.length) {
-							container.push({
-								...node,
-								children: childrenNode
-							})
-						}
-					}
-				}
-				return container
-			}
-			const result = filterNode(nodes, container)
-			return result
-		},
-		[]
-	)
+			return container
+		}
+		const result = filterNode(nodes, container)
+		return result
+	}, [])
 
 	const treeDataAfterFilter = useMemo(
-		() => (filterText ? getFilterNode(treeData) : treeData),
+		() => (filterText ? getFilterNode(treeData, filterText) : treeData),
 		[filterText, treeData]
 	)
 	const onExpand = useCallback((keys: TreeData['key'][]) => {
