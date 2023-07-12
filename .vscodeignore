@@ -2,7 +2,6 @@
 .vscode-test/**
 .gitignore
 tsconfig.json
-CHANGELOG.md
 node_modules/
 dist/*.map
 src
@@ -10,3 +9,5 @@ vsc-extension-quickstart.md
 .prettierrc.js
 commitlint.config.js
 lint-staged.config.js
+.changeset/**
+.husky/**
