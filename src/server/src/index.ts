@@ -15,7 +15,7 @@ import {
 	TextDocumentSyncKind
 } from 'vscode-languageserver/node'
 
-import { API_NOT_DEFINED, MAIN_MSG } from '../../utils/constant'
+import { API_NOT_DEFINED, MAIN_MSG, MsgType } from '../../constant/msg'
 import Dove from '../../utils/dove'
 import { YapiVSCodeConfig } from '../../utils/types'
 import { getAST } from './astree'
@@ -29,7 +29,6 @@ import { quickfix } from './quickfix'
 import store from './store'
 import type { ApiFunctionStruct, ImportPositionInfo } from './types'
 import { Command } from '../../constant/vscode'
-import { MsgType } from '../../constant/msg'
 
 // 初始化 LSP 连接对象
 export const connection = createConnection(ProposedFeatures.all)
@@ -97,7 +96,7 @@ connection.onNotification(MAIN_MSG, (data: any) => {
 // 监听消息
 dove.subscribe(MsgType.FIX_ALL, async (uri: string) => {
 	const fixs = await provideCodeActions(store.get(uri).detail, true).catch(
-		(e) => {
+		() => {
 			dove.sendMessage(MsgType.COMMAND, {
 				command: Command.WARN_TOAST,
 				data: 'Yapi请求失败'

@@ -16,6 +16,7 @@ import { AllStorageType } from './constant/storage'
 
 import { getProjectRoot } from './common/vscodeapi'
 import { CONFIG_FILE_NAME, genConfigTemplate } from './constant/config'
+import { debugRequest } from './debug'
 
 const container: {
 	dove?: Dove
@@ -177,7 +178,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		refreshApiFileList()
 	})
 	async function refreshApiFileList() {
-		console.log('init request')
+		debugRequest('init request')
 
 		const files = await getApiFileList()
 		diagnoseBaseInputFiles(files)

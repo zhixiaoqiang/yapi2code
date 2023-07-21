@@ -1,34 +1,17 @@
-import request from './request'
+import request from '../../utils/request'
 
-import storage from '../../utils/storage'
-import { AllStorageType } from '../../constant/storage'
 import { composeRequest } from '../../utils/componse'
-import { LOGIN_PATH, LOGIN_PATH_BY_LDAP } from '../../constant/yapi'
-
-const getUrl = (path: string) => {
-	return storage.getStorage<string>(AllStorageType.SERVER_URL) + path
-}
-
-/** 登录 */
-export const login = (body: { email: string; password: string }): any => {
-	const isLoginByLdap = storage.getStorage<boolean>(
-		AllStorageType.LOGIN_BY_LDAP
-	)
-	return request.post(getUrl(isLoginByLdap ? LOGIN_PATH_BY_LDAP : LOGIN_PATH), {
-		data: body
-	})
-}
 
 /** 获取分组列表 */
 export const getGroupList = composeRequest(
-	() => request.get(getUrl('/api/group/list')),
+	() => request.get('/api/group/list'),
 	600e3
 ) //合并请求10分钟
 
 /** 获取项目列表 */
 export const getProject = composeRequest(
 	(groupId: number) =>
-		request.get(getUrl('/api/project/list'), {
+		request.get('/api/project/list', {
 			params: {
 				group_id: groupId,
 				page: 1,
@@ -41,7 +24,7 @@ export const getProject = composeRequest(
 /** 获取文件夹列表 */
 export const getDir = composeRequest(
 	(dirId: number) =>
-		request.get(getUrl('/api/project/get'), {
+		request.get('/api/project/get', {
 			params: {
 				id: dirId
 			}
@@ -52,7 +35,7 @@ export const getDir = composeRequest(
 /** 获取 yapi 文件夹列表及接口列表 */
 export const getDirAndItemList = composeRequest(
 	(projectId: number) =>
-		request.get(getUrl('/api/interface/list_menu'), {
+		request.get('/api/interface/list_menu', {
 			params: {
 				project_id: projectId
 			}
@@ -63,7 +46,7 @@ export const getDirAndItemList = composeRequest(
 /** 获取item列表 */
 export const getItemList = composeRequest(
 	(itemId: number) =>
-		request.get(getUrl('/api/interface/list_cat'), {
+		request.get('/api/interface/list_cat', {
 			params: {
 				page: 1,
 				limit: 1000,
@@ -76,7 +59,7 @@ export const getItemList = composeRequest(
 /** 获取接口详情 */
 export const getApiDetail = composeRequest(
 	(apiId: string) =>
-		request.get(getUrl('/api/interface/get'), {
+		request.get('/api/interface/get', {
 			params: {
 				id: apiId
 			}
@@ -87,7 +70,7 @@ export const getApiDetail = composeRequest(
 /** 查找接口 */
 export const searchApi = composeRequest(
 	(path: string) =>
-		request.get(getUrl('/api/project/search'), {
+		request.get('/api/project/search', {
 			params: {
 				q: path
 			}

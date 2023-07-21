@@ -10,14 +10,15 @@ import {
 import Dove from '../utils/dove'
 
 import { Client_Server_MsgTYpe } from '../utils/types'
-import { searchApi, getApiDetail, getDir } from '../service/api'
+import { searchApi, getApiDetail, getDir } from '../services/api'
 import { data2Type } from '../utils/yapi2type'
-import { MAIN_MSG } from '../utils/constant'
+import { MAIN_MSG } from '../constant/msg'
+import { debugVscodeApi } from '@/debug'
 
 let client: LanguageClient
 let doveContext: Dove | null = null
 
-function clientRun(context: ExtensionContext): [LanguageClient, Dove] {
+function clientRun(): [LanguageClient, Dove] {
 	// 服务器使用node实现
 	const serverModule = path.join(__dirname, 'server.js')
 	// The debug options for the server
@@ -64,7 +65,7 @@ function clientRun(context: ExtensionContext): [LanguageClient, Dove] {
 
 	// 启动客户端，也会启动服务器
 	client.onReady().then(async () => {
-		console.log('client ready')
+		debugVscodeApi('client ready')
 
 		client.onNotification(MAIN_MSG, (data: any) => {
 			dove.receiveMessage(data)

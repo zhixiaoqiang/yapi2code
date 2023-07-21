@@ -135,8 +135,8 @@ export const genRequest = (
 			hasReqType ? 'params: ' + contentMap.IReqTypeName : ''
 		})${renderOuterFunctionType} {
 	return request.${contentMap.requestFnName}${renderFetchMethodGenericType}('${
-			contentMap.apiPath
-		}'${hasReqType ? ', params' : ''})
+		contentMap.apiPath
+	}'${hasReqType ? ', params' : ''})
 }`
 	)
 }

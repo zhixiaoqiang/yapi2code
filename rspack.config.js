@@ -1,5 +1,6 @@
 const path = require('path')
 
+/** @type {import('@rspack/cli').Configuration} */
 module.exports = {
 	target: 'node',
 	mode: 'production',
@@ -16,7 +17,10 @@ module.exports = {
 	},
 	resolve: {
 		extensions: ['.ts', '.js', '.tsx', '.jsx'],
-		modules: [path.resolve(__dirname, 'node_modules')]
+		modules: [path.resolve(__dirname, 'node_modules')],
+		alias: {
+			'@': path.resolve(__dirname, './src')
+		}
 	},
 	builtins: {
 		copy: {

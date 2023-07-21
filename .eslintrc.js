@@ -25,6 +25,7 @@ module.exports = defineConfig({
 		'arrow-body-style': 'off',
 		'prefer-arrow-callback': 'off',
 		'@typescript-eslint/no-var-requires': 1,
+		'@typescript-eslint/no-explicit-any': 1,
 		curly: 'warn',
 		eqeqeq: 'warn',
 		'no-throw-literal': 'warn',

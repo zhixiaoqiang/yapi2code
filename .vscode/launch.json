@@ -12,6 +12,9 @@
 			"port": 6011,
 			"restart": true,
 			"outFiles": ["${workspaceFolder}/dist/**/server.js"],
+			"env": {
+        "DEBUG": "*"
+      }
 		},
 		{
 			"name": "Launch Client",
@@ -23,7 +26,10 @@
 			"outFiles": [
 				"${workspaceFolder}/dist/**/extension.js"
 			],
-			"preLaunchTask": "${defaultBuildTask}"
+			"preLaunchTask": "${defaultBuildTask}",
+			"env": {
+        "DEBUG": "*"
+      },
 		},
 		{
 			"name": "Extension Tests",

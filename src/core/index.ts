@@ -3,7 +3,7 @@ import { ExtensionContext, commands, workspace, window } from 'vscode'
 import { SlideBarWebview } from './webviewTemplate'
 import Dove from '../utils/dove'
 
-import login from '../service/login'
+import login from '../services/api/login'
 import {
 	getGroupList,
 	getProject,
@@ -11,7 +11,7 @@ import {
 	getItemList,
 	getApiDetail,
 	getDirAndItemList
-} from '../service/api'
+} from '../services/api'
 import storage from '../utils/storage'
 import createFile from './createFile'
 import { data2Type, formatBaseTips, formatDubboTips } from '../utils/yapi2type'
@@ -20,6 +20,7 @@ import { Command, ContextEnum } from '../constant/vscode'
 import { MsgType } from '../constant/msg'
 import { AllStorageType } from '../constant/storage'
 import { DEFAULT_CONFIG } from '../constant/config'
+import { debugLogin, debugVscodeApi, debugWebview } from '@/debug'
 
 export const getSlideBarWebview = (context: ExtensionContext) => {
 	const wv = new SlideBarWebview(context)
@@ -77,12 +78,12 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 						}
 					})
 					.catch((e) => {
-						console.log('登录失败', e)
+						debugLogin('登录失败', e)
 					})
 			}),
 			// 监听是否webview加载完成
 			dove.subscribe(MsgType.WEBVIEW_DONE, () => {
-				console.log('webview loaded')
+				debugWebview('webview loaded')
 
 				// 判断当前是否登录
 				const isLogin = Boolean(storage.getStorage(AllStorageType.USER_INFO))
@@ -211,7 +212,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 
 						Object.assign(config, projectConfig)
 					} catch (error) {
-						console.error('get config error', error)
+						debugVscodeApi('get config error', error)
 					}
 
 					const { data } = await getApiDetail(
@@ -244,7 +245,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 								params.blank
 							)
 						} catch (error) {
-							console.log('preview code', error)
+							debugVscodeApi('preview code', error)
 							createFile(
 								[
 									formatBaseTips(data, '生成异常'),
@@ -269,7 +270,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 	}
 	wv.onUnMount = (dove: Dove) => {
 		// 卸载消息监听
-		console.log('卸载消息')
+		debugVscodeApi('webview unmount')
 		storage.setStorage(AllStorageType.WEBVIEW_DONE, false)
 		gatherKey.map((key) => {
 			dove.unSubscribe(key)
@@ -286,7 +287,7 @@ export function openLocalFile(filePath: string) {
 			window.showTextDocument(doc)
 		},
 		(err) => {
-			console.log(`Open ${filePath} error, ${err}.`)
+			debugVscodeApi(`Open ${filePath} error, ${err}.`)
 		}
 	)
 }

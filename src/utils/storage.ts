@@ -4,15 +4,25 @@ import { AllStorageType, StorageType } from '../constant/storage'
 
 type StorageTypePlus = `${AllStorageType}` | `${AllStorageType}_${string}`
 
-class Store {
+class Store<IStorage extends Record<StorageTypePlus, any>> {
 	context: vscode.ExtensionContext | null = null
+
 	init(context: vscode.ExtensionContext) {
 		this.context = context
 	}
-	setStorage(key: StorageTypePlus, value: any) {
+	setStorage(key: StorageTypePlus, value: unknown) {
 		return this.context?.globalState.update(key, value)
 	}
-	getStorage<T = any>(key: StorageTypePlus): T | undefined {
+	getStorage<
+		DefaultValue = unknown,
+		T extends StorageTypePlus = StorageTypePlus
+	>(
+		key: T
+	):
+		| (IStorage[T] extends NonNullable<IStorage[T]>
+				? IStorage[T]
+				: DefaultValue)
+		| undefined {
 		return this.context?.globalState.get(key)
 	}
 	clear(key: StorageTypePlus) {
@@ -29,7 +39,7 @@ class Store {
 				key.startsWith(StorageType.DATA_DIR_AND_ITEM) ||
 				key.startsWith(StorageType.DATA_ITEM)
 			) {
-				this.clear(key as any)
+				this.clear(key as StorageTypePlus)
 			}
 		})
 	}

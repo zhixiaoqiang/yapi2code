@@ -34,7 +34,9 @@ export function composeRequest(task: taskType, durTime = 1000) {
 		if (!item) {
 			return
 		}
+
 		const key = JSON.stringify([params])
+
 		if (!item.get(key)) {
 			item.set(key, {
 				lastFetchTime: 0,
@@ -46,7 +48,7 @@ export function composeRequest(task: taskType, durTime = 1000) {
 		if (!current) {
 			return
 		}
-		if (Date.now() - current.lastFetchTime > current.durTime || needFresh) {
+		if (needFresh || Date.now() - current.lastFetchTime > current.durTime) {
 			current.lastFetchTime = Date.now()
 			current.execResult = task(params).catch(() => {
 				// 出错则清除

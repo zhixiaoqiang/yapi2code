@@ -13,6 +13,7 @@ import {
 } from 'vscode'
 import { Command } from '../constant/vscode'
 import { CONFIG_FILE_NAME, IConfig } from '../constant/config'
+import { debugVscodeApi } from '@/debug'
 
 export function createOutputChannel(name: string): LogOutputChannel {
 	return window.createOutputChannel(name, { log: true })
@@ -81,7 +82,7 @@ export async function getProjectConfig() {
 						config = eval(res.toString())?.()
 						return config
 					} catch (error) {
-						console.log('配置异常，请检查配置项', error)
+						debugVscodeApi('配置文件异常，请检查配置项', error)
 						commands.executeCommand(
 							Command.WARN_TOAST,
 							`配置异常，请检查配置项 ${error}`
@@ -89,7 +90,7 @@ export async function getProjectConfig() {
 					}
 				},
 				(err) => {
-					console.log('error', err)
+					debugVscodeApi('getProjectConfig error', err)
 				}
 			)
 	}
