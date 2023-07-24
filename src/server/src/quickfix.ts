@@ -7,7 +7,6 @@ import {
 	DiagnosticSeverity
 } from 'vscode-languageserver'
 
-import { API_NOT_DEFINED } from '../../utils/constant'
 import Dove from '../../utils/dove'
 import { Client_Server_MsgTYpe } from '../../utils/types'
 import { getFileCurrentWorkSpace } from './fileSys'
@@ -15,6 +14,7 @@ import store from './store'
 import type { ApiInterface } from './types'
 import { YAPI_RESPONSE_NAME } from '../../constant/config'
 import { Command } from '../../constant/vscode'
+import { API_NOT_DEFINED } from '../../constant/msg'
 
 async function checkApiTypeExist(
 	typeFilePath: string,
@@ -32,8 +32,7 @@ async function checkApiTypeExist(
 
 export async function quickfix(
 	dove: Dove,
-	parms: CodeActionParams,
-	isFixAll?: boolean
+	parms: CodeActionParams
 ): Promise<CodeAction[]> {
 	const diagnostics = parms.context.diagnostics
 	if (diagnostics && diagnostics.length === 0) {
