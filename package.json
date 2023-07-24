@@ -230,7 +230,7 @@
   "engines": {
     "node": ">=16.17.0",
     "npm": ">=8.15.0",
-    "vscode": "^1.78.0"
+    "vscode": "^1.80.0"
   },
   "icon": "dist/assets/logo.png"
 }
