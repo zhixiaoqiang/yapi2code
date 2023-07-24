@@ -1,4 +1,6 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "yapi.responseKey": "all"
+  "editor.codeActionsOnSave": {
+    "source.fixAll.markdownlint": true
+}
 }

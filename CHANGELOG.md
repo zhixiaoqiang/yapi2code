@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.28
+
+### Patch Changes
+
+- feat: 登录的host支持配置, 登录信息支持读取缓存结果
+
 ## 0.0.26
 
 ### Patch Changes
