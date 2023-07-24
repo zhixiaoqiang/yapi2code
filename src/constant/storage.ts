@@ -1,7 +1,6 @@
 /** 退出登录应被清理 */
 export enum StorageType { // 储存类型
 	USER_INFO = 'userInfo',
-	LOGIN_INFO = 'loginInfo',
 	COOKIE = 'cookie',
 	DATA_GROUP = 'DATA_GROUP',
 	DATA_PROJECT = 'DATA_PROJECT',
@@ -14,6 +13,7 @@ export enum StorageType { // 储存类型
 
 /** 退出登录还要保留 */
 export enum StorageTypeLong {
+	LOGIN_INFO = 'loginInfo',
 	SERVER_URL = 'SERVER_URL',
 	API_TYPE_LIST = 'API_TYPE_LIST',
 	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP'

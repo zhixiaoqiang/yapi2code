@@ -27,13 +27,6 @@ function Login(props: LoginProps) {
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
 
-	// const toastWarnInfo = (content: string) => {
-	// 	dove.sendMessage(MsgType.COMMAND, {
-	// 		command: Command.WARN_TOAST,
-	// 		data: content
-	// 	})
-	// }
-
 	const warning = (content: string) => {
 		message.open({
 			type: 'warning',
@@ -68,16 +61,24 @@ function Login(props: LoginProps) {
 		}
 	}
 
+	const getInitConfig = async () => {
+		const [config] = await dove.sendMessage(MsgType.INIT_CONFIG)
+		const { username, password, host } = config
+		setServerUrl(host?.[0] || YAPI_DEFAULT_SERVER_URL)
+		setUsername(username)
+		setPassword(password)
+	}
+
+	useEffect(() => {
+		getInitConfig()
+	}, [])
+
 	const onLearnMore = () => {
 		dove.sendMessage(MsgType.COMMAND, {
 			command: Command.GITHUB,
 			data: true
 		})
 	}
-
-	useEffect(() => {
-		dove.sendMessage(MsgType.SERVER_URL, serverUrl)
-	}, [serverUrl])
 
 	return (
 		<div className="container">

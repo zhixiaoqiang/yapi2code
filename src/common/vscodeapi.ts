@@ -3,7 +3,6 @@ import { pathExists } from 'fs-extra'
 
 import {
 	commands,
-	ConfigurationScope,
 	Disposable,
 	LogOutputChannel,
 	Uri,
@@ -12,15 +11,27 @@ import {
 	WorkspaceFolder
 } from 'vscode'
 import { Command } from '../constant/vscode'
-import { CONFIG_FILE_NAME, IConfig } from '../constant/config'
+import { CONFIG_FILE_NAME, DEFAULT_CONFIG, IConfig } from '../constant/config'
 import { debugVscodeApi } from '@/debug'
 
 export function createOutputChannel(name: string): LogOutputChannel {
 	return window.createOutputChannel(name, { log: true })
 }
 
-export function getConfiguration(config?: string, scope?: ConfigurationScope) {
-	return workspace.getConfiguration(config, scope) as unknown as IConfig
+export async function getConfiguration() {
+	const mergeConfig: IConfig = {
+		...DEFAULT_CONFIG,
+		...workspace.getConfiguration('yapi')
+	}
+	try {
+		const projectConfig = await getProjectConfig()
+
+		Object.assign(mergeConfig, projectConfig)
+	} catch (error) {
+		debugVscodeApi('get config error', error)
+	}
+
+	return mergeConfig
 }
 
 export function registerCommand(

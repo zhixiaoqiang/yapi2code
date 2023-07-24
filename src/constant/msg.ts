@@ -23,7 +23,9 @@ export enum MsgType {
 	/** 导航到文件 */
 	OPEN_FILE = 'OPEN_FILE',
 	LSP_DONE = 'LSP_DONE',
-	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP'
+	LOGIN_BY_LDAP = 'LOGIN_BY_LDAP',
+	/** 初始配置 */
+	INIT_CONFIG = 'INIT_CONFIG'
 }
 
 // 主消息类型 用于客户端和服务器通信

@@ -31,6 +31,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	// initWorkspaceConfig()
 
 	/** 初始化vscode功能 */
+
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(
 			SideBarView.YAPI_VIEW,
@@ -87,9 +88,10 @@ export function activate(context: vscode.ExtensionContext): void {
 				if (answer === '是') {
 					const encoder = new TextEncoder()
 
+					const config = await getConfiguration()
 					await vscode.workspace.fs.writeFile(
 						configFile,
-						encoder.encode(genConfigTemplate(getConfiguration('yapi')))
+						encoder.encode(genConfigTemplate(config))
 					)
 					await vscode.window.showTextDocument(configFile)
 				} else if (answer === '预览') {
@@ -98,7 +100,9 @@ export function activate(context: vscode.ExtensionContext): void {
 			}
 		}),
 		vscode.commands.registerCommand(Command.CONFIGURATION_PREVIEW, async () => {
-			const content = genConfigTemplate(getConfiguration('yapi'))
+			const config = await getConfiguration()
+
+			const content = genConfigTemplate(config)
 			const document = await vscode.workspace.openTextDocument({
 				language: 'typescript',
 				content
@@ -247,13 +251,15 @@ export function deactivate() {
 }
 
 // function initWorkspaceConfig() {
-// 	storage.setStorage(AllStorageType.WORKSPACE_CONFIG, getConfiguration('yapi'))
+// const config = await getConfiguration()
+// 	storage.setStorage(AllStorageType.WORKSPACE_CONFIG, config)
 
 // 	vscode.workspace.onDidChangeConfiguration((e) => {
 // 		if (e.affectsConfiguration('yapi')) {
+//			const config = await getConfiguration()
 // 			storage.setStorage(
 // 				AllStorageType.WORKSPACE_CONFIG,
-// 				getConfiguration('yapi')
+// 				config
 // 			)
 // 		}
 // 	})

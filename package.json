@@ -84,6 +84,12 @@
       "type": "object",
       "title": "yapi to code",
       "properties": {
+        "yapi.host": {
+          "type": "string",
+          "default": "http://yapi.internal.weimob.com",
+          "markdownDescription": "域名：优先取工作区缓存的域名(登录时填写的域名)",
+          "scope": "resource"
+        },
         "yapi.responseType": {
           "type": "string",
           "enum": [

@@ -15,11 +15,10 @@ import {
 import storage from '../utils/storage'
 import createFile from './createFile'
 import { data2Type, formatBaseTips, formatDubboTips } from '../utils/yapi2type'
-import { getConfiguration, getProjectConfig } from '../common/vscodeapi'
+import { getConfiguration } from '../common/vscodeapi'
 import { Command, ContextEnum } from '../constant/vscode'
 import { MsgType } from '../constant/msg'
 import { AllStorageType } from '../constant/storage'
-import { DEFAULT_CONFIG } from '../constant/config'
 import { debugLogin, debugVscodeApi, debugWebview } from '@/debug'
 
 export const getSlideBarWebview = (context: ExtensionContext) => {
@@ -81,13 +80,28 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 						debugLogin('登录失败', e)
 					})
 			}),
+			dove.subscribe(MsgType.INIT_CONFIG, async () => {
+				const { username, password } =
+					storage.getStorage(AllStorageType.LOGIN_INFO) || {}
+				const { host } = await getConfiguration()
+				return {
+					username,
+					password,
+					host: [
+						storage.getStorage<string>(AllStorageType.SERVER_URL),
+						host
+					].filter(Boolean)
+				}
+			}),
 			// 监听是否webview加载完成
-			dove.subscribe(MsgType.WEBVIEW_DONE, () => {
+			dove.subscribe(MsgType.WEBVIEW_DONE, async () => {
 				debugWebview('webview loaded')
 
 				// 判断当前是否登录
 				const isLogin = Boolean(storage.getStorage(AllStorageType.USER_INFO))
+
 				dove.sendMessage(MsgType.LOGIN_STATUS, isLogin)
+
 				/** 设置导航栏中的menu */
 				commands.executeCommand(
 					'setContext',
@@ -203,17 +217,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 			dove.subscribe(
 				MsgType.FETCH_DETAIL,
 				async (params: { id: string; blank: boolean; needFresh: boolean }) => {
-					const config = {
-						...DEFAULT_CONFIG,
-						...getConfiguration('yapi')
-					}
-					try {
-						const projectConfig = await getProjectConfig()
-
-						Object.assign(config, projectConfig)
-					} catch (error) {
-						debugVscodeApi('get config error', error)
-					}
+					const config = await getConfiguration()
 
 					const { data } = await getApiDetail(
 						params.id,

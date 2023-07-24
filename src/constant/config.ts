@@ -1,4 +1,5 @@
 import { DetailData } from '../utils/yapi2type/type'
+import { YAPI_DEFAULT_SERVER_URL } from './yapi'
 
 export const CONFIG_FILE_NAME = 'yapi-to-code.config.cjs'
 
@@ -24,12 +25,14 @@ export enum ResponseTypePositionEnum {
 }
 
 export enum ConfigKeyEnum {
+	HOST = 'host',
 	RESPONSE_KEY = 'responseKey',
 	RESPONSE_TYPE_POSITION = 'responseTypePosition',
 	GEN_REQUEST = 'genRequest'
 }
 
 export interface IConfig {
+	[ConfigKeyEnum.HOST]: string
 	[ConfigKeyEnum.RESPONSE_KEY]: `${ResponseKeyEnum}`
 	[ConfigKeyEnum.RESPONSE_TYPE_POSITION]: `${ResponseTypePositionEnum}`
 	genRequest?(
@@ -46,6 +49,7 @@ export interface IConfig {
 }
 
 export const DEFAULT_CONFIG: IConfig = {
+	[ConfigKeyEnum.HOST]: YAPI_DEFAULT_SERVER_URL,
 	[ConfigKeyEnum.RESPONSE_KEY]: ResponseKeyEnum.ALL,
 	[ConfigKeyEnum.RESPONSE_TYPE_POSITION]:
 		ResponseTypePositionEnum.OUTER_FUNCTION
@@ -56,6 +60,8 @@ export const YAPI_RESPONSE_NAME = 'YapiResponse'
 export const genConfigTemplate = (config: IConfig = DEFAULT_CONFIG) => {
 	return `module.exports = () => {
 	return {
+		// 域名：优先取工作区缓存的域名(登录时填写的域名)
+		// host: 'https://yapi.pro',
 		// resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型
 		// 'outerFunction' | 'fetchMethodGeneric'
 		responseTypePosition: '${config.responseTypePosition}',
