@@ -1,6 +1,5 @@
 # YAPI TO CODE
-
-一个基于 YAPI 生成 TS/Dart 的 VS Code 扩展，支持浏览整个 Yapi 组，支持自定义模板
+<img src="https://socialify.git.ci/zhixiaoqiang/yapi2code/image?description=1&descriptionEditable=%E4%B8%80%E4%B8%AA%20VS%20Code%20%E6%89%A9%E5%B1%95%EF%BC%8C%E6%94%AF%E6%8C%81%E5%9F%BA%E4%BA%8E%20YAPI%20%E7%94%9F%E6%88%90%20JS%2FTS%2FDart%20%E4%BB%A3%E7%A0%81%EF%BC%8C%E5%BC%80%E7%AE%B1%E5%8D%B3%E7%94%A8%EF%BC%8C%E6%94%AF%E6%8C%81%E8%87%AA%E5%AE%9A%E4%B9%89&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Plus&stargazers=1&theme=Light" alt="一个基于 YAPI 生成 TS/Dart 的 VS Code 扩展，无需配置即可浏览所有接口，支持自定义模板" width="640" height="320" />
 
 [marketplace.visualstudio](https://marketplace.visualstudio.com/items?itemName=zhixiaoqiang.yapi-to-code)
 

@@ -12,7 +12,7 @@ export function loadFile(absPath: string): Promise<string> {
 					reject(err)
 					return console.log(err)
 				}
-				return resolve(data.toString())
+				return resolve(data?.toString())
 			})
 		} else {
 			// 文件不存在

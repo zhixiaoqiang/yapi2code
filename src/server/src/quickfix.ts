@@ -22,7 +22,7 @@ async function checkApiTypeExist(
 	key: keyof ApiInterface
 ) {
 	try {
-		const content = (await readFile(typeFilePath)).toString()
+		const content = (await readFile(typeFilePath))?.toString()
 		const alreadyExist = content.includes(apiData[key])
 		return alreadyExist
 	} catch (error) {
