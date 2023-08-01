@@ -4,19 +4,21 @@ import {
 	reqBody2type,
 	resBody2type,
 	getTypeNameData,
-	resBodyData2type,
-	parseJson
+	resBodySubProp2type,
+	AllTypeNode,
+	updateUseTab
 } from './json2type'
 
 import storage from '../../utils/storage'
 
-import type { DetailData } from './type'
 import {
 	ResponseKeyEnum,
 	ResponseTypePositionEnum,
 	IConfig
 } from '../../constant/config'
 import { AllStorageType } from '../../constant/storage'
+import { parseJson } from './utils'
+import type { DetailData } from './type'
 
 /**
  * @description 获取接口名称
@@ -51,11 +53,11 @@ const formatTime = (stamp: number) => {
  * @description 格式化顶部的注释说明
  */
 const formatInterfaceComment = (data: DetailData, subName: string) => {
-	return `\n/**
+	return `/**
   * @description ${data.title}-${subName}
   * @url ${getApiUrl(data)}
   * @updateDate ${formatTime(data.up_time)}
-  */\n`
+  */`
 }
 
 export const formatDubboTips = (data: DetailData) => {
@@ -70,32 +72,38 @@ export const formatBaseTips = (data: DetailData, decs = '') => {
 }
 
 type genRequestOptionsType = {
-	isReturnResDataProp?: boolean
+	/** 接口名称 */
+	fnName: string
+	/** 是否有响应类型 */
 	hasResType?: boolean
+	/** 是否有请求类型 */
 	hasReqType?: boolean
+	/** 类型名称后缀 */
+	typeNameSuffix: string
+	/** 结构数据类型，决定返回 interface 还是 type */
+	dataType: AllTypeNode['type']
 } & Partial<IConfig>
 
 export const genRequest = (
 	data: DetailData,
 	options: genRequestOptionsType
 ) => {
-	const paths = data?.path?.split(/[/.]/g) || []
-	const lastWord = paths[paths.length - 1]
-
-	const interfaceName = getApiName(data)
-
 	const suffixMap: Record<string, string> = {
 		GET: 'ReqQuery',
 		POST: 'ReqBody'
 	}
-	const { responseTypePosition, isReturnResDataProp, hasReqType, hasResType } =
-		options
+	const {
+		fnName,
+		dataType,
+		responseTypePosition,
+		typeNameSuffix,
+		hasReqType,
+		hasResType
+	} = options
 	const { name: resTypeName } = getTypeNameData(
-		interfaceName,
-		isReturnResDataProp
-			? parseJson(data.res_body)?.properties?.data
-			: parseJson(data.res_body),
-		isReturnResDataProp ? 'ResData' : 'ResBody'
+		fnName,
+		dataType,
+		typeNameSuffix
 	)
 
 	const contentMap = {
@@ -103,9 +111,9 @@ export const genRequest = (
 	* @description ${data.title}
 	* @url ${getApiUrl(data)}
 	*/`,
-		fnName: lastWord,
+		fnName,
 		IReqTypeName: `I${firstCharUpperCase(
-			interfaceName,
+			fnName,
 			suffixMap[data.method] || ''
 		)}`,
 		IResTypeName: resTypeName,
@@ -117,26 +125,30 @@ export const genRequest = (
 		return options.genRequest(contentMap, data)
 	}
 
+	const paramsContent = hasReqType ? 'params: ' + contentMap.IReqTypeName : ''
+
 	const renderOuterFunctionType =
 		hasResType &&
 		responseTypePosition !== ResponseTypePositionEnum.FETCH_METHOD_GENERIC
-			? ': Promise<' + contentMap.IResTypeName + '>'
+			? `: Promise<${contentMap.IResTypeName}>`
 			: ''
 
-	const renderFetchMethodGenericType =
+	const renderGenericType =
 		hasResType &&
 		responseTypePosition === ResponseTypePositionEnum.FETCH_METHOD_GENERIC
-			? '<' + contentMap.IResTypeName + '>'
+			? `<${contentMap.IResTypeName}>`
 			: ''
 
+	const requestInstance = `request.${contentMap.requestFnName}`
+
 	return (
-		`\n${contentMap.comment}\n` +
-		`export async function ${contentMap.fnName}(${
-			hasReqType ? 'params: ' + contentMap.IReqTypeName : ''
-		})${renderOuterFunctionType} {
-	return request.${contentMap.requestFnName}${renderFetchMethodGenericType}('${
-		contentMap.apiPath
-	}'${hasReqType ? ', params' : ''})
+		`${contentMap.comment}\n` +
+		`export async function ${
+			contentMap.fnName
+		}(${paramsContent})${renderOuterFunctionType} {
+	return ${requestInstance}${renderGenericType}('${contentMap.apiPath}'${
+		hasReqType ? ', params' : ''
+	})
 }`
 	)
 }
@@ -150,37 +162,64 @@ export const getApiUrl = (data: DetailData) => {
 /**
  * @description 数据转类型
  */
-export function data2Type(data: DetailData, config: Partial<IConfig> = {}) {
-	const { responseKey } = config
-
+export function data2Type(data: DetailData, config?: IConfig) {
+	const { responseKey, responseCustomKey, useTab } = config || {}
+	updateUseTab(useTab)
 	const interfaceName = getApiName(data)
 	const reqQueryType = data?.req_query?.length
-		? formatInterfaceComment(data, 'query请求参数') +
-		  reqQuery2type(interfaceName, data.req_query)
+		? `${formatInterfaceComment(data, 'query请求参数')}\n${reqQuery2type(
+				interfaceName,
+				data.req_query
+		  )}`
 		: ''
 	const reqBodyType = data.req_body_other
-		? formatInterfaceComment(data, 'post请求体') +
-		  reqBody2type(interfaceName, parseJson(data.req_body_other))
-		: ''
-	const resBodyType = data.res_body
-		? formatInterfaceComment(data, '响应体') +
-		  resBody2type(interfaceName, parseJson(data.res_body))
-		: ''
-	const resBodyDataType = data.res_body
-		? formatInterfaceComment(data, '响应体') +
-		  resBodyData2type(
+		? `${formatInterfaceComment(data, 'post请求体')}\n${reqBody2type(
 				interfaceName,
-				parseJson(data.res_body)?.properties?.data
-		  )
+				parseJson(data.req_body_other)
+		  )}`
 		: ''
-	const isReturnResDataProp = responseKey === ResponseKeyEnum.DATA
+
+	const parseResBody = parseJson(data.res_body)
+	const resBodyType = data.res_body
+		? `${formatInterfaceComment(data, '响应体')}\n${resBody2type(
+				interfaceName,
+				parseResBody
+		  )}`
+		: ''
+
+	const isReturnResDataProp =
+		ResponseKeyEnum.DATA === responseKey ||
+		ResponseKeyEnum.CUSTOM === responseKey
+
+	const getNestData = (data: Record<string, any>, str: string) => {
+		return str.split('.').reduce((prev, curr) => {
+			prev = prev['properties'][curr]
+			return prev
+		}, data) as AllTypeNode
+	}
+
+	const dataKey =
+		isReturnResDataProp && ResponseKeyEnum.DATA === responseKey
+			? responseKey
+			: responseCustomKey || 'data'
+
+	const resBodyDataType = getNestData(parseResBody, dataKey)
+		? `${formatInterfaceComment(data, '响应体')}\n${resBodySubProp2type(
+				interfaceName,
+				getNestData(parseResBody, dataKey)
+		  )}`
+		: ''
 
 	const resType = isReturnResDataProp ? resBodyDataType : resBodyType
 
 	const requestContent = genRequest(data, {
-		isReturnResDataProp,
+		fnName: interfaceName,
+		dataType: isReturnResDataProp
+			? getNestData(parseResBody, dataKey).type
+			: parseResBody?.type,
 		hasReqType: !!(reqQueryType || reqBodyType),
 		hasResType: !!(reqBodyType || resBodyDataType),
+		typeNameSuffix: isReturnResDataProp ? 'ResData' : 'ResBody',
 		...config
 	})
 

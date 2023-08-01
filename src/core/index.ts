@@ -239,13 +239,14 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 							const tsData = data2Type(data, config)
 							createFile(
 								[
+									config.banner,
 									tsData.reqQueryType,
 									tsData.reqBodyType,
 									tsData.resType,
 									tsData.requestContent
 								]
 									.filter(Boolean)
-									.join('\n'),
+									.join('\n\n'),
 								params.blank
 							)
 						} catch (error) {

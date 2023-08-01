@@ -13,7 +13,9 @@ export enum ResponseKeyEnum {
 	/** 返回所有属性 */
 	ALL = 'all',
 	/** 仅返回 data 属性 */
-	DATA = 'data'
+	DATA = 'data',
+	/** 自定义属性 */
+	CUSTOM = 'custom'
 }
 
 /** resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型 */
@@ -26,14 +28,20 @@ export enum ResponseTypePositionEnum {
 
 export enum ConfigKeyEnum {
 	HOST = 'host',
+	BANNER = 'banner',
 	RESPONSE_KEY = 'responseKey',
+	RESPONSE_CUSTOM_KEY = 'responseCustomKey',
 	RESPONSE_TYPE_POSITION = 'responseTypePosition',
-	GEN_REQUEST = 'genRequest'
+	GEN_REQUEST = 'genRequest',
+	USE_TAB = 'useTab'
 }
 
 export interface IConfig {
 	[ConfigKeyEnum.HOST]: string
+	[ConfigKeyEnum.BANNER]?: string
+	[ConfigKeyEnum.USE_TAB]: boolean
 	[ConfigKeyEnum.RESPONSE_KEY]: `${ResponseKeyEnum}`
+	[ConfigKeyEnum.RESPONSE_CUSTOM_KEY]: string
 	[ConfigKeyEnum.RESPONSE_TYPE_POSITION]: `${ResponseTypePositionEnum}`
 	genRequest?(
 		formData: {
@@ -50,7 +58,9 @@ export interface IConfig {
 
 export const DEFAULT_CONFIG: IConfig = {
 	[ConfigKeyEnum.HOST]: YAPI_DEFAULT_SERVER_URL,
+	[ConfigKeyEnum.USE_TAB]: false,
 	[ConfigKeyEnum.RESPONSE_KEY]: ResponseKeyEnum.ALL,
+	[ConfigKeyEnum.RESPONSE_CUSTOM_KEY]: ResponseKeyEnum.DATA,
 	[ConfigKeyEnum.RESPONSE_TYPE_POSITION]:
 		ResponseTypePositionEnum.OUTER_FUNCTION
 }
@@ -60,14 +70,23 @@ export const YAPI_RESPONSE_NAME = 'YapiResponse'
 export const genConfigTemplate = (config: IConfig = DEFAULT_CONFIG) => {
 	return `module.exports = () => {
 	return {
-		// 域名：优先取工作区缓存的域名(登录时填写的域名)
-		// host: 'https://yapi.pro',
-		// resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型
-		// 'outerFunction' | 'fetchMethodGeneric'
-		responseTypePosition: '${config.responseTypePosition}',
-		// 生成 res 包含的属性，默认 all, 可指定为 data
+		/** 域名：优先取工作区缓存的域名(登录成功的域名) */
+		host: ${config.host},
+		/** banner 头部内容，可以填写导入的请求实例等 */
+		banner: ${config.banner},
+		/** 生成 res 包含的属性，默认 all, 可指定为 data、custom
+		 * 'all' | 'data' | 'custom' 
+		 */
 		responseKey: '${config.responseKey}',
-		// 自定义生成 request 方法
+		/** 生成 res 指定的属性值，仅当 responseKey 选择 custom 是有效，默认 data, 可指定为任意 key(支持链式：data.result) */
+		responseCustomKey: ${config.responseCustomKey}
+		/** resType 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
+		 * 'outerFunction' | 'fetchMethodGeneric'
+		 */
+		responseTypePosition: '${config.responseTypePosition}',
+		/** 缩进使用 tab，或者 双空格 */
+		useTab: ${config.useTab}
+		/** 自定义生成 request 方法 */
 		genRequest(
 			{
 				comment,

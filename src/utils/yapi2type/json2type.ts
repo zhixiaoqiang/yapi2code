@@ -1,13 +1,16 @@
 /**
  * @description 对数据进一步抽象，分析json语法树
  */
+import { encodeKey } from './utils'
 
 /** 请求体类型 */
 type ReqBody = ResObjectBody
 
 /** 返回对象类型 */
 interface ResObjectBody {
+	/** 数据类型 */
 	type: `${YapiDataType.Object}`
+	/** 属性枚举 */
 	properties: Record<string, AllTypeNode>
 	title?: string
 	description?: string
@@ -21,8 +24,8 @@ interface ResArrayBody {
 	required?: string[]
 }
 
-/**json抽象语法树的节点 */
-type AllTypeNode =
+/** json抽象语法树的节点 */
+export type AllTypeNode =
 	| {
 			type: `${
 				| YapiDataType.Number
@@ -71,7 +74,9 @@ const YapiTypeMapTsType = {
 	[YapiDataType.Object]: 'Record<string, any>'
 }
 
-export function isBasicType(type: `${YapiDataType}`) {
+export function isBasicType(
+	type: `${YapiDataType}`
+): type is keyof typeof YapiTypeMapBasicTsType {
 	const basicTypeList: string[] = [
 		YapiDataType.Boolean,
 		YapiDataType.Integer,
@@ -84,7 +89,7 @@ export function isBasicType(type: `${YapiDataType}`) {
 }
 
 /**
- * @description 首字母大写
+ * @description 首字母大写，可以拼接后缀
  */
 export function firstCharUpperCase(word: string, suffix = '') {
 	if (!word) {
@@ -92,33 +97,44 @@ export function firstCharUpperCase(word: string, suffix = '') {
 	}
 	return word[0].toUpperCase() + word.slice(1) + suffix
 }
-/**
- * @description 格式化注释
- */
-export function formatComment(comment: string | undefined, tabCount = 0) {
-	return comment ? `\n${formatTabSpace(tabCount + 1)}/** ${comment} */` : ''
+
+let isUseTab = false
+
+export function updateUseTab(useTab?: boolean) {
+	isUseTab = !!useTab
 }
+
 /**
  * @description 格式化tab
  */
 export function formatTabSpace(tabCount: number) {
-	return '	'.repeat(tabCount)
+	return (isUseTab ? '	' : '  ').repeat(tabCount)
 }
+
+/**
+ * @description 格式化注释
+ */
+export function formatComment(comment: string | undefined, tabCount = 0) {
+	return comment ? `\n${formatTabSpace(tabCount)}/** ${comment} */` : ''
+}
+
 /**
  * @description GET请求参数转化typescript interface
  */
 export function reqQuery2type(typeName: string, queryList: ReqQuery) {
-	return `export interface I${firstCharUpperCase(
+	const typeNameData = getTypeNameData(
 		typeName,
+		YapiDataType.Object,
 		'ReqQuery'
-	)} {${queryList
+	)
+
+	return `export ${typeNameData.type} ${typeNameData.name} {${queryList
 		.map((query) => {
-			const linkSymbol = query.required === '0' ? '?: ' : ': '
-			return `${formatComment(query.desc || '')}\n${formatTabSpace(1)}${
-				query.name
-			}${linkSymbol}string;`
+			const comment = formatComment(query.desc || '', 1)
+			const key = query.required === '0' ? `${query.name}?` : query.name
+			return `${comment}\n${formatTabSpace(1)}${key}: string`
 		})
-		.join('')}\n}`
+		.join()}\n}`
 }
 
 /**
@@ -136,23 +152,30 @@ function getTypeNode(
 	node.type = node.type.toLowerCase() as `${YapiDataType}`
 
 	if (isBasicType(node.type)) {
-		return YapiTypeMapTsType[node.type] || 'any'
-	} else if (YapiDataType.Object === node.type) {
+		return YapiTypeMapBasicTsType[node.type] || 'any'
+	}
+
+	if (YapiDataType.Object === node.type) {
 		if (!node.properties) {
 			return '{}'
 		}
-		let result = '{'
-		for (const [key, value] of Object.entries(node.properties)) {
-			result += `${formatComment(
-				value.description,
-				tabCount
-			)}\n${formatTabSpace(tabCount + 1)}${encodeKey(key)}${
-				(value.required || node.required)?.includes(key) ? ': ' : '?: '
-			}${getTypeNode(value, tabCount + 1, true)}`
-		}
-		result += `\n${formatTabSpace(tabCount)}}`
-		return result
-	} else if (YapiDataType.Array === node.type) {
+
+		return `{${Object.keys(node.properties).map((prop) => {
+			const value = node.properties[prop]
+			const comment = formatComment(value.description, tabCount + 1)
+			const key = (value.required || node.required)?.includes(prop)
+				? encodeKey(prop)
+				: `${encodeKey(prop)}?`
+
+			return `${comment}\n${formatTabSpace(tabCount + 1)}${key}: ${getTypeNode(
+				value,
+				tabCount + 1,
+				true
+			)}`
+		})}\n${formatTabSpace(tabCount)}}`
+	}
+
+	if (YapiDataType.Array === node.type) {
 		return (
 			getTypeNode(node.items, tabCount + (hadAddTabCount ? 0 : 1)) +
 			YapiTypeMapTsType[YapiDataType.Array]
@@ -169,25 +192,31 @@ export function resBody2type(
 	resBody: AllTypeNode,
 	suffix = 'ResBody'
 ) {
-	const result = `export interface I${firstCharUpperCase(
-		typeName,
-		suffix
-	)} ${getTypeNode(resBody)}`
+	const typeNameData = getTypeNameData(typeName, resBody.type, suffix)
+
+	const result = `export ${typeNameData.type} ${
+		typeNameData.name
+	} ${getTypeNode(resBody)}`
 
 	return result
 }
 
 export function getTypeNameData(
 	typeName: string,
-	resBody: AllTypeNode,
+	type: AllTypeNode['type'],
 	suffix = 'ResData'
-) {
+): {
+	/** typeName */
+	name: string
+	/** interface | type */
+	type: string
+} {
 	try {
-		const isArrayType = resBody.type === YapiDataType.Array
+		const typeLowerCase = type.toLowerCase() as `${YapiDataType}`
 
 		const typeNameContent = `${firstCharUpperCase(typeName, suffix)}`
 
-		if (isBasicType(resBody.type) || isArrayType) {
+		if (isBasicType(typeLowerCase) || typeLowerCase === YapiDataType.Array) {
 			return {
 				name: typeNameContent,
 				type: 'type'
@@ -206,13 +235,13 @@ export function getTypeNameData(
 	}
 }
 
-export function resBodyData2type(
+export function resBodySubProp2type(
 	typeName: string,
 	resBody: AllTypeNode,
 	suffix = 'ResData'
 ) {
 	try {
-		const typeNameData = getTypeNameData(typeName, resBody, suffix)
+		const typeNameData = getTypeNameData(typeName, resBody.type, suffix)
 
 		const typeNode = getTypeNode(resBody)
 
@@ -228,35 +257,4 @@ export function resBodyData2type(
  */
 export function reqBody2type(typeName: string, reqBody: ReqBody) {
 	return resBody2type(typeName, reqBody, 'ReqBody')
-}
-
-/**
- * @description key转义
- */
-export function encodeKey(key: string) {
-	return encodeURIComponent(key) === key ? key : `"${key}""`
-}
-
-/**
- * 解析JSON, 包含解析非标准的 json, e.g.: "{a:1}"
- * @param content 内容
- * @returns 对象
- */
-export function parseJson(content: string) {
-	if (!content) {
-		return {}
-	}
-
-	function convertStringToObj(str: string) {
-		let obj
-		eval('obj =' + str)
-		return obj
-	}
-
-	try {
-		const data = JSON.parse(content)
-		return typeof data === 'string' ? convertStringToObj(content) : data
-	} catch (error) {
-		return convertStringToObj(content)
-	}
 }

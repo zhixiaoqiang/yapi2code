@@ -85,35 +85,44 @@
       "title": "yapi to code",
       "properties": {
         "yapi.host": {
+          "order": 0,
           "type": "string",
           "default": "http://yapi.internal.weimob.com",
-          "markdownDescription": "域名：优先取工作区缓存的域名(登录时填写的域名)",
+          "markdownDescription": "域名：优先取工作区缓存的域名(登录成功的域名)",
           "scope": "resource"
         },
-        "yapi.responseType": {
+        "yapi.banner": {
+          "order": 1,
           "type": "string",
-          "enum": [
-            "methodGeneric"
-          ],
-          "default": "methodGeneric",
-          "markdownDescription": "补全返回类型",
+          "markdownDescription": "头部内容，可以填写导入的请求实例等",
           "scope": "resource"
         },
         "yapi.responseKey": {
+          "order": 2,
           "type": "string",
           "enum": [
             "all",
-            "data"
+            "data",
+            "custom"
           ],
           "enumDescriptions": [
             "返回所有属性",
-            "仅返回 data 属性"
+            "仅返回 data 属性",
+            "自定义属性"
           ],
           "default": "all",
-          "markdownDescription": "生成 res 包含的属性，默认 all, 可指定为 data",
+          "markdownDescription": "生成 res 包含的属性，默认 `all`, 可指定为 `data、custom`",
+          "scope": "resource"
+        },
+        "yapi.responseCustomKey": {
+          "order": 3,
+          "type": "string",
+          "default": "data",
+          "markdownDescription": "生成 res 指定的属性值，仅当 `responseKey` 选择 `custom` 是有效，默认 `data`, 可指定为任意 key(支持链式：data.result)",
           "scope": "resource"
         },
         "yapi.responseTypePosition": {
+          "order": 4,
           "type": "string",
           "enum": [
             "outerFunction",
@@ -124,7 +133,23 @@
             "类型将会放置在请求方法的泛型中：post<T>"
           ],
           "default": "outerFunction",
-          "markdownDescription": "resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型",
+          "markdownDescription": "`resType` 放置的位置是外层的 `Promise<T>` 还是作为请求方法的泛型 `post<T>`",
+          "scope": "resource"
+        },
+        "yapi.useTab": {
+          "order": 5,
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "缩进使用 `tab`，或者 双空格"
+        },
+        "yapi.responseType": {
+          "order": 6,
+          "type": "string",
+          "enum": [
+            "methodGeneric"
+          ],
+          "default": "methodGeneric",
+          "markdownDescription": "补全返回类型",
           "scope": "resource"
         }
       }

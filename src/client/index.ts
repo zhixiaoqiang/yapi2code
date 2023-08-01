@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { workspace, ExtensionContext } from 'vscode'
+import { workspace } from 'vscode'
 
 import {
 	LanguageClient,
@@ -86,9 +86,9 @@ function clientRun(): [LanguageClient, Dove] {
 
 let vClient: LanguageClient | null = null
 
-export function callWhenActivate(context: ExtensionContext) {
+export function callWhenActivate() {
 	let dove: null | Dove = null
-	;[vClient, dove] = clientRun(context)
+	;[vClient, dove] = clientRun()
 	return dove
 }
 

@@ -176,7 +176,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		})
 	)
 	// 创建LSP客户端连接服务器
-	container.dove = callWhenActivate(context)
+	container.dove = callWhenActivate()
 	// init fetch
 	container.dove.subscribe(MsgType.LSP_DONE, () => {
 		refreshApiFileList()
