@@ -16,7 +16,7 @@
 
 **TODO:**
 
-- [ ] 1. 自定义生成模版 & 切换模版预览
+- [x] 1. 自定义生成模版 & 切换模版预览
 - [ ] 2. 项目组可选 - 加快请求 & 提高性能
 - [ ] 3. 请求异步加载
 - [ ] 4. 优化页面性能
@@ -24,6 +24,7 @@
 - [x] 6. yarn 替换为 pnpm
 - [x] 7. 迁移到 Rspack
 - [ ] 8. 函数类型检测由 `typescript` 替换为 `ts-morph`，有效减少 90% 体积
+- [ ] 9. 支持检测接口定义是否有更新
 - [ ] ...
 
 ## 登录 YAPI
@@ -74,33 +75,45 @@ Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口�
 
 ```js
 module.exports = () => {
-  return {
-    // resType 放置的位置 是外层的 Promise<T> 还是作为请求方法的泛型
-    // 'outerFunction' | 'fetchMethodGeneric'
-    responseTypePosition: 'outerFunction',
-    // 生成 res 包含的属性，默认 all, 可指定为 data
-    responseKey: 'all',
-    // 自定义生成 request 方法
-    genRequest(
-      {
-        comment,
-        fnName,
-        IReqTypeName,
-        IResTypeName,
-        requestFnName,
-        apiPath,
-      },
-      data
-    ) {
-      return (
-        `\n${comment}\n` +
+ return {
+  /** 域名：优先取工作区缓存的域名(登录成功的域名) */
+  host: 'http://yapi.internal.weimob.com',
+  /** banner 头部内容，可以填写导入的请求实例等 */
+  banner: '',
+  /** 生成 res 包含的属性，默认 all, 可指定为 data、custom
+   * 'all' | 'data' | 'custom' 
+   */
+  responseKey: 'all',
+  /** 生成 res 指定的属性值，仅当 responseKey 选择 custom 是有效，默认 data, 可指定为任意 key(支持链式：data.result) */
+  responseCustomKey: 'data'
+  /** resType 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
+   * 'outerFunction' | 'fetchMethodGeneric'
+   */
+  responseTypePosition: 'outerFunction',
+  /** 缩进使用 tab，或者 双空格 */
+  useTab: false
+  /** 自定义生成 request 方法 */
+  genRequest(
+   {
+    comment,
+    fnName,
+    IReqTypeName,
+    IResTypeName,
+    requestFnName,
+    apiPath,
+   },
+   data
+  ) {
+   return (
+    `\n${comment}\n` +
         `export async function ${fnName}(params: I${IReqTypeName}) {
           return request.${requestFnName}<${IResTypeName}>('${apiPath}', params)
         }`
-      )
-    }
+   )
   }
+ }
 }
+
 ```
 
 ## Webview & VS Code Data Flow.png
