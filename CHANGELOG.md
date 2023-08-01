@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.29
+
+### Patch Changes
+
+- feat: 改善生产类型的代码逻辑,支持更多的配置项: banner customKey useTab
+
 ## 0.0.28
 
 ### Patch Changes
