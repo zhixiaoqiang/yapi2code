@@ -3,6 +3,10 @@
 
 [marketplace.visualstudio](https://marketplace.visualstudio.com/items?itemName=zhixiaoqiang.yapi-to-code)
 
+<center>
+中文|<a href="./README.EN.md">ENGLISH</a>
+</center>
+
 ## 特性
 
 1. 🙈 0配置、开箱即用
@@ -127,14 +131,6 @@ module.exports = () => {
 ### 编译前置依赖
 
 #### Rspack ⚡️⚡️⚡️
-
-```bash
-pnpm i
-cd src/server && pnpm start
-cd src/webview && pnpm start
-```
-
-#### Webpack
 
 ```bash
 pnpm i
