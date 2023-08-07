@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.30
+
+### Patch Changes
+
+- feat: 设置支持跳转到 workspace settings, 修正配置内容
+
 ## 0.0.29
 
 ### Patch Changes
