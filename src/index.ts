@@ -83,7 +83,8 @@ export function activate(context: vscode.ExtensionContext): void {
 					`${configFile.fsPath} 不存在，是否创建?`,
 					'是',
 					'否',
-					'预览'
+					'预览',
+					'workspace Setting'
 				)
 				if (answer === '是') {
 					const encoder = new TextEncoder()
@@ -96,6 +97,12 @@ export function activate(context: vscode.ExtensionContext): void {
 					await vscode.window.showTextDocument(configFile)
 				} else if (answer === '预览') {
 					vscode.commands.executeCommand(Command.CONFIGURATION_PREVIEW)
+				} else if (answer === 'workspace Setting') {
+					// open in workspace setting
+					vscode.commands.executeCommand(
+						'workbench.action.openWorkspaceSettings',
+						'yapi'
+					)
 				}
 			}
 		}),

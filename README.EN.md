@@ -90,13 +90,13 @@ module.exports = () => {
    */
   responseKey: 'all',
   /** 生成 res 指定的属性值，仅当 responseKey 选择 custom 是有效，默认 data, 可指定为任意 key(支持链式：data.result) */
-  responseCustomKey: 'data'
+  responseCustomKey: 'data',
   /** resType 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
    * 'outerFunction' | 'fetchMethodGeneric'
    */
   responseTypePosition: 'outerFunction',
   /** 缩进使用 tab，或者 双空格 */
-  useTab: false
+  useTab: false,
   /** 自定义生成 request 方法 */
   genRequest(
    {

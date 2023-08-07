@@ -71,21 +71,21 @@ export const genConfigTemplate = (config: IConfig = DEFAULT_CONFIG) => {
 	return `module.exports = () => {
 	return {
 		/** 域名：优先取工作区缓存的域名(登录成功的域名) */
-		host: ${config.host},
+		host: '${config.host}',
 		/** banner 头部内容，可以填写导入的请求实例等 */
-		banner: ${config.banner},
+		banner: '${config.banner}',
 		/** 生成 res 包含的属性，默认 all, 可指定为 data、custom
 		 * 'all' | 'data' | 'custom' 
 		 */
 		responseKey: '${config.responseKey}',
 		/** 生成 res 指定的属性值，仅当 responseKey 选择 custom 是有效，默认 data, 可指定为任意 key(支持链式：data.result) */
-		responseCustomKey: ${config.responseCustomKey}
+		responseCustomKey: '${config.responseCustomKey}',
 		/** resType 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
 		 * 'outerFunction' | 'fetchMethodGeneric'
 		 */
 		responseTypePosition: '${config.responseTypePosition}',
 		/** 缩进使用 tab，或者 双空格 */
-		useTab: ${config.useTab}
+		useTab: ${config.useTab},
 		/** 自定义生成 request 方法 */
 		genRequest(
 			{
