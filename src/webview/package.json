@@ -6,20 +6,21 @@
   "author": "",
   "main": "index.js",
   "scripts": {
+    "analyze": "rspack build --analyze",
     "build": "rspack build",
     "start": "rspack build --watch true"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.1.4",
-    "antd": "^5.7.3",
-    "lodash": "^4.17.21",
+    "@ant-design/icons": "^5.2.5",
+    "antd": "^5.8.2",
+    "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-contexify": "^6.0.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.195",
-    "@types/react": "^18.2.16",
+    "@types/lodash-es": "^4.17.8",
+    "@types/react": "^18.2.19",
     "@types/react-dom": "^18.2.7",
     "@types/vscode-webview": "^1.57.1",
     "less-loader": "^11.1.3"

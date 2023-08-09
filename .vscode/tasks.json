@@ -18,7 +18,7 @@
               "background": {
                   "activeOnStart": true,
                   // 通过对 rspack 的输出内容进行匹配，得知编译是否完成
-                  "beginsPattern": "Time:.*",
+                  "beginsPattern": "rspack compiled successfully .*",
                   "endsPattern": "ms"
               }
           },

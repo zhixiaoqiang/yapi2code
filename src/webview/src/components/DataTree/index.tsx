@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import { Badge, Input, List, message, Spin, Tree, Tooltip } from 'antd'
 import { ApiFilled, SearchOutlined, SelectOutlined } from '@ant-design/icons'
-import { Badge, Input, List, message, Spin, Tree } from 'antd'
-import debounce from 'lodash/debounce'
+import debounce from 'lodash-es/debounce'
 import type { FieldDataNode } from 'rc-tree/lib/interface'
 import fileIcon from '../../../../assets/api-file.svg'
 
@@ -48,12 +48,14 @@ type TreeData = FieldDataNode<{
 }
 
 function DataTree() {
+	const cacheTreeData = useRef<TreeData[] | null>(null)
+
 	const [showApiList, setShowApi] = useState<boolean>(true)
 	const [loading, setLoading] = useState(true)
 	const [treeData, setTreeData] = useState<TreeData[]>([])
 	const [filterText, setFilterText] = useState('')
-	const [expandKeys, setExpendKeys] = useState<TreeData['key'][]>([])
 	const [fileList, setFileList] = useState<ApiTypeList>([])
+	const [isChinese, setIsChinese] = useState(false)
 
 	const currentTreeNode = useRef<TreeData | null>(null)
 
@@ -465,27 +467,44 @@ function DataTree() {
 		})
 	}, [])
 
-	const titleRender = useCallback((nodeData: TreeData) => {
-		return (
-			<div className="node-container">
-				<div className="node-container-content">
-					<span className="line1">{nodeData.title}</span>
-					{nodeData.isApi && !nodeData.isDubbo && (
-						<span
-							onClick={(e) => {
-								e.preventDefault()
-								e.stopPropagation()
-								onSelect(nodeData.id, nodeData.isApi, { blank: true })
-							}}
-						>
-							<SelectOutlined></SelectOutlined>
+	const titleRender = useCallback(
+		(nodeData: TreeData) => {
+			const index = nodeData.title?.toString()?.indexOf(filterText) ?? -1
+			const beforeStr =
+				index >= 0 ? nodeData.title?.toString().substring(0, index) : ''
+			const afterStr =
+				index >= 0
+					? nodeData.title?.toString().slice(index + filterText.length)
+					: nodeData.title
+
+			return (
+				<div className="node-container">
+					<div className="node-container-content">
+						<span className="line1">
+							{beforeStr}
+							<span hidden={index < 0} className="site-tree-search-value">
+								{filterText}
+							</span>
+							{afterStr}
 						</span>
-					)}
+						{nodeData.isApi && !nodeData.isDubbo && (
+							<span
+								onClick={(e) => {
+									e.preventDefault()
+									e.stopPropagation()
+									onSelect(nodeData.id, nodeData.isApi, { blank: true })
+								}}
+							>
+								<SelectOutlined></SelectOutlined>
+							</span>
+						)}
+					</div>
+					<div>{nodeData.isApi && nodeData.path}</div>
 				</div>
-				<div>{nodeData.isApi && nodeData.path}</div>
-			</div>
-		)
-	}, [])
+			)
+		},
+		[filterText]
+	)
 
 	const getFilterNode = useCallback((nodes: TreeData[], filterText: string) => {
 		let isApiUrl = false
@@ -536,13 +555,12 @@ function DataTree() {
 		return result
 	}, [])
 
-	const treeDataAfterFilter = useMemo(
-		() => (filterText ? getFilterNode(treeData, filterText) : treeData),
-		[filterText, treeData]
-	)
-	const onExpand = useCallback((keys: TreeData['key'][]) => {
-		setExpendKeys(keys)
-	}, [])
+	const treeDataAfterFilter = useMemo(() => {
+		if (cacheTreeData.current) {
+			return cacheTreeData.current
+		}
+		return filterText ? getFilterNode(treeData, filterText) : treeData
+	}, [filterText, treeData, isChinese])
 
 	const navigationToFile = useCallback((item: { uri: string }) => {
 		dove.sendMessage(MsgType.OPEN_FILE, item?.uri)
@@ -555,7 +573,9 @@ function DataTree() {
 					{!showApiList ? (
 						<ApiFilled />
 					) : (
-						<Badge count={fileList.length} showZero />
+						<Tooltip title={'类型缺失接口数为' + fileList.length}>
+							<Badge count={fileList.length} showZero />
+						</Tooltip>
 					)}
 				</div>
 				{showApiList ? (
@@ -567,6 +587,14 @@ function DataTree() {
 						className="search-bar"
 						onChange={(e) => {
 							setFilterText(e.target.value)
+						}}
+						onCompositionStart={() => {
+							cacheTreeData.current = treeDataAfterFilter
+							setIsChinese(true)
+						}}
+						onCompositionEnd={() => {
+							cacheTreeData.current = null
+							setIsChinese(false)
 						}}
 					></Input>
 				) : (
@@ -591,11 +619,11 @@ function DataTree() {
 								displayMenu(event)
 								currentTreeNode.current = node
 							}}
-							expandedKeys={expandKeys}
+							// expandedKeys={expandKeys}
 							treeData={treeDataAfterFilter}
 							titleRender={titleRender}
 							onSelect={(_, { node }) => onSelect(node.id, node.isApi)}
-							onExpand={onExpand}
+							// onExpand={onExpand}
 						/>
 					</div>
 				) : (

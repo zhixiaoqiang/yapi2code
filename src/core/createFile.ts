@@ -11,8 +11,8 @@ const createFile = async (content: string, blank = false) => {
 			new vscode.Range(0, 0, Math.max(9999, cacheDocument.lineCount), 0),
 			content
 		)
-		vscode.window.showTextDocument(cacheDocument)
-		vscode.languages.setTextDocumentLanguage(cacheDocument, 'typescript')
+		await vscode.window.showTextDocument(cacheDocument)
+		await vscode.languages.setTextDocumentLanguage(cacheDocument, 'typescript')
 		return vscode.workspace.applyEdit(edit)
 	}
 
