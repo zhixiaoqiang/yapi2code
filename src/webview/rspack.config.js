@@ -1,5 +1,6 @@
 const path = require('path')
 
+/** @type {import('@rspack/cli').Configuration} */
 module.exports = {
 	entry: {
 		slideBar: './src/index.tsx'

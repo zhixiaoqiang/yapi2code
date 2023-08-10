@@ -193,7 +193,7 @@ export function data2Type(data: DetailData, config?: IConfig) {
 
 	const getNestData = (data: Record<string, any>, str: string) => {
 		return str.split('.').reduce((prev, curr) => {
-			prev = prev['properties'][curr]
+			prev = prev?.['properties']?.[curr]
 			return prev
 		}, data) as AllTypeNode
 	}

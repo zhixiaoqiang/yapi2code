@@ -11,8 +11,8 @@
     "start": "rspack build --watch true"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.2.5",
-    "antd": "^5.8.2",
+    "@ant-design/icons": "5.1.4",
+    "antd": "5.7.3",
     "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-contexify": "^6.0.0",
