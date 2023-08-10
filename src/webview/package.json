@@ -8,7 +8,7 @@
   "scripts": {
     "analyze": "rspack build --analyze",
     "build": "rspack build",
-    "start": "rspack build --watch true"
+    "start": "rspack build -c ./rspack.dev.config.js --watch true"
   },
   "dependencies": {
     "@ant-design/icons": "5.1.4",
