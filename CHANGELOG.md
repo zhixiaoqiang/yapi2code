@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.31
+
+### Patch Changes
+
+- feat: 修正无法过滤链接的问题，优化 tree 交互性能（拼音、状态分离等）
+
 ## 0.0.30
 
 ### Patch Changes
