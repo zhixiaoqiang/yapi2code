@@ -247,7 +247,10 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 								]
 									.filter(Boolean)
 									.join('\n\n'),
-								params.blank
+								{
+									blank: params.blank,
+									format: config.format
+								}
 							)
 						} catch (error) {
 							debugVscodeApi('preview code', error)
@@ -286,13 +289,15 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 
 export function openLocalFile(filePath: string) {
 	// 获取TextDocument对象
-	workspace.openTextDocument(filePath).then(
-		(doc) => {
-			// 在VSCode编辑窗口展示读取到的文本
-			window.showTextDocument(doc)
-		},
-		(err) => {
-			debugVscodeApi(`Open ${filePath} error, ${err}.`)
-		}
-	)
+	workspace
+		.openTextDocument({ language: 'typescript', content: filePath })
+		.then(
+			(doc) => {
+				// 在VSCode编辑窗口展示读取到的文本
+				window.showTextDocument(doc)
+			},
+			(err) => {
+				debugVscodeApi(`Open ${filePath} error, ${err}.`)
+			}
+		)
 }

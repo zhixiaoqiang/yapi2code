@@ -32,14 +32,14 @@ async function checkApiTypeExist(
 
 export async function quickfix(
 	dove: Dove,
-	parms: CodeActionParams
+	params: CodeActionParams
 ): Promise<CodeAction[]> {
-	const diagnostics = parms.context.diagnostics
+	const diagnostics = params.context.diagnostics
 	if (diagnostics && diagnostics.length === 0) {
 		return []
 	}
 
-	const diagStore = store.get(parms.textDocument.uri)
+	const diagStore = store.get(params.textDocument.uri)
 
 	const codeActions: CodeAction[] = []
 	for (const diag of diagnostics) {
@@ -73,7 +73,7 @@ export async function quickfix(
 
 			const importList: string[] = []
 			const typeFilePath = getFileCurrentWorkSpace(
-				parms.textDocument.uri,
+				params.textDocument.uri,
 				'types.ts'
 			)
 			// 有参数插入参数，requestBody优先级高
@@ -235,7 +235,7 @@ export async function quickfix(
 					diagnostics: [diag],
 					edit: {
 						changes: {
-							[parms.textDocument.uri]: fixList
+							[params.textDocument.uri]: fixList
 						}
 					},
 					command: {
@@ -244,7 +244,7 @@ export async function quickfix(
 							{
 								text: importList.join('\n\n'),
 								// filePath: getFileCurrentWorkSpace(
-								//   parms.textDocument.uri,
+								//   params.textDocument.uri,
 								//   'types.ts'
 								// ),
 								filePath: typeFilePath
@@ -260,7 +260,7 @@ export async function quickfix(
 					diagnostics: [diag],
 					edit: {
 						changes: {
-							[parms.textDocument.uri]: anyFixList
+							[params.textDocument.uri]: anyFixList
 						}
 					}
 				}

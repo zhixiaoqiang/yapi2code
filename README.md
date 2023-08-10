@@ -94,6 +94,8 @@ module.exports = () => {
    * 'outerFunction' | 'fetchMethodGeneric'
    */
   responseTypePosition: 'outerFunction',
+  /** 开启自动格式化 */
+  format: false,
   /** 缩进使用 tab，或者 双空格 */
   useTab: false,
   /** 自定义生成 request 方法 */

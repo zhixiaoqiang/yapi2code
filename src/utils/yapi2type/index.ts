@@ -54,10 +54,10 @@ const formatTime = (stamp: number) => {
  */
 const formatInterfaceComment = (data: DetailData, subName: string) => {
 	return `/**
-  * @description ${data.title}-${subName}
-  * @url ${getApiUrl(data)}
-  * @updateDate ${formatTime(data.up_time)}
-  */`
+ * @description ${data.title}-${subName}
+ * @url ${getApiUrl(data)}
+ * @updateDate ${formatTime(data.up_time)}
+ */`
 }
 
 export const formatDubboTips = (data: DetailData) => {
@@ -66,8 +66,8 @@ export const formatDubboTips = (data: DetailData) => {
 
 export const formatBaseTips = (data: DetailData, decs = '') => {
 	return `/**
-  * ${decs}，暂时无法生成类型
-	* 详情点击：${getApiUrl(data)}
+ * ${decs}，暂时无法生成类型
+ * 详情点击：${getApiUrl(data)}
 */\n`
 }
 
@@ -108,9 +108,9 @@ export const genRequest = (
 
 	const contentMap = {
 		comment: `/**
-	* @description ${data.title}
-	* @url ${getApiUrl(data)}
-	*/`,
+ * @description ${data.title}
+ * @url ${getApiUrl(data)}
+ */`,
 		fnName,
 		IReqTypeName: `I${firstCharUpperCase(
 			fnName,

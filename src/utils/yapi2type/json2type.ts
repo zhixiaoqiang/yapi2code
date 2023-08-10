@@ -245,9 +245,9 @@ export function resBodySubProp2type(
 
 		const typeNode = getTypeNode(resBody)
 
-		return `export ${typeNameData.type} ${typeNameData.name} ${
-			typeNameData.type === 'type' ? '=' : ''
-		} ${typeNode}`
+		return `export ${typeNameData.type} ${typeNameData.name}${
+			typeNameData.type === 'type' ? ' = ' : ' '
+		}${typeNode}`
 	} catch (error) {
 		return ''
 	}

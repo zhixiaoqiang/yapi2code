@@ -279,17 +279,17 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 connection.onCodeAction((params) => provideCodeActions(params))
 
 async function provideCodeActions(
-	parms: CodeActionParams,
+	params: CodeActionParams,
 	isFixAll?: boolean
 ): Promise<CodeAction[]> {
-	if (!parms.context.diagnostics.length) {
+	if (!params.context.diagnostics.length) {
 		return []
 	}
-	const document = parms.textDocument
+	const document = params.textDocument
 	if (!document) {
 		return []
 	}
-	return quickfix(dove, parms, isFixAll)
+	return quickfix(dove, params, isFixAll)
 }
 
 /** 获取副本名字 */

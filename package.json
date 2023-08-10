@@ -136,14 +136,20 @@
           "markdownDescription": "`resType` 放置的位置是外层的 `Promise<T>` 还是作为请求方法的泛型 `post<T>`",
           "scope": "resource"
         },
-        "yapi.useTab": {
+        "yapi.format": {
           "order": 5,
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "开启默认格式化"
+        },
+        "yapi.useTab": {
+          "order": 6,
           "type": "boolean",
           "default": false,
           "markdownDescription": "缩进使用 `tab`，或者 双空格"
         },
         "yapi.responseType": {
-          "order": 6,
+          "order": 7,
           "type": "string",
           "enum": [
             "methodGeneric"
@@ -214,6 +220,7 @@
     "axios": "^1.4.0",
     "debug": "^4.3.4",
     "fs-extra": "^11.1.1",
+    "ts-morph": "^19.0.0",
     "vscode-languageclient": "^7.0.0"
   },
   "devDependencies": {

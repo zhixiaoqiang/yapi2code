@@ -33,12 +33,14 @@ export enum ConfigKeyEnum {
 	RESPONSE_CUSTOM_KEY = 'responseCustomKey',
 	RESPONSE_TYPE_POSITION = 'responseTypePosition',
 	GEN_REQUEST = 'genRequest',
+	FORMAT = 'format',
 	USE_TAB = 'useTab'
 }
 
 export interface IConfig {
 	[ConfigKeyEnum.HOST]: string
 	[ConfigKeyEnum.BANNER]?: string
+	[ConfigKeyEnum.FORMAT]: boolean
 	[ConfigKeyEnum.USE_TAB]: boolean
 	[ConfigKeyEnum.RESPONSE_KEY]: `${ResponseKeyEnum}`
 	[ConfigKeyEnum.RESPONSE_CUSTOM_KEY]: string
@@ -59,6 +61,7 @@ export interface IConfig {
 export const DEFAULT_CONFIG: IConfig = {
 	[ConfigKeyEnum.HOST]: YAPI_DEFAULT_SERVER_URL,
 	[ConfigKeyEnum.USE_TAB]: false,
+	[ConfigKeyEnum.FORMAT]: false,
 	[ConfigKeyEnum.RESPONSE_KEY]: ResponseKeyEnum.ALL,
 	[ConfigKeyEnum.RESPONSE_CUSTOM_KEY]: ResponseKeyEnum.DATA,
 	[ConfigKeyEnum.RESPONSE_TYPE_POSITION]:
@@ -75,7 +78,7 @@ export const genConfigTemplate = (config: IConfig = DEFAULT_CONFIG) => {
 		/** banner 头部内容，可以填写导入的请求实例等 */
 		banner: '${config.banner}',
 		/** 生成 res 包含的属性，默认 all, 可指定为 data、custom
-		 * 'all' | 'data' | 'custom' 
+		 * 'all' | 'data' | 'custom'
 		 */
 		responseKey: '${config.responseKey}',
 		/** 生成 res 指定的属性值，仅当 responseKey 选择 custom 是有效，默认 data, 可指定为任意 key(支持链式：data.result) */
@@ -84,6 +87,8 @@ export const genConfigTemplate = (config: IConfig = DEFAULT_CONFIG) => {
 		 * 'outerFunction' | 'fetchMethodGeneric'
 		 */
 		responseTypePosition: '${config.responseTypePosition}',
+		/** 开启自动格式化 */
+		format: ${config.format},
 		/** 缩进使用 tab，或者 双空格 */
 		useTab: ${config.useTab},
 		/** 自定义生成 request 方法 */

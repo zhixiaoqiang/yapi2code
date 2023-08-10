@@ -3,7 +3,10 @@ import * as vscode from 'vscode'
 // 缓存 document
 let cacheDocument: vscode.TextDocument
 
-const createFile = async (content: string, blank = false) => {
+const createFile = async (
+	content: string,
+	{ blank = false, format = false } = {}
+) => {
 	if (!blank && cacheDocument) {
 		const edit = new vscode.WorkspaceEdit()
 		edit.replace(
@@ -13,7 +16,14 @@ const createFile = async (content: string, blank = false) => {
 		)
 		await vscode.window.showTextDocument(cacheDocument)
 		await vscode.languages.setTextDocumentLanguage(cacheDocument, 'typescript')
-		return vscode.workspace.applyEdit(edit)
+
+		await vscode.workspace.applyEdit(edit)
+		if (format) {
+			await vscode.commands.executeCommand<string>(
+				'editor.action.formatDocument'
+			)
+		}
+		return
 	}
 
 	const document = await vscode.workspace.openTextDocument({
@@ -25,7 +35,10 @@ const createFile = async (content: string, blank = false) => {
 		cacheDocument = document
 	}
 
-	vscode.window.showTextDocument(document)
+	await vscode.window.showTextDocument(document)
+	if (format) {
+		await vscode.commands.executeCommand<string>('editor.action.formatDocument')
+	}
 }
 
 export default createFile
