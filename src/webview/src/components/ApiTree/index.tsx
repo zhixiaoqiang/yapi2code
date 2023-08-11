@@ -7,8 +7,12 @@ import React, {
 	FC
 } from 'react'
 
-import { message, Spin, Tree } from 'antd'
-import { SelectOutlined } from '@ant-design/icons'
+import { message, Spin, Tree, Tooltip } from 'antd'
+import {
+	AppstoreAddOutlined,
+	CopyOutlined,
+	SnippetsOutlined
+} from '@ant-design/icons'
 
 import debounce from 'lodash-es/debounce'
 import {
@@ -33,13 +37,14 @@ import 'react-contexify/dist/ReactContexify.css'
 
 import './index.less'
 
-import type {
-	DirAndItemData,
-	DirData,
-	GroupData,
-	ItemData,
-	ProjectData,
-	TreeData
+import {
+	menuKeyEnum,
+	type DirAndItemData,
+	type DirData,
+	type GroupData,
+	type ItemData,
+	type ProjectData,
+	type TreeData
 } from './types'
 
 const { DirectoryTree } = Tree
@@ -51,7 +56,7 @@ const ApiTree: FC<{ isChinese: boolean; filterText: string }> = (props) => {
 
 	const [loading, setLoading] = useState(true)
 	const [treeData, setTreeData] = useState<TreeData[]>([])
-
+	const [rightContentIsApi, setRightContentIsApi] = useState(false)
 	const currentTreeNode = useRef<TreeData | null>(null)
 
 	// 🔥 you can use this hook from everywhere. All you need is the menu id
@@ -59,17 +64,55 @@ const ApiTree: FC<{ isChinese: boolean; filterText: string }> = (props) => {
 		id: MENU_ID
 	})
 
-	const handleItemClick = useCallback(
-		({ data }: ItemParams<any, { type: 'refresh' | 'disable' | 'delete' }>) => {
-			if (data?.type === 'refresh') {
+	const handleMenuItemClick = useCallback(
+		async ({
+			data
+		}: ItemParams<
+			any,
+			{
+				type: menuKeyEnum
+			}
+		>) => {
+			if (data?.type === menuKeyEnum.refresh) {
 				currentTreeNode.current && refreshData(currentTreeNode.current)
-			} else if (data?.type === 'delete') {
+			} else if (data?.type === menuKeyEnum.delete) {
 				setTreeData((origin) =>
 					updateTreeDataByKey(origin, currentTreeNode.current?.key || '', [])
 				)
+			} else if (
+				(data?.type === menuKeyEnum.copy ||
+					data?.type === menuKeyEnum.insertToPosition) &&
+				currentTreeNode.current?.id
+			) {
+				getApiDetail({
+					id: currentTreeNode.current.id,
+					openType: data.type
+				})
 			}
 		},
 		[treeData]
+	)
+
+	const getApiDetail = useCallback(
+		async (params: {
+			id: string | number
+			blank?: boolean
+			needFresh?: boolean
+			openType?:
+				| menuKeyEnum.show
+				| menuKeyEnum.copy
+				| menuKeyEnum.insertToPosition
+		}) => {
+			const res = await dove.sendMessage(MsgType.FETCH_DETAIL, params)
+			message.loading('加载中', 0)
+			if (res?.[0]) {
+				message.destroy()
+				message.success('操作成功')
+				return
+			}
+			message.destroy()
+		},
+		[]
 	)
 
 	const displayMenu = useCallback((e: TriggerEvent) => {
@@ -78,34 +121,8 @@ const ApiTree: FC<{ isChinese: boolean; filterText: string }> = (props) => {
 		})
 	}, [])
 
-	const onSelect = useCallback(
-		async (
-			id: string | number,
-			isApi = false,
-			{ needFresh = false, blank = false } = {}
-		) => {
-			if (!isApi) {
-				return
-			}
-
-			message.loading('加载中', 0)
-			try {
-				await dove.sendMessage(MsgType.FETCH_DETAIL, {
-					id,
-					blank,
-					needFresh
-				})
-			} catch (error) {
-				// message.destroy()
-			}
-			message.destroy()
-		},
-		[]
-	)
-
 	const updateTreeData = useCallback(
 		debounce(() => {
-			console.log('31312312312')
 			setTreeData((treeData) => [...treeData])
 		}, 300),
 		[]
@@ -402,7 +419,8 @@ const ApiTree: FC<{ isChinese: boolean; filterText: string }> = (props) => {
 					break
 				}
 				case treeLevelTypeEnum.item: {
-					onSelect(node.id, node.isApi, {
+					getApiDetail({
+						id: node.id,
 						needFresh: true
 					})
 					break
@@ -482,22 +500,58 @@ const ApiTree: FC<{ isChinese: boolean; filterText: string }> = (props) => {
 			return (
 				<div className="node-container">
 					<div className="node-container-content">
-						<span className="line1">
+						<div className="line1">
 							{renderFilterHighlightContent(
 								nodeData.title?.toString(),
 								filterText
 							)}
-						</span>
+						</div>
 						{nodeData.isApi && !nodeData.isDubbo && (
-							<span
-								onClick={(e) => {
-									e.preventDefault()
-									e.stopPropagation()
-									onSelect(nodeData.id, nodeData.isApi, { blank: true })
-								}}
-							>
-								<SelectOutlined></SelectOutlined>
-							</span>
+							<div className="icon-list">
+								<Tooltip title="复制">
+									<span
+										onClick={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											getApiDetail({
+												id: nodeData.id,
+												openType: menuKeyEnum.copy
+											})
+										}}
+									>
+										<CopyOutlined />
+									</span>
+								</Tooltip>
+								<Tooltip title="插入到光标处">
+									<span
+										onClick={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											getApiDetail({
+												id: nodeData.id,
+												openType: menuKeyEnum.insertToPosition
+											})
+										}}
+									>
+										<SnippetsOutlined />
+									</span>
+								</Tooltip>
+
+								<Tooltip title="在新窗口打开">
+									<span
+										onClick={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											getApiDetail({
+												id: nodeData.id,
+												blank: true
+											})
+										}}
+									>
+										<AppstoreAddOutlined />
+									</span>
+								</Tooltip>
+							</div>
 						)}
 					</div>
 					{nodeData.isApi && (
@@ -602,22 +656,39 @@ const ApiTree: FC<{ isChinese: boolean; filterText: string }> = (props) => {
 					blockNode
 					onRightClick={({ event, node }) => {
 						displayMenu(event)
+						setRightContentIsApi(!!node.isApi)
 						currentTreeNode.current = node
 					}}
 					treeData={treeDataAfterFilter}
 					titleRender={titleRender}
-					onSelect={(_, { node }) => onSelect(node.id, node.isApi)}
+					onSelect={(_, { node }) =>
+						node.isApi && getApiDetail({ id: node.id })
+					}
 				/>
 			</Spin>
 
 			<Menu id={MENU_ID} theme="dark">
-				<Item onClick={handleItemClick} data={{ type: 'refresh' }}>
+				<Item
+					onClick={handleMenuItemClick}
+					hidden={!rightContentIsApi}
+					data={{ type: menuKeyEnum.copy }}
+				>
+					复制
+				</Item>
+				<Item
+					hidden={!rightContentIsApi}
+					onClick={handleMenuItemClick}
+					data={{ type: menuKeyEnum.insertToPosition }}
+				>
+					插入到光标处
+				</Item>
+				<Item
+					onClick={handleMenuItemClick}
+					data={{ type: menuKeyEnum.refresh }}
+				>
 					重新请求
 				</Item>
-				{/* <Item onClick={handleItemClick} data={{ type: 'disable' }}>
-					禁用
-				</Item> */}
-				<Item onClick={handleItemClick} data={{ type: 'delete' }}>
+				<Item onClick={handleMenuItemClick} data={{ type: menuKeyEnum.delete }}>
 					清除子项
 				</Item>
 			</Menu>

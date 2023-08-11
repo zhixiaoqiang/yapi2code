@@ -1,4 +1,4 @@
-import { ExtensionContext, commands, workspace, window } from 'vscode'
+import { ExtensionContext, commands, workspace, window, env } from 'vscode'
 
 import { SlideBarWebview } from './webviewTemplate'
 import Dove from '../utils/dove'
@@ -13,7 +13,7 @@ import {
 	getDirAndItemList
 } from '../services/api'
 import storage from '../utils/storage'
-import createFile from './createFile'
+import showDocument from './show-document'
 import { data2Type, formatBaseTips, formatDubboTips } from '../utils/yapi2type'
 import { getConfiguration } from '../common/vscodeapi'
 import { Command, ContextEnum } from '../constant/vscode'
@@ -216,7 +216,12 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 			// 获取详情数据
 			dove.subscribe(
 				MsgType.FETCH_DETAIL,
-				async (params: { id: string; blank: boolean; needFresh: boolean }) => {
+				async (params: {
+					id: string
+					blank: boolean
+					needFresh: boolean
+					openType: 'show' | 'copy' | 'insertToPosition'
+				}) => {
 					const config = await getConfiguration()
 
 					const { data } = await getApiDetail(
@@ -231,30 +236,58 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 					})
 
 					if (data?.method === 'DUBBO') {
-						return createFile(formatDubboTips(data))
+						return showDocument(formatDubboTips(data))
 					}
 
 					if (data?.path) {
 						try {
 							const tsData = data2Type(data, config)
-							createFile(
-								[
-									config.banner,
-									tsData.reqQueryType,
-									tsData.reqBodyType,
-									tsData.resType,
-									tsData.requestContent
-								]
-									.filter(Boolean)
-									.join('\n\n'),
-								{
+
+							const editor = window.activeTextEditor
+							const bannerExist = !!(
+								config.banner &&
+								editor?.document.getText().includes(config.banner)
+							)
+
+							const content = [
+								!bannerExist && config.banner,
+								tsData.reqQueryType,
+								tsData.reqBodyType,
+								tsData.resType,
+								tsData.requestContent
+							]
+								.filter(Boolean)
+								.join('\n\n')
+
+							if (params.openType === 'show') {
+								await showDocument(content, {
 									blank: params.blank,
 									format: config.format
+								})
+								return true
+							} else if (params.openType === 'copy') {
+								await env.clipboard.writeText(content)
+								return true
+							} else if (params.openType === 'insertToPosition') {
+								if (editor) {
+									await editor.edit((editBuilder) => {
+										editBuilder.insert(
+											editor.selection.active,
+											`\r\n${content}`
+										)
+									})
+									return true
 								}
-							)
+							}
+
+							await showDocument(content, {
+								blank: params.blank,
+								format: config.format
+							})
+							return true
 						} catch (error) {
 							debugVscodeApi('preview code', error)
-							createFile(
+							showDocument(
 								[
 									formatBaseTips(data, '生成异常'),
 									data ? JSON.stringify(data, null, 2) : ''
@@ -262,7 +295,7 @@ export const getSlideBarWebview = (context: ExtensionContext) => {
 							)
 							commands.executeCommand(Command.WARN_TOAST, '无法预览')
 						}
-						return
+						return false
 					}
 
 					commands.executeCommand(Command.WARN_TOAST, '无法预览')

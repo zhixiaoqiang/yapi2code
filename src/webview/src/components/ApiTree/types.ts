@@ -2,6 +2,21 @@ import type { FieldDataNode } from 'rc-tree/lib/interface'
 
 import { treeLevelTypeEnum } from '../DataTree/constants'
 
+export enum menuKeyEnum {
+	/** 显示文档 */
+	show = 'show',
+	/** 刷新 */
+	refresh = 'refresh',
+	/** 禁用 */
+	disable = 'disable',
+	/** 删除子项 */
+	delete = 'delete',
+	/** 复制 */
+	copy = 'copy',
+	/** 插入到光标处 */
+	insertToPosition = 'insertToPosition'
+}
+
 export interface GroupData {
 	add_time: number
 	custom_field1: { enable: boolean }

@@ -1,10 +1,22 @@
 import * as vscode from 'vscode'
 
+type showDocumentFn = (
+	/** 内容 */
+	content: string,
+	options?: {
+		/** 是否新开 */
+		blank?: boolean
+		/** 是否格式化 */
+		format?: boolean
+	}
+) => Promise<void>
+
 // 缓存 document
 let cacheDocument: vscode.TextDocument
 
-const createFile = async (
-	content: string,
+/** 将内容展示到文本编辑窗口 */
+const showDocument: showDocumentFn = async (
+	content,
 	{ blank = false, format = false } = {}
 ) => {
 	if (!blank && cacheDocument) {
@@ -41,4 +53,4 @@ const createFile = async (
 	}
 }
 
-export default createFile
+export default showDocument
