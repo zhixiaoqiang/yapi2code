@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.0.31
+## 0.0.32
 
 ### Patch Changes
 

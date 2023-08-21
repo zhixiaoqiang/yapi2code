@@ -1,11 +1,21 @@
-import * as ts from 'typescript'
+import {
+	TypeFormatFlags,
+	isFunctionDeclaration,
+	isFunctionExpression,
+	isArrowFunction,
+	SyntaxKind,
+	isReturnStatement,
+	forEachChild,
+	isVariableStatement
+} from 'typescript'
+import type { Node, Program, Type, Block, SourceFile } from 'typescript'
 
 /**
  * 获取节点的类型
  * @param node 要获取类型的节点
  * @param program TypeScript 程序
  */
-function getType(node: ts.Node, program: ts.Program): ts.Type {
+function getType(node: Node, program: Program): Type {
 	return program.getTypeChecker().getTypeAtLocation(node)
 }
 
@@ -14,7 +24,7 @@ function getType(node: ts.Node, program: ts.Program): ts.Type {
  * @param node 要获取类型的节点
  * @param program TypeScript 程序
  */
-function getTypeString(node: ts.Node, program: ts.Program): string {
+function getTypeString(node: Node, program: Program): string {
 	const type = getType(node, program)
 
 	if (!type) {
@@ -26,9 +36,7 @@ function getTypeString(node: ts.Node, program: ts.Program): string {
 	if (type.isStringLiteral()) {
 		return 'string'
 	}
-	return program
-		.getTypeChecker()
-		.typeToString(type, node, ts.TypeFormatFlags.None)
+	return program.getTypeChecker().typeToString(type, node, TypeFormatFlags.None)
 }
 
 /**
@@ -36,19 +44,19 @@ function getTypeString(node: ts.Node, program: ts.Program): string {
  * @param node 要获取返回值类型的函数节点
  * @param program TypeScript 程序
  */
-function getReturnType(node: ts.Node, program: ts.Program): string {
+function getReturnType(node: Node, program: Program): string {
 	if (
-		ts.isFunctionDeclaration(node) ||
-		ts.isFunctionExpression(node) ||
-		ts.isArrowFunction(node)
+		isFunctionDeclaration(node) ||
+		isFunctionExpression(node) ||
+		isArrowFunction(node)
 	) {
 		const body = node.body
 
 		if (body) {
-			if (body.kind === ts.SyntaxKind.Block) {
+			if (body.kind === SyntaxKind.Block) {
 				// 函数体为一个代码块
-				const block = body as ts.Block
-				const statements = block.statements.filter(ts.isReturnStatement)
+				const block = body as Block
+				const statements = block.statements.filter(isReturnStatement)
 				if (statements.length > 0) {
 					const statement = statements[0]
 					if (statement.expression) {
@@ -71,25 +79,25 @@ function getReturnType(node: ts.Node, program: ts.Program): string {
  * @param fileName 要分析类型的代码文件名
  */
 export function analyzeFunctionReturnType(
-	sourceFile: ts.SourceFile,
-	program: ts.Program
+	sourceFile: SourceFile,
+	program: Program
 ) {
 	if (sourceFile) {
 		const types: string[] = []
 
-		ts.forEachChild(sourceFile, (node) => {
+		forEachChild(sourceFile, (node) => {
 			if (
-				ts.isFunctionDeclaration(node) ||
-				ts.isArrowFunction(node) ||
-				ts.isFunctionExpression(node)
+				isFunctionDeclaration(node) ||
+				isArrowFunction(node) ||
+				isFunctionExpression(node)
 			) {
 				types.push(getReturnType(node, program))
-			} else if (ts.isVariableStatement(node)) {
+			} else if (isVariableStatement(node)) {
 				node.declarationList.declarations.forEach((decl) => {
 					if (
 						decl.initializer &&
-						(ts.isArrowFunction(decl.initializer) ||
-							ts.isFunctionExpression(decl.initializer))
+						(isArrowFunction(decl.initializer) ||
+							isFunctionExpression(decl.initializer))
 					) {
 						types.push(getReturnType(decl.initializer, program))
 					}

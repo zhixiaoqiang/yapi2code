@@ -1,4 +1,4 @@
-import * as path from 'path'
+import { join } from 'path'
 import { workspace } from 'vscode'
 
 import {
@@ -20,7 +20,7 @@ let doveContext: Dove | null = null
 
 function clientRun(): [LanguageClient, Dove] {
 	// 服务器使用node实现
-	const serverModule = path.join(__dirname, 'server.js')
+	const serverModule = join(__dirname, 'server.js')
 	// The debug options for the server
 	// --inspect=6011: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
 	const debugOptions = { execArgv: ['--nolazy', '--inspect=6011'] }

@@ -1,4 +1,12 @@
-import * as vscode from 'vscode'
+import {
+	WorkspaceEdit,
+	Range,
+	window,
+	languages,
+	commands,
+	workspace,
+	type TextDocument
+} from 'vscode'
 
 type showDocumentFn = (
 	/** 内容 */
@@ -12,7 +20,7 @@ type showDocumentFn = (
 ) => Promise<void>
 
 // 缓存 document
-let cacheDocument: vscode.TextDocument
+let cacheDocument: TextDocument
 
 /** 将内容展示到文本编辑窗口 */
 const showDocument: showDocumentFn = async (
@@ -20,25 +28,23 @@ const showDocument: showDocumentFn = async (
 	{ blank = false, format = false } = {}
 ) => {
 	if (!blank && cacheDocument) {
-		const edit = new vscode.WorkspaceEdit()
+		const edit = new WorkspaceEdit()
 		edit.replace(
 			cacheDocument.uri,
-			new vscode.Range(0, 0, Math.max(9999, cacheDocument.lineCount), 0),
+			new Range(0, 0, Math.max(9999, cacheDocument.lineCount), 0),
 			content
 		)
-		await vscode.window.showTextDocument(cacheDocument)
-		await vscode.languages.setTextDocumentLanguage(cacheDocument, 'typescript')
+		await window.showTextDocument(cacheDocument)
+		await languages.setTextDocumentLanguage(cacheDocument, 'typescript')
 
-		await vscode.workspace.applyEdit(edit)
+		await workspace.applyEdit(edit)
 		if (format) {
-			await vscode.commands.executeCommand<string>(
-				'editor.action.formatDocument'
-			)
+			await commands.executeCommand<string>('editor.action.formatDocument')
 		}
 		return
 	}
 
-	const document = await vscode.workspace.openTextDocument({
+	const document = await workspace.openTextDocument({
 		language: 'typescript',
 		content
 	})
@@ -47,9 +53,9 @@ const showDocument: showDocumentFn = async (
 		cacheDocument = document
 	}
 
-	await vscode.window.showTextDocument(document)
+	await window.showTextDocument(document)
 	if (format) {
-		await vscode.commands.executeCommand<string>('editor.action.formatDocument')
+		await commands.executeCommand<string>('editor.action.formatDocument')
 	}
 }
 

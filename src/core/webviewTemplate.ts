@@ -1,17 +1,22 @@
-import * as vscode from 'vscode'
-import * as path from 'path'
+import {
+	Uri,
+	type ExtensionContext,
+	type WebviewViewProvider,
+	type WebviewView
+} from 'vscode'
+import { join } from 'path'
 
 import Dove from '../utils/dove'
 import { MsgType } from '../constant/msg'
 
 // type lifeCycleFnType = (dove: Dove) => void
 
-export class SlideBarWebview implements vscode.WebviewViewProvider {
-	context: vscode.ExtensionContext
+export class SlideBarWebview implements WebviewViewProvider {
+	context: ExtensionContext
 	dove?: Dove
 	onDidMount: any
 	onUnMount: any
-	public resolveWebviewView(webviewView: vscode.WebviewView) {
+	public resolveWebviewView(webviewView: WebviewView) {
 		webviewView.webview.options = {
 			enableScripts: true
 		}
@@ -31,7 +36,7 @@ export class SlideBarWebview implements vscode.WebviewViewProvider {
 		this.onDidMount?.(this.dove)
 	}
 
-	constructor(context: vscode.ExtensionContext) {
+	constructor(context: ExtensionContext) {
 		this.context = context
 	}
 
@@ -39,16 +44,12 @@ export class SlideBarWebview implements vscode.WebviewViewProvider {
 		this.dove?.sendMessage(MsgType.FRESH_DATA, '')
 	}
 
-	render(panel: vscode.WebviewView) {
+	render(panel: WebviewView) {
 		const slideBarCssPath = panel.webview.asWebviewUri(
-			vscode.Uri.file(
-				path.join(this.context.extensionPath, 'dist', 'slideBar.css')
-			)
+			Uri.file(join(this.context.extensionPath, 'dist', 'slideBar.css'))
 		)
 		const slideBarJsPath = panel.webview.asWebviewUri(
-			vscode.Uri.file(
-				path.join(this.context.extensionPath, 'dist', 'slideBar.js')
-			)
+			Uri.file(join(this.context.extensionPath, 'dist', 'slideBar.js'))
 		)
 
 		return `<!DOCTYPE html>

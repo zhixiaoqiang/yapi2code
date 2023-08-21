@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import * as vscode from 'vscode'
+import { commands } from 'vscode'
 import storage from './storage'
 
 import { login } from '../services/api/login'
@@ -104,11 +104,7 @@ const yapiReq = {
 		if (!username || !password || !serverUrl) {
 			// 清空储存，切换到登录页
 			storage.clearAll()
-			vscode.commands.executeCommand(
-				'setContext',
-				ContextEnum.SHOW_TREE_VIEW,
-				false
-			)
+			commands.executeCommand('setContext', ContextEnum.SHOW_TREE_VIEW, false)
 			return Promise.reject()
 		}
 		// 有效期2个小时，重新登录

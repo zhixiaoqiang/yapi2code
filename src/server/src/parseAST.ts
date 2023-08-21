@@ -1,20 +1,58 @@
-import * as ts from 'typescript'
+import {
+	visitEachChild,
+	transform,
+	isParameter,
+	isCallExpression,
+	isArrowFunction,
+	isFunctionDeclaration,
+	isFunctionExpression,
+	isBlock,
+	isReturnStatement,
+	isToken,
+	isStringLiteral,
+	isTemplateExpression,
+	isTemplateTail,
+	isImportDeclaration,
+	isImportSpecifier,
+	isTypeAliasDeclaration,
+	isInterfaceDeclaration,
+	isPropertyAccessExpression,
+	isIdentifier
+} from 'typescript'
+import type {
+	ArrowFunction,
+	FunctionExpression,
+	FunctionDeclaration,
+	SourceFile,
+	TransformerFactory,
+	Node,
+	TransformationContext,
+	CallExpression,
+	ParameterDeclaration,
+	StringLiteral,
+	ExpressionStatement,
+	ImportDeclaration,
+	ImportClause,
+	ImportSpecifier,
+	TypeAliasDeclaration,
+	InterfaceDeclaration,
+	PropertyAccessExpression,
+	Identifier,
+	NamedImports
+} from 'typescript'
 
 import type { FunctionStruct, ApiFunctionStruct } from './types'
 import { YAPI_RESPONSE_NAME, YAPI_RESPONSE_TYPE } from '../../constant/config'
 
-type FunctionNode =
-	| ts.ArrowFunction
-	| ts.FunctionExpression
-	| ts.FunctionDeclaration
+type FunctionNode = ArrowFunction | FunctionExpression | FunctionDeclaration
 
-export function getApiPositionList(ast: ts.SourceFile, config?: any) {
+export function getApiPositionList(ast: SourceFile, config?: any) {
 	const result: ApiFunctionStruct[] = []
 	// 遍历所有节点 获取位置
-	const transformer: ts.TransformerFactory<ts.Node> = (
-		context: ts.TransformationContext
+	const transformer: TransformerFactory<Node> = (
+		context: TransformationContext
 	) => {
-		return function visitor(node: ts.Node | ts.CallExpression): ts.Node {
+		return function visitor(node: Node | CallExpression): Node {
 			if (isFunction(node)) {
 				const apiNode = getApiNode(node as FunctionNode, config)
 				if (apiNode) {
@@ -26,10 +64,10 @@ export function getApiPositionList(ast: ts.SourceFile, config?: any) {
 				}
 			}
 
-			return ts.visitEachChild(node, visitor, context)
+			return visitEachChild(node, visitor, context)
 		}
 	}
-	ts.transform(ast, [transformer]) // 记录节点位置
+	transform(ast, [transformer]) // 记录节点位置
 
 	return result
 }
@@ -37,7 +75,7 @@ export function getApiPositionList(ast: ts.SourceFile, config?: any) {
 function getApiNode(node: FunctionNode, config?: any): false | FunctionStruct {
 	const result: FunctionStruct = { apiPath: '', requestFn: 'any' }
 	// 获取参数节点
-	const paramNodes = getTheChildNode(node, ts.isParameter)
+	const paramNodes = getTheChildNode(node, isParameter)
 
 	// 参数大于一的时候不是个正常的接口传参，所以直接返回
 	if (paramNodes.length > 1) {
@@ -47,13 +85,13 @@ function getApiNode(node: FunctionNode, config?: any): false | FunctionStruct {
 	const paramIsTyped =
 		paramNodes.length === 0
 			? true
-			: getIsParamType(paramNodes[0] as ts.ParameterDeclaration)
+			: getIsParamType(paramNodes[0] as ParameterDeclaration)
 
 	if (!paramIsTyped) {
 		result.paramTypeInsertPosition = paramNodes[0].end
 	}
 	// 函数是否有返回类型
-	const respIsTyped = getIsReturnType(node as ts.ArrowFunction)
+	const respIsTyped = getIsReturnType(node as ArrowFunction)
 
 	// 若参数和返回值均定义了类型，则不进行标记
 	if (respIsTyped && paramIsTyped) {
@@ -61,9 +99,9 @@ function getApiNode(node: FunctionNode, config?: any): false | FunctionStruct {
 	}
 	// 存在参数和返回值未定义类型，读取函数体
 	// isCallExpression ()=>request.get('xxx')
-	const [callExpressionNode] = getTheChildNode<ts.CallExpression>(
+	const [callExpressionNode] = getTheChildNode<CallExpression>(
 		node,
-		ts.isCallExpression
+		isCallExpression
 	)
 
 	const hasResGeneric =
@@ -94,14 +132,14 @@ function getApiNode(node: FunctionNode, config?: any): false | FunctionStruct {
 		}
 	}
 	// ()=>{ return request.get('xxx') }
-	const [bodyNode] = getTheChildNode(node, ts.isBlock)
+	const [bodyNode] = getTheChildNode(node, isBlock)
 
 	if (bodyNode) {
-		const [returnNode] = getTheChildNode(bodyNode, ts.isReturnStatement)
+		const [returnNode] = getTheChildNode(bodyNode, isReturnStatement)
 		if (returnNode) {
-			const [callExpressionNode] = getTheChildNode<ts.CallExpression>(
+			const [callExpressionNode] = getTheChildNode<CallExpression>(
 				returnNode,
-				ts.isCallExpression
+				isCallExpression
 			)
 			if (callExpressionNode) {
 				const apiPath = getApiUrlFromExpressionNode(callExpressionNode)
@@ -117,20 +155,20 @@ function getApiNode(node: FunctionNode, config?: any): false | FunctionStruct {
 	return false
 }
 
-function isFunction(node: ts.Node): boolean {
+function isFunction(node: Node): boolean {
 	return (
-		ts.isArrowFunction(node) ||
-		ts.isFunctionExpression(node) ||
-		ts.isFunctionDeclaration(node)
+		isArrowFunction(node) ||
+		isFunctionExpression(node) ||
+		isFunctionDeclaration(node)
 	)
 }
 
 /**
  * @description 获取指定子节点
  */
-function getTheChildNode<T = ts.Node>(
-	parentNode: ts.Node,
-	jugeFn: (node: ts.Node) => any
+function getTheChildNode<T = Node>(
+	parentNode: Node,
+	jugeFn: (node: Node) => any
 ): T[] {
 	const gather: T[] = []
 	parentNode?.forEachChild((node) => {
@@ -144,7 +182,7 @@ function getTheChildNode<T = ts.Node>(
 /**
  * @description 获取接口链接
  */
-function getUrlFromStringNode(node: ts.StringLiteral) {
+function getUrlFromStringNode(node: StringLiteral) {
 	return node?.text || ''
 }
 
@@ -152,35 +190,36 @@ function getUrlFromStringNode(node: ts.StringLiteral) {
  * @description 获取api URL
  */
 function getApiUrlFromExpressionNode(
-	node: ts.ExpressionStatement | ts.CallExpression
+	node: ExpressionStatement | CallExpression
 ) {
-	// ts.isStringLiteral
+	// isStringLiteral
 	const strNodes: any[] = []
-	const identifierNode = getTheChildNode<ts.StringLiteral>(node, ts.isToken)
+	const identifierNode = getTheChildNode<StringLiteral>(node, isToken)
 	if (identifierNode) {
 		strNodes.push(
 			...identifierNode.map((node) =>
-				getUrlFromStringNode(node as ts.StringLiteral)
+				getUrlFromStringNode(node as StringLiteral)
 			)
 		)
 	}
-	const strNode = getTheChildNode<ts.StringLiteral>(node, ts.isStringLiteral)
+	const strNode = getTheChildNode<StringLiteral>(node, isStringLiteral)
 	if (strNode) {
 		strNodes.push(
-			...strNode.map((node) => getUrlFromStringNode(node as ts.StringLiteral))
+			...strNode.map((node) => getUrlFromStringNode(node as StringLiteral))
 		)
 	}
 	// 携带变量
-	const [variableNode] = getTheChildNode<
-		ts.Node & { templateSpans: ts.Node[] }
-	>(node, ts.isTemplateExpression)
+	const [variableNode] = getTheChildNode<Node & { templateSpans: Node[] }>(
+		node,
+		isTemplateExpression
+	)
 	if (variableNode) {
 		const nodes = variableNode?.templateSpans?.map(
-			(node) => getTheChildNode(node, ts.isTemplateTail)?.[0]
+			(node) => getTheChildNode(node, isTemplateTail)?.[0]
 		)
 		strNodes.push(
 			...(nodes?.map((node: any) =>
-				getUrlFromStringNode(node as ts.StringLiteral)
+				getUrlFromStringNode(node as StringLiteral)
 			) || [])
 		)
 	}
@@ -197,14 +236,14 @@ function getApiUrlFromExpressionNode(
 /**
  * @description 判断函数是否有返回类型
  */
-function getIsReturnType(node: ts.ArrowFunction) {
+function getIsReturnType(node: ArrowFunction) {
 	return node.type
 }
 
 /**
  * @description 判断参数是否有定义类型
  */
-function getIsParamType(node: ts.ParameterDeclaration) {
+function getIsParamType(node: ParameterDeclaration) {
 	return node.type
 }
 
@@ -212,24 +251,24 @@ function getIsParamType(node: ts.ParameterDeclaration) {
  * @description 获取函数的返回类型插入点
  */
 function getFnRespInsertPosition(node: FunctionNode) {
-	if (ts.isArrowFunction(node)) {
-		return (node as ts.ArrowFunction).equalsGreaterThanToken.pos
-	} else if (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) {
-		return (node as ts.FunctionExpression).body.pos
+	if (isArrowFunction(node)) {
+		return (node as ArrowFunction).equalsGreaterThanToken.pos
+	} else if (isFunctionDeclaration(node) || isFunctionExpression(node)) {
+		return (node as FunctionExpression).body.pos
 	}
 }
 
 /**
  * @description 查找import的位置
  */
-export async function getImportTypePosition(ast: ts.SourceFile) {
-	const importNodes = getTheChildNode<ts.ImportDeclaration>(
+export async function getImportTypePosition(ast: SourceFile) {
+	const importNodes = getTheChildNode<ImportDeclaration>(
 		ast,
-		ts.isImportDeclaration
+		isImportDeclaration
 	)
 
 	for (const node of importNodes) {
-		const path = (node.moduleSpecifier as ts.StringLiteral)?.text
+		const path = (node.moduleSpecifier as StringLiteral)?.text
 		if (path === './types') {
 			return {
 				type: 'useOld',
@@ -248,20 +287,20 @@ export async function getImportTypePosition(ast: ts.SourceFile) {
 /**
  * @description 查找YapiResponseName
  */
-export function getYapiResponseInfo(ast: ts.SourceFile) {
+export function getYapiResponseInfo(ast: SourceFile) {
 	// 查找import
-	const importNodes = getTheChildNode<ts.ImportDeclaration>(
+	const importNodes = getTheChildNode<ImportDeclaration>(
 		ast,
-		ts.isImportDeclaration
+		isImportDeclaration
 	)
 	for (const node of importNodes) {
-		const path = node.importClause as ts.ImportClause
+		const path = node.importClause as ImportClause
 		const bindingNode = path?.namedBindings
 		const name = path?.name
 		if (bindingNode) {
-			for (const node of getTheChildNode<ts.ImportSpecifier>(
+			for (const node of getTheChildNode<ImportSpecifier>(
 				bindingNode,
-				ts.isImportSpecifier
+				isImportSpecifier
 			)) {
 				if (node.name.escapedText === YAPI_RESPONSE_NAME) {
 					return {
@@ -279,13 +318,13 @@ export function getYapiResponseInfo(ast: ts.SourceFile) {
 		}
 	}
 	// 查找命名变量
-	const typeAliasNode = getTheChildNode<ts.TypeAliasDeclaration>(
+	const typeAliasNode = getTheChildNode<TypeAliasDeclaration>(
 		ast,
-		ts.isTypeAliasDeclaration
+		isTypeAliasDeclaration
 	)
-	const interfaceNode = getTheChildNode<ts.InterfaceDeclaration>(
+	const interfaceNode = getTheChildNode<InterfaceDeclaration>(
 		ast,
-		ts.isInterfaceDeclaration
+		isInterfaceDeclaration
 	)
 	for (const node of [...typeAliasNode, ...interfaceNode]) {
 		if (node.name.escapedText === YAPI_RESPONSE_NAME) {
@@ -306,29 +345,29 @@ export function getYapiResponseInfo(ast: ts.SourceFile) {
 /**
  * @description 获取函数名字
  */
-function getFnName(node: ts.CallExpression): string {
-	const [pNode] = getTheChildNode<ts.PropertyAccessExpression>(
+function getFnName(node: CallExpression): string {
+	const [pNode] = getTheChildNode<PropertyAccessExpression>(
 		node,
-		ts.isPropertyAccessExpression
+		isPropertyAccessExpression
 	)
 	if (pNode) {
 		// 形式 request.get
 		return (
-			(pNode.expression as ts.Identifier).escapedText.toString() +
+			(pNode.expression as Identifier).escapedText.toString() +
 			'.' +
-			(pNode.name as ts.Identifier).escapedText.toString()
+			(pNode.name as Identifier).escapedText.toString()
 		)
 	} else {
 		// 形式 request
-		const [iNode] = getTheChildNode<ts.Identifier>(node, ts.isIdentifier)
+		const [iNode] = getTheChildNode<Identifier>(node, isIdentifier)
 		return iNode.escapedText.toString()
 	}
 }
 
-function getResponseGenericInsertPosition(node: ts.CallExpression) {
-	const [pNode] = getTheChildNode<ts.PropertyAccessExpression>(
+function getResponseGenericInsertPosition(node: CallExpression) {
+	const [pNode] = getTheChildNode<PropertyAccessExpression>(
 		node,
-		ts.isPropertyAccessExpression
+		isPropertyAccessExpression
 	)
 	// http expression.end  http.get 取下级name.end
 	if (pNode) {
@@ -343,12 +382,12 @@ function getResponseGenericInsertPosition(node: ts.CallExpression) {
  * import { a, b, c, d } from './types'
  * @returns { string[] } [a, b, c, d]
  */
-function getNameListFromImportClause(node: ts.ImportClause): string[] {
+function getNameListFromImportClause(node: ImportClause): string[] {
 	try {
 		if (!node) {
 			return []
 		}
-		const nameBindingsNode = node.namedBindings as ts.NamedImports
+		const nameBindingsNode = node.namedBindings as NamedImports
 		if (!nameBindingsNode) {
 			return []
 		}

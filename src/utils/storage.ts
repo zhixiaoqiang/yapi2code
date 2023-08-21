@@ -1,13 +1,13 @@
-import * as vscode from 'vscode'
+import { ExtensionContext } from 'vscode'
 
 import { AllStorageType, StorageType } from '../constant/storage'
 
 type StorageTypePlus = `${AllStorageType}` | `${AllStorageType}_${string}`
 
 class Store<IStorage extends Record<StorageTypePlus, any>> {
-	context: vscode.ExtensionContext | null = null
+	context: ExtensionContext | null = null
 
-	init(context: vscode.ExtensionContext) {
+	init(context: ExtensionContext) {
 		this.context = context
 	}
 	setStorage(key: StorageTypePlus, value: unknown) {

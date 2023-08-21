@@ -1,4 +1,13 @@
-import * as vscode from 'vscode'
+import {
+	commands,
+	Uri,
+	window,
+	workspace,
+	env,
+	WorkspaceEdit,
+	type ExtensionContext,
+	type Range
+} from 'vscode'
 
 import { callWhenActivate, callWhenDeactivate } from './client'
 
@@ -14,7 +23,7 @@ import { GIT_REMOTE_URL } from './constant/github'
 import { MsgType } from './constant/msg'
 import { AllStorageType } from './constant/storage'
 
-import { getProjectRoot } from './common/vscodeapi'
+import { getProjectRoot, registerCommand } from './common/vscodeapi'
 import { CONFIG_FILE_NAME, genConfigTemplate } from './constant/config'
 import { debugRequest } from './debug'
 
@@ -22,7 +31,7 @@ const container: {
 	dove?: Dove
 } = {}
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: ExtensionContext): void {
 	/** 初始化webview */
 	const slideWebview = getSlideBarWebview(context)
 	/** 初始化storage */
@@ -33,53 +42,42 @@ export function activate(context: vscode.ExtensionContext): void {
 	/** 初始化vscode功能 */
 
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(
-			SideBarView.YAPI_VIEW,
-			slideWebview,
-			{
-				webviewOptions: {
-					retainContextWhenHidden: true
-				}
+		window.registerWebviewViewProvider(SideBarView.YAPI_VIEW, slideWebview, {
+			webviewOptions: {
+				retainContextWhenHidden: true
 			}
-		),
-		vscode.commands.registerCommand(Command.WARN_TOAST, (msg: string) => {
-			vscode.window.showWarningMessage(msg)
 		}),
-		vscode.commands.registerCommand(Command.REFRESH, () => {
+		registerCommand(Command.WARN_TOAST, (msg: string) => {
+			window.showWarningMessage(msg)
+		}),
+		registerCommand(Command.REFRESH, () => {
 			// 刷新接口
 			clearComposeRequestCache()
 			slideWebview.freshAll()
 		}),
-		vscode.commands.registerCommand(Command.GITHUB, () => {
+		registerCommand(Command.GITHUB, () => {
 			// 访问github
-			vscode.env.openExternal(vscode.Uri.parse(GIT_REMOTE_URL))
+			env.openExternal(Uri.parse(GIT_REMOTE_URL))
 		}),
-		vscode.commands.registerCommand(Command.LOGOUT, () => {
+		registerCommand(Command.LOGOUT, () => {
 			// 退出登录
 			clearComposeRequestCache()
 			storage.clearAll()
-			vscode.commands.executeCommand(
-				'setContext',
-				ContextEnum.SHOW_TREE_VIEW,
-				false
-			)
+			commands.executeCommand('setContext', ContextEnum.SHOW_TREE_VIEW, false)
 			slideWebview.dove?.sendMessage(MsgType.LOGIN_STATUS, false)
 		}),
-		vscode.commands.registerCommand(Command.CONFIGURATION, async () => {
+		registerCommand(Command.CONFIGURATION, async () => {
 			const rootWorkspace = await getProjectRoot()
-			const configFile = vscode.Uri.joinPath(
-				rootWorkspace.uri,
-				CONFIG_FILE_NAME
-			)
+			const configFile = Uri.joinPath(rootWorkspace.uri, CONFIG_FILE_NAME)
 
-			const exists = await vscode.workspace.fs.stat(configFile).then(
+			const exists = await workspace.fs.stat(configFile).then(
 				() => true,
 				() => false
 			)
 			if (exists) {
-				await vscode.window.showTextDocument(configFile)
+				await window.showTextDocument(configFile)
 			} else {
-				const answer = await vscode.window.showWarningMessage(
+				const answer = await window.showWarningMessage(
 					`${configFile.fsPath} 不存在，是否创建?`,
 					'是',
 					'否',
@@ -90,44 +88,41 @@ export function activate(context: vscode.ExtensionContext): void {
 					const encoder = new TextEncoder()
 
 					const config = await getConfiguration()
-					await vscode.workspace.fs.writeFile(
+					await workspace.fs.writeFile(
 						configFile,
 						encoder.encode(genConfigTemplate(config))
 					)
-					await vscode.window.showTextDocument(configFile)
+					await window.showTextDocument(configFile)
 				} else if (answer === '预览') {
-					vscode.commands.executeCommand(Command.CONFIGURATION_PREVIEW)
+					commands.executeCommand(Command.CONFIGURATION_PREVIEW)
 				} else if (answer === 'workspace Setting') {
 					// open in workspace setting
-					vscode.commands.executeCommand(
+					commands.executeCommand(
 						'workbench.action.openWorkspaceSettings',
 						'yapi'
 					)
 				}
 			}
 		}),
-		vscode.commands.registerCommand(Command.CONFIGURATION_PREVIEW, async () => {
+		registerCommand(Command.CONFIGURATION_PREVIEW, async () => {
 			const config = await getConfiguration()
 
 			const content = genConfigTemplate(config)
-			const document = await vscode.workspace.openTextDocument({
+			const document = await workspace.openTextDocument({
 				language: 'typescript',
 				content
 			})
 
-			vscode.window.showTextDocument(document)
+			window.showTextDocument(document)
 		}),
 
-		vscode.commands.registerCommand(
-			Command.INSERT_TYPE,
-			async ({ filePath, text }) => {
-				// 写入类型文本到文件
-				await writeFile(filePath, text)
-			}
-		),
+		registerCommand(Command.INSERT_TYPE, async ({ filePath, text }) => {
+			// 写入类型文本到文件
+			await writeFile(filePath, text)
+		}),
 
-		vscode.commands.registerCommand(Command.FIX_ALL, async () => {
-			const uri = vscode.window.activeTextEditor?.document.uri
+		registerCommand(Command.FIX_ALL, async () => {
+			const uri = window.activeTextEditor?.document.uri
 			if (!container.dove || !uri) {
 				return
 			}
@@ -138,17 +133,17 @@ export function activate(context: vscode.ExtensionContext): void {
 				url
 			)
 			const diags = fixs?.filter((item) => item.isPreferred) || []
-			const edit = new vscode.WorkspaceEdit()
+			const edit = new WorkspaceEdit()
 
 			for (let i = 0; i < diags.length; i++) {
 				const diag = diags[i]
 				const changes: {
-					range: vscode.Range
+					range: Range
 					newText: string
 				}[] = diag.edit.changes[url]
 				const commandInfo = diag.command
 				// 写入类型文件
-				await vscode.commands.executeCommand(
+				await commands.executeCommand(
 					Command.INSERT_TYPE,
 					commandInfo.arguments[0]
 				)
@@ -160,16 +155,16 @@ export function activate(context: vscode.ExtensionContext): void {
 					edit.replace(uri, item.range, item.newText)
 				})
 			}
-			await vscode.workspace.applyEdit(edit)
+			await workspace.applyEdit(edit)
 		}),
 		// 保存文件
-		vscode.workspace.onDidSaveTextDocument((e) => {
+		workspace.onDidSaveTextDocument((e) => {
 			const absPath = e.uri.scheme + '://' + e.uri.fsPath
 			if (container.dove) {
 				diagnoseBaseInputFiles([absPath])
 			}
 		}),
-		vscode.workspace.onDidDeleteFiles((e) => {
+		workspace.onDidDeleteFiles((e) => {
 			const deleteFiles = e.files?.map(
 				(file) => file.scheme + '://' + file.fsPath
 			)
@@ -210,7 +205,7 @@ export function activate(context: vscode.ExtensionContext): void {
 			)) || []
 
 		const results = fileTypeList?.[0]?.map((file) => file)
-		const rootPath = getWorkspaceFolder(vscode.Uri.parse(results?.[0]?.uri))
+		const rootPath = getWorkspaceFolder(Uri.parse(results?.[0]?.uri))
 
 		const replaceRex = rootPath?.uri?.scheme + '://' + rootPath?.uri?.fsPath
 		const finalRet: ApiTypeList = results?.map((i) => ({
@@ -261,7 +256,7 @@ export function deactivate() {
 // const config = await getConfiguration()
 // 	storage.setStorage(AllStorageType.WORKSPACE_CONFIG, config)
 
-// 	vscode.workspace.onDidChangeConfiguration((e) => {
+// 	workspace.onDidChangeConfiguration((e) => {
 // 		if (e.affectsConfiguration('yapi')) {
 //			const config = await getConfiguration()
 // 			storage.setStorage(
@@ -277,7 +272,7 @@ async function getApiFileList() {
 	const fileList: string[] = []
 	// '**/*{.ts,.tsx}' 检测所有的 ts tsx 文件
 	// '**/*[!(.d)]{.ts,.tsx}' 检测所有的不包含 .d 的 ts tsx 文件
-	const filesFromApiFile = await vscode.workspace.findFiles(
+	const filesFromApiFile = await workspace.findFiles(
 		'**/*[!(.d)]{.ts,.tsx}',
 		'**​/node_modules/**',
 		200
