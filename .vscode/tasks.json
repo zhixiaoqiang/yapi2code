@@ -3,8 +3,9 @@
   "tasks": [
       {
           // 定义 npm: watch
-          "type": "npm",
-          "script": "watch",
+          "label": "start watch",
+          "type": "shell",
+          "command": "source ~/.zshrc && nvm use 16 && npm run watch",
           "problemMatcher": {
               "owner": "typescript",
               "pattern":[
@@ -22,6 +23,12 @@
                   "endsPattern": "ms"
               }
           },
+          "options": {
+            "env": {
+              "NODE_ENV": "development",
+              "DEBUG": "*"
+            }
+          },
           "isBackground": true,
           "presentation": {
               "reveal": "never"
@@ -31,5 +38,6 @@
               "isDefault": true
           }
       }
-  ]
+  ],
+  "runtimeVersion": "2.0.0"
 }

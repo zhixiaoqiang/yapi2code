@@ -113,6 +113,7 @@ dove.subscribe(MsgType.FIX_ALL, async (uri: string) => {
 
 //关闭文件时清空储存
 documents.onDidClose((change) => {
+	console.log('关闭文件时清空储存')
 	const uri = change.document.uri
 	store.remove(uri)
 })
@@ -299,6 +300,7 @@ function getSubName(diagMap: any, name: string, init = 1): string {
 
 /** 保存获取接口列表进行校验 */
 dove.subscribe(MsgType.API_FILE_HANDLER, async (apiFileList: any) => {
+	console.log('保存获取接口列表进行校验')
 	const results = await Promise.all(
 		apiFileList?.map(async (file: string) => {
 			// 获取项目yapi配置
