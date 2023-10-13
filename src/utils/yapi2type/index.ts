@@ -6,7 +6,8 @@ import {
 	getTypeNameData,
 	resBodySubProp2type,
 	AllTypeNode,
-	updateUseTab
+	updateUseTab,
+	resFormBody2type
 } from './json2type'
 
 import storage from '../../utils/storage'
@@ -178,7 +179,12 @@ export function data2Type(data: DetailData, config?: IConfig) {
 				parseJson(data.req_body_other)
 		  )}`
 		: ''
-
+	const reqBodyFormType = data.req_body_form?.length
+		? `${formatInterfaceComment(data, 'post请求体')}\n${resFormBody2type(
+				interfaceName,
+				data.req_body_form
+		  )}`
+		: ''
 	const parseResBody = parseJson(data.res_body)
 	const resBodyType = data.res_body
 		? `${formatInterfaceComment(data, '响应体')}\n${resBody2type(
@@ -217,7 +223,7 @@ export function data2Type(data: DetailData, config?: IConfig) {
 		dataType: isReturnResDataProp
 			? getNestData(parseResBody, dataKey).type
 			: parseResBody?.type,
-		hasReqType: !!(reqQueryType || reqBodyType),
+		hasReqType: !!(reqQueryType || reqBodyType || reqBodyFormType),
 		hasResType: !!(reqBodyType || resBodyDataType),
 		typeNameSuffix: isReturnResDataProp ? 'ResData' : 'ResBody',
 		...config
@@ -225,7 +231,7 @@ export function data2Type(data: DetailData, config?: IConfig) {
 
 	return {
 		reqQueryType,
-		reqBodyType,
+		reqBodyType: reqBodyType || reqBodyFormType,
 		resBodyType,
 		resBodyDataType,
 		resType,

@@ -71,7 +71,9 @@ const YapiTypeMapBasicTsType = {
 const YapiTypeMapTsType = {
 	...YapiTypeMapBasicTsType,
 	[YapiDataType.Array]: '[]',
-	[YapiDataType.Object]: 'Record<string, any>'
+	[YapiDataType.Object]: 'Record<string, any>',
+	int64: 'number',
+	text: 'string'
 }
 
 export function isBasicType(
@@ -149,7 +151,10 @@ function getTypeNode(
 	tabCount = 0,
 	hadAddTabCount = false
 ): string {
-	node.type = node.type.toLowerCase() as `${YapiDataType}`
+	node.type =
+		typeof node.type === 'string'
+			? (node.type.toLowerCase() as `${YapiDataType}`)
+			: ('string' as `${YapiDataType}`)
 
 	if (isBasicType(node.type)) {
 		return YapiTypeMapBasicTsType[node.type] || 'any'
@@ -184,6 +189,31 @@ function getTypeNode(
 	return ''
 }
 
+function getFormTypeNode(
+	reqFormBody: {
+		required: '0' | '1'
+		_id: string
+		name: string
+		type: YapiDataType
+		example: string
+		desc: string
+	}[]
+) {
+	if (!reqFormBody) {
+		return ''
+	}
+
+	return `{${reqFormBody.map((item) => {
+		const comment = formatComment(item.desc, 1)
+		const key = item.required === '0' ? `${item.name}?` : item.name
+		return `${comment}\n${formatTabSpace(1)}${key}: ${
+			YapiTypeMapTsType[item.type]
+		}`
+	})}}`
+
+	return ''
+}
+
 /**
  * @description POST请求体转化typescript interface
  */
@@ -197,6 +227,22 @@ export function resBody2type(
 	const result = `export ${typeNameData.type} ${
 		typeNameData.name
 	} ${getTypeNode(resBody)}`
+
+	return result
+}
+/**
+ * @description FORM POST请求体转化typescript interface
+ */
+export function resFormBody2type(
+	typeName: string,
+	resBody: any[],
+	suffix = 'ResBody'
+) {
+	const typeNameData = getTypeNameData(typeName, 'object', suffix)
+
+	const result = `export ${typeNameData.type} ${
+		typeNameData.name
+	} ${getFormTypeNode(resBody)}`
 
 	return result
 }
@@ -256,5 +302,12 @@ export function resBodySubProp2type(
  * @description POST响应体转化typescript interface
  */
 export function reqBody2type(typeName: string, reqBody: ReqBody) {
+	return resBody2type(typeName, reqBody, 'ReqBody')
+}
+
+/**
+ * @description FROM POST响应体转化typescript interface
+ */
+export function reqFormBody2type(typeName: string, reqBody: ReqBody) {
 	return resBody2type(typeName, reqBody, 'ReqBody')
 }
