@@ -4,8 +4,8 @@
       {
           // 定义 npm: watch
           "label": "start watch",
-          "type": "shell",
-          "command": "source ~/.zshrc && nvm use 16 && npm run watch",
+          "type": "npm",
+          "script": "watch",
           "problemMatcher": {
               "owner": "typescript",
               "pattern":[
