@@ -35,7 +35,6 @@
     "lint-fix": "eslint --fix './**/*.{js?(x),ts?(x),mjs}' --cache",
     "markdownlint-fix": "markdownlint-cli2-fix",
     "package": "vsce package --no-dependencies",
-    "prepare": "husky install",
     "pub": "vsce publish --no-dependencies",
     "sort-package-json": "sort-package-json '**/package.json'",
     "start": "rspack build --watch true",
@@ -216,6 +215,10 @@
     "onLanguage:typescript",
     "onLanguage:typescriptreact"
   ],
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged",
+    "commit-msg": "npx commitlint --config commitlint.config.cjs --edit"
+  },
   "dependencies": {
     "axios": "^1.11.0",
     "debug": "^4.4.1",
@@ -250,12 +253,12 @@
     "eslint-plugin-prettier": "^5.5.3",
     "eslint-plugin-react": "^7.37.5",
     "fast-glob": "^3.3.3",
-    "husky": "9.1.7",
     "lint-staged": "16.1.2",
     "markdownlint-cli2": "^0.18.1",
     "mocha": "^11.7.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
+    "simple-git-hooks": "^2.13.1",
     "sort-package-json": "3.4.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
