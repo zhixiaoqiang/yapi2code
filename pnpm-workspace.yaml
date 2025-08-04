@@ -1,3 +1,10 @@
 packages:
-  - "src/server"
-  - "src/webview"
+  - src/server
+  - src/webview
+
+onlyBuiltDependencies:
+  - '@vscode/vsce-sign'
+  - core-js-pure
+  - esbuild
+  - keytar
+  - simple-git-hooks
