@@ -37,7 +37,7 @@
 
 初次使用，输入 yapi 的服务地址 & 账号密码，进行登录
 
-<img src="./public/login.png" width="300" />
+<img src="./public/login.png" width="300" alt=""/>
 
 ## 使用
 
@@ -47,19 +47,19 @@
 
 Yapi To Code 对文档中未定义参数类型或返回值类型的接口进行波浪形警告，可以通过快速修复（quick fix）直接添加接口类型到项目中。
 
-<img src="https://qnm.hunliji.com/FnOC3c1bW5bzpRu23iArFXKTrMZH" width="800" />
+<img src="https://qnm.hunliji.com/FnOC3c1bW5bzpRu23iArFXKTrMZH" width="800" alt=""/>
 
 #### 接口浏览器
 
 Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口对接口类型进行预览，然后把类型复制到项目中。
 
-<img src="https://qnm.hunliji.com/FtK9IFJlRvKdPCA4jLNoEXs1xyKO" width="800" />
+<img src="https://qnm.hunliji.com/FtK9IFJlRvKdPCA4jLNoEXs1xyKO" width="800" alt=""/>
 
 ##### 新窗口中打开
 
 默认接口都会在一个窗口预览，有时候需要在新窗口中预览则可以点击如下 Icon
 
-<img src="./public/api-blank.png" width="300" />
+<img src="./public/api-blank.png" width="300" alt=""/>
 
 ##### 定向刷新 & 清除
 
@@ -67,13 +67,13 @@ Yapi To Code 还提供了接口预览的功能，可以通过搜索选择接口�
 
 清除操作仅静态删除子项内容
 
-<img src="./public/tree-contextMenu.png" width="300" />
+<img src="./public/tree-contextMenu.png" width="300" alt=""/>
 
 #### 自定义渲染
 
 工作区配置：可以修改 输出的字段、类型填充的位置等
 
-<img src="./public/config.png" width="300" />
+<img src="./public/config.png" width="300" alt=""/>
 
 </br>
 
@@ -92,7 +92,7 @@ module.exports = () => {
   responseKey: 'all',
   /** 生成 res 指定的属性值，仅当 responseKey 选择 custom 是有效，默认 data, 可指定为任意 key(支持链式：data.result) */
   responseCustomKey: 'data',
-  /** resType 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
+  /** resDataTypeContent 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
    * 'outerFunction' | 'fetchMethodGeneric'
    */
   responseTypePosition: 'outerFunction',

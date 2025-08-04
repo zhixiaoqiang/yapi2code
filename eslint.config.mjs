@@ -14,5 +14,7 @@ export default antfu({
     'ts/no-use-before-define': 1,
     'style/no-mixed-spaces-and-tabs': 1,
     'no-console': 0,
+    'unused-imports/no-unused-vars': 1,
+    'no-eval': 1,
   },
 })
