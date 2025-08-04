@@ -75,7 +75,7 @@ export const DEFAULT_CONFIG: IConfig = {
 export const YAPI_RESPONSE_NAME = 'YapiResponse'
 
 export function genConfigTemplate(config: IConfig = DEFAULT_CONFIG) {
-  return `module.exports = () => {
+  const configTemplate = `module.exports = () => {
 	return {
 		/** 域名：优先取工作区缓存的域名(登录成功的域名) */
 		host: '${config.host}',
@@ -95,8 +95,12 @@ export function genConfigTemplate(config: IConfig = DEFAULT_CONFIG) {
 		format: ${config.format},
 		/** 缩进使用 tab，或者 双空格 */
 		useTab: ${config.useTab},
-		/** 自定义生成 request 方法 */
-		genRequest(
+		/** 自定义生成 request 方法 */${
+      config.genRequest
+        ? `
+    ${config.genRequest?.toString()}`
+        : `
+    genRequest(
 			{
 				comment,
 				fnName,
@@ -107,13 +111,17 @@ export function genConfigTemplate(config: IConfig = DEFAULT_CONFIG) {
 			},
 			data
 		) {
+      const params = IReqTypeName ? \`data: \${IReqTypeName}\` : ''
+      const dataContent = IResTypeName ? 'data' : ''
 			return (
-				\`\\n\${comment}\\n\` +
-				\`export async function \${fnName}(params: I\${IReqTypeName}) {
-					return request.\${requestMethod}<\${IResTypeName}>('\${apiPath}', params)
-				}\`
+				\`\\n\${comment}\\n
+export async function \${fnName}(\${params}) {
+  return request.\${requestMethod}<\${IResTypeName}>('\${apiPath}', '\${dataContent}')
+}\`
 			)
-		}
-	}
+		}`
+    }}
 }`
+
+  return configTemplate
 }
