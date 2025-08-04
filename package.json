@@ -33,7 +33,7 @@
     "preinstall": "npx only-allow pnpm",
     "lint": "eslint src --ext ts",
     "lint-fix": "eslint --fix './**/*.{js?(x),ts?(x),mjs}' --cache",
-    "markdownlint-fix": "markdownlint-cli2-fix",
+    "markdownlint-fix": "markdownlint-cli2 --fix",
     "package": "vsce package --no-dependencies",
     "pub": "vsce publish --no-dependencies",
     "sort-package-json": "sort-package-json '**/package.json'",
