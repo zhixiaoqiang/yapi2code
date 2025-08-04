@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.0.33
+
+### Patch Changes
+
+- chore: 升级依赖及配套修改
+- feat: 优化打开文档交互体验
+- feat: 拆分yapi相关函数，统一上层数据确保底下拿到的是一致的数据以解决生成不稳定的问题
+
 ## 0.0.32
 
 ### Patch Changes
