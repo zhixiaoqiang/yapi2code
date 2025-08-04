@@ -70,8 +70,8 @@ function genRequest(data: YapiDetailResData,	options: genRequestOptionsType) {
  * @url ${getApiUrl(data)}
  */`,
     fnName,
-    IReqTypeName,
-    IResTypeName,
+    IReqTypeName: hasReqType ? IReqTypeName : '',
+    IResTypeName: hasResType ? IResTypeName : '',
     requestMethod: data.method.toLowerCase(),
     requestFnName: data.method.toLowerCase(),
     apiPath: data?.path,

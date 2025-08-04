@@ -1,7 +1,7 @@
 {
   "name": "yapi-to-code",
   "displayName": "Yapi to Code",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "private": true,
   "description": "基于 YApi 生成 ts/dart/...",
   "categories": [
@@ -86,7 +86,7 @@
         "yapi.host": {
           "order": 0,
           "type": "string",
-          "default": "http://yapi.internal.weimob.com",
+          "default": "http://yapi.internal.com",
           "markdownDescription": "域名：优先取工作区缓存的域名(登录成功的域名)",
           "scope": "resource"
         },

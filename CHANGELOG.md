@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.34
+
+### Patch Changes
+
+- feat: 修正 request 函数生成, 支持正确的预览完整的配置
+
 ## 0.0.33
 
 ### Patch Changes

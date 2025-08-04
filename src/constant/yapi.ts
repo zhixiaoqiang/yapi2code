@@ -1,5 +1,5 @@
 /** 默认host */
-export const YAPI_DEFAULT_SERVER_URL = 'http://yapi.internal.weimob.com'
+export const YAPI_DEFAULT_SERVER_URL = 'http://yapi.internal.com'
 
 /** 是否 LDAP 登录 */
 export const LOGIN_BY_LDAP = true
