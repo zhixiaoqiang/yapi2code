@@ -1,7 +1,7 @@
 {
   "name": "yapi-to-code",
   "displayName": "Yapi to Code",
-  "version": "0.0.31",
+  "version": "0.0.33",
   "private": true,
   "description": "基于 YApi 生成 ts/dart/...",
   "categories": [
