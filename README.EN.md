@@ -82,7 +82,7 @@ Config file：`yapi-to-code.config.cjs` **priority**
 module.exports = () => {
  return {
   /** 域名：优先取工作区缓存的域名(登录成功的域名) */
-  host: 'http://yapi.internal.weimob.com',
+  host: 'http://yapi.internal.com',
   /** banner 头部内容，可以填写导入的请求实例等 */
   banner: '',
   /** 生成 res 包含的属性，默认 all, 可指定为 data、custom
@@ -111,11 +111,13 @@ module.exports = () => {
    },
    data
   ) {
+  const params = IReqTypeName ? `data: ${IReqTypeName}` : ''
+  const dataContent = IResTypeName ? 'data' : ''
    return (
-    `\n${comment}\n` +
-        `export async function ${fnName}(params: I${IReqTypeName}) {
-          return request.${requestFnName}<${IResTypeName}>('${apiPath}', params)
-        }`
+    `\n${comment}\n
+export async function ${fnName}(${params}) {
+  return request.${requestFnName}<${IResTypeName}>('${apiPath}', ${dataContent})
+}`
    )
   }
  }
