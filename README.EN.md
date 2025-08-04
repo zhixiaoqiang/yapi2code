@@ -36,7 +36,7 @@
 
 For the first time use, enter the service address & account password of YAPI to log in.
 
-<img src="./public/login.png" width="300" />
+<img src="./public/login.png" width="300" alt=""/>
 
 ## Usage
 
@@ -46,19 +46,19 @@ After logging in, vscode has the ability to access YAPI interfaces and can autom
 
 Yapi To Code warns of undefined parameter types or return value types in the document in a wavy form, and can directly add interface types to the project through quick fixes.
 
-<img src="https://qnm.hunliji.com/FnOC3c1bW5bzpRu23iArFXKTrMZH" width="800" />
+<img src="https://qnm.hunliji.com/FnOC3c1bW5bzpRu23iArFXKTrMZH" width="800" alt=""/>
 
 #### Interface Browser
 
 Yapi To Code also provides an interface preview function. You can preview the interface type by searching and selecting the interface, and then copy the type to the project.
 
-<img src="https://qnm.hunliji.com/FtK9IFJlRvKdPCA4jLNoEXs1xyKO" width="800" />
+<img src="https://qnm.hunliji.com/FtK9IFJlRvKdPCA4jLNoEXs1xyKO" width="800" alt=""/>
 
 ##### Open in New Window
 
 By default, interfaces are previewed in the same window. If you need to preview in a new window, you can click on the following Icon:
 
-<img src="./public/api-blank.png" width="300" />
+<img src="./public/api-blank.png" width="300" alt=""/>
 
 ##### Refresh & Clear Directives
 
@@ -66,13 +66,13 @@ Sometimes, when certain interfaces are updated, you may need to refresh specific
 
 The clear operation only deletes the content of child items permanently.
 
-<img src="./public/tree-contextMenu.png" width="300" />
+<img src="./public/tree-contextMenu.png" width="300" alt=""/>
 
 #### Custom Rendering
 
 Workspace configuration: You can modify the output fields, the position of the type filling, etc.
 
-<img src="./public/config.png" width="300" />
+<img src="./public/config.png" width="300" alt="" />
 
 </br>
 
@@ -91,7 +91,7 @@ module.exports = () => {
   responseKey: 'all',
   /** 生成 res 指定的属性值，仅当 responseKey 选择 custom 是有效，默认 data, 可指定为任意 key(支持链式：data.result) */
   responseCustomKey: 'data',
-  /** resType 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
+  /** resDataTypeContent 放置的位置是外层的 Promise<T> 还是作为请求方法的泛型 post<T>
    * 'outerFunction' | 'fetchMethodGeneric'
    */
   responseTypePosition: 'outerFunction',
